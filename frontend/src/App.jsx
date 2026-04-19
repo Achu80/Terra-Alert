@@ -1,120 +1,100 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            🌍 GeoSafe - Landslide Risk Prediction
+          </h1>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        {/* Hero Section */}
+        <div className="card mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Welcome to GeoSafe
+          </h2>
+          <p className="text-gray-600 mb-6">
+            AI-powered landslide risk prediction using real-time satellite data from Google Earth Engine.
           </p>
+          
+          {/* Test Counter */}
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg p-6 text-white">
+            <h3 className="text-xl font-semibold mb-4">Tailwind CSS Test</h3>
+            <p className="mb-4">Count: {count}</p>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setCount(count + 1)}
+                className="btn-primary"
+              >
+                Increment
+              </button>
+              <button 
+                onClick={() => setCount(0)}
+                className="btn-secondary"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
         </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        {/* Feature Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="card hover:shadow-lg transition-shadow">
+            <div className="text-4xl mb-4">🛰️</div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Real-time Data
+            </h3>
+            <p className="text-gray-600">
+              Fetches live satellite data from Google Earth Engine
+            </p>
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <div className="card hover:shadow-lg transition-shadow">
+            <div className="text-4xl mb-4">🤖</div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              AI Prediction
+            </h3>
+            <p className="text-gray-600">
+              XGBoost model trained on historical landslide data
+            </p>
+          </div>
+
+          <div className="card hover:shadow-lg transition-shadow">
+            <div className="text-4xl mb-4">🗺️</div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Interactive Map
+            </h3>
+            <p className="text-gray-600">
+              Click anywhere to get landslide risk assessment
+            </p>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        {/* Status Section */}
+        <div className="mt-8 card bg-green-50 border-2 border-green-200">
+          <div className="flex items-center gap-3">
+            <div className="text-3xl">✅</div>
+            <div>
+              <h3 className="text-lg font-semibold text-green-900">
+                Tailwind CSS Installed Successfully!
+              </h3>
+              <p className="text-green-700">
+                Your frontend is ready for development. Backend API is running on http://localhost:5000
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   )
 }
 
