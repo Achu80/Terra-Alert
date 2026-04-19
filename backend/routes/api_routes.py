@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from services.gee_service import GEEService
+from services.model_service import ModelService
 from utils.data_processor import DataProcessor
-from utils.mock_data import get_mock_prediction
 from database.repositories import (
     DistrictRepository, 
     RiskHistoryRepository, 
@@ -14,13 +14,15 @@ import os
 
 api_bp = Blueprint('api', __name__)
 
-# Check if mock mode is enabled
-MOCK_MODE = os.getenv('MOCK_MODE', 'false').lower() == 'true'
-
 # Initialize services
 gee_project_id = os.getenv('GEE_PROJECT_ID')
-gee_service = GEEService(project_id=gee_project_id) if not MOCK_MODE else None
+gee_service = GEEService(project_id=gee_project_id)
 data_processor = DataProcessor()
+model_service = ModelService()
+
+# Load ML models on startup
+print("Loading ML models...")
+model_service.load_models()
 
 # Initialize repositories
 district_repo = DistrictRepository()
@@ -28,6 +30,7 @@ history_repo = RiskHistoryRepository()
 alert_repo = AlertRepository()
 settings_repo = SettingsRepository()
 stats_repo = StatsRepository()
+
 
 @api_bp.route('/health')
 def health():
@@ -113,8 +116,17 @@ def process_gee_data():
 @api_bp.route('/predict', methods=['POST'])
 def predict():
     """
-    Dynamic prediction for ANY location
+    Dynamic landslide prediction for ANY location
     User clicks anywhere on map, gets real-time prediction
+    
+    Request body:
+    {
+        "lat": 19.0760,
+        "lon": 72.8777,
+        "days_back": 30,  // optional
+        "buffer": 1000,   // optional
+        "use_cache": true // optional
+    }
     """
     try:
         data = request.json
@@ -124,31 +136,34 @@ def predict():
         # Optional parameters
         days_back = data.get('days_back', 30)
         buffer = data.get('buffer', 1000)
-        use_cache = data.get('use_cache', True)  # Enable caching by default
+        use_cache = data.get('use_cache', True)
         
         if not all([lat, lon]):
             return jsonify({'error': 'Missing lat/lon coordinates'}), 400
         
         # Check cache first (optional but recommended)
         if use_cache:
-            from database.cache_repository import PredictionCache
-            cache = PredictionCache()
-            cached_result = cache.get_cached(lat, lon, max_age_hours=2)
-            
-            if cached_result:
-                return jsonify({
-                    **cached_result['prediction_data'],
-                    'cached': True,
-                    'cache_age': cached_result['created_at']
-                })
+            try:
+                from database.cache_repository import PredictionCache
+                cache = PredictionCache()
+                cached_result = cache.get_cached(lat, lon, max_age_hours=2)
+                
+                if cached_result:
+                    return jsonify({
+                        **cached_result['prediction_data'],
+                        'cached': True,
+                        'cache_age': cached_result['created_at']
+                    })
+            except:
+                pass  # Cache not available, continue
         
         # Auto-calculate date range
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days_back)
         
-        # Step 1: Fetch live GEE data for this exact location
+        # Step 1: Fetch ALL features from GEE
         print(f"Fetching GEE data for location: {lat}, {lon}")
-        gee_data = gee_service.get_satellite_data(
+        gee_data = gee_service.get_all_features(
             lat, lon,
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d'),
@@ -161,40 +176,56 @@ def predict():
         # Step 2: Process data for model
         processed_data = data_processor.prepare_model_input(gee_data)
         
-        # Step 3: Make prediction (TODO: implement when model is ready)
-        # from services.model_service import ModelService
-        # model_service = ModelService()
-        # prediction = model_service.predict(processed_data['features'])
+        if not processed_data:
+            return jsonify({'error': 'Failed to process GEE data'}), 500
         
-        # For now, return mock prediction based on features
-        # You can replace this with real model later
-        mock_score = min(100, max(0, sum(processed_data['features'][:3]) * 10))
-        mock_level = 'CRITICAL' if mock_score >= 80 else 'HIGH' if mock_score >= 60 else 'MODERATE' if mock_score >= 40 else 'LOW'
+        # Step 3: Make prediction with ML model
+        prediction = model_service.predict(processed_data['features'])
         
+        # Build response
         result = {
-            'location': {'lat': lat, 'lon': lon},
+            'location': {
+                'lat': lat,
+                'lon': lon
+            },
             'date_range': {
                 'start': start_date.strftime('%Y-%m-%d'),
                 'end': end_date.strftime('%Y-%m-%d')
             },
             'prediction': {
-                'score': round(mock_score, 1),
-                'level': mock_level,
-                'confidence': 0.85  # Mock confidence
+                'score': prediction['score'],
+                'level': prediction['level'],
+                'confidence': prediction['confidence']
             },
-            'features': processed_data['features'],
-            'feature_names': processed_data['feature_names'],
+            'model_scores': prediction['model_scores'],
+            'features': {
+                'values': processed_data['features'],
+                'names': processed_data['feature_names'],
+                'normalized': processed_data['normalized_features']
+            },
+            'derived_features': processed_data['derived_features'],
             'raw_data': processed_data['raw_data'],
-            'cached': False
+            'cached': False,
+            'timestamp': datetime.utcnow().isoformat()
         }
+        
+        # Add mock indicator if using mock predictions
+        if prediction.get('mock'):
+            result['warning'] = 'Using mock prediction - ML models not loaded'
         
         # Save to cache for future requests
         if use_cache:
-            cache.save_prediction(lat, lon, result)
+            try:
+                cache.save_prediction(lat, lon, result)
+            except:
+                pass  # Cache save failed, but prediction succeeded
         
         return jsonify(result)
     
     except Exception as e:
+        import traceback
+        print(f"Error in predict endpoint: {e}")
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/alerts', methods=['GET'])
