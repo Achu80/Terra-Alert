@@ -12,24 +12,27 @@ df = pd.read_csv('landslides_combined.csv')
 print("Dataset loaded:", df.shape)
 
 # Drop metadata columns (NOT features)
+# Drop metadata AND geometry columns
 metadata_cols = ['event_id', 'point_id', 'event_date', 'latitude', 'longitude', 
-                 'landslide_trigger', 'landslide_size', 'fatality_count', 'admin_division_name']
+                 'landslide_trigger', 'landslide_size', 'fatality_count', 
+                 'admin_division_name', 'system:index', '.geo']
 
 df_clean = df.drop(columns=metadata_cols, errors='ignore')
 
 # Handle missing values
-df_clean['soil_type'].fillna(df_clean['soil_type'].mode()[0], inplace=True)
-df_clean['population'].fillna(0, inplace=True)
-df_clean['ndvi'].fillna(df_clean['ndvi'].median(), inplace=True)
-df_clean['ndwi'].fillna(df_clean['ndwi'].median(), inplace=True)
+df_clean = df_clean.copy()
+df_clean['soil_type'] = df_clean['soil_type'].fillna(df_clean['soil_type'].mode()[0])
+df_clean['population'] = df_clean['population'].fillna(0)
+df_clean['ndvi'] = df_clean['ndvi'].fillna(df_clean['ndvi'].median())
+df_clean['ndwi'] = df_clean['ndwi'].fillna(df_clean['ndwi'].median())
 df_clean[['rainfall_3d', 'rainfall_7d', 'rainfall_14d', 'rainfall_30d']] = \
     df_clean[['rainfall_3d', 'rainfall_7d', 'rainfall_14d', 'rainfall_30d']].fillna(0)
-df_clean['elevation'].fillna(df_clean['elevation'].median(), inplace=True)
-df_clean['slope'].fillna(df_clean['slope'].median(), inplace=True)
-df_clean['aspect'].fillna(df_clean['aspect'].median(), inplace=True)
+df_clean['elevation'] = df_clean['elevation'].fillna(df_clean['elevation'].median())
+df_clean['slope'] = df_clean['slope'].fillna(df_clean['slope'].median())
+df_clean['aspect'] = df_clean['aspect'].fillna(df_clean['aspect'].median())
 
 # Drop road_distance (placeholder)
-df_clean = df_clean.drop(columns=['road_distance_m'], errors='ignore')
+df_clean = df_clean.drop(columns=['road_distance_m', 'population'], errors='ignore')
 
 # Separate features and target
 X = df_clean.drop(columns=['label'])

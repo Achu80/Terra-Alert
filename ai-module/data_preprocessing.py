@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load datasets
-df_landslides = pd.read_csv('landslide_ALL_features_north_india.csv.csv')
+df_landslides = pd.read_csv('landslide_north_india.csv')
 df_non_landslides = pd.read_csv('non_landslide_constrained_north_india.csv')
 
 # Add label column if missing
