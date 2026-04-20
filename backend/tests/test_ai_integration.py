@@ -22,8 +22,8 @@ def test_complete_pipeline():
     print("=" * 70)
     
     # Test location (example: Mumbai area)
-    lat = 19.0760
-    lon = 72.8777
+    lat = 30.115
+    lon = 78.285
     
     # Date range
     end_date = datetime.now()

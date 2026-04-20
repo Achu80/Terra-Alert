@@ -3,6 +3,7 @@ import numpy as np
 from typing import Dict, List, Optional
 import joblib
 import pickle
+import xgboost as xgb
 
 
 class ModelService:
@@ -17,29 +18,56 @@ class ModelService:
     def load_models(self):
         """Load trained XGBoost model and scaler from disk"""
         try:
-            # Load XGBoost model
-            model_path = os.path.join(self.model_dir, 'xgboost_model.pkl')
-            if os.path.exists(model_path):
-                self.model = joblib.load(model_path)
-                print("✓ XGBoost model loaded")
+            # Load XGBoost model from JSON (version-independent format)
+            model_json_path = os.path.join(self.model_dir, 'xgboost_model.json')
+            model_pkl_path = os.path.join(self.model_dir, 'xgboost_model.pkl')
+            
+            # Try JSON format first (preferred)
+            if os.path.exists(model_json_path):
+                self.model = xgb.XGBClassifier()
+                self.model.load_model(model_json_path)
+                print("✓ XGBoost model loaded from JSON (version-independent)")
+                self.model_loaded = True
+            # Fallback to pickle format
+            elif os.path.exists(model_pkl_path):
+                self.model = joblib.load(model_pkl_path)
+                print("✓ XGBoost model loaded from pickle")
                 self.model_loaded = True
             else:
-                print(f"⚠ Model not found at: {model_path}")
+                print(f"⚠ Model not found at: {model_json_path} or {model_pkl_path}")
                 self.model_loaded = False
                 return
             
-            # Load StandardScaler
-            scaler_path = os.path.join(self.model_dir, 'scaler.pkl')
-            if os.path.exists(scaler_path):
-                self.scaler = joblib.load(scaler_path)
-                print("✓ StandardScaler loaded")
+            # Load StandardScaler parameters from JSON (version-independent)
+            scaler_json_path = os.path.join(self.model_dir, 'scaler_params.json')
+            scaler_pkl_path = os.path.join(self.model_dir, 'scaler.pkl')
+            
+            if os.path.exists(scaler_json_path):
+                import json
+                with open(scaler_json_path, 'r') as f:
+                    scaler_params = json.load(f)
+                
+                # Recreate scaler from parameters
+                from sklearn.preprocessing import StandardScaler
+                self.scaler = StandardScaler()
+                self.scaler.mean_ = np.array(scaler_params['mean'])
+                self.scaler.scale_ = np.array(scaler_params['scale'])
+                self.scaler.var_ = np.array(scaler_params['var'])
+                self.scaler.n_features_in_ = scaler_params['n_features']
+                self.scaler.n_samples_seen_ = scaler_params['n_samples_seen']
+                print("✓ StandardScaler loaded from JSON (version-independent)")
+            elif os.path.exists(scaler_pkl_path):
+                self.scaler = joblib.load(scaler_pkl_path)
+                print("✓ StandardScaler loaded from pickle")
             else:
-                print(f"⚠ Scaler not found at: {scaler_path}")
+                print(f"⚠ Scaler not found at: {scaler_json_path} or {scaler_pkl_path}")
                 print("  Model expects scaled features!")
                 self.scaler = None
                 
         except Exception as e:
             print(f"Error loading model: {e}")
+            import traceback
+            print(traceback.format_exc())
             self.model_loaded = False
     
     def predict(self, features: List[float]) -> Dict:

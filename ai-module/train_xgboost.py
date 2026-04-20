@@ -95,12 +95,29 @@ feature_importance = pd.DataFrame({
 print("\nTop 10 Feature Importance:")
 print(feature_importance.head(10))
 
-# Save model
-with open('xgboost_model.pkl', 'wb') as f:
-    pickle.dump(model, f)
+# Save model in XGBoost native format (version-independent)
+model.save_model('xgboost_model.json')
+print("\n✓ Model saved as xgboost_model.json (XGBoost native format)")
 
+# Save scaler as pickle (still needed for backward compatibility)
 with open('scaler.pkl', 'wb') as f:
     pickle.dump(scaler, f)
-
-print("\n✓ Model saved as xgboost_model.pkl")
 print("✓ Scaler saved as scaler.pkl")
+
+# Save scaler parameters as JSON (version-independent)
+import json
+scaler_params = {
+    'mean': scaler.mean_.tolist(),
+    'scale': scaler.scale_.tolist(),
+    'var': scaler.var_.tolist(),
+    'n_features': int(scaler.n_features_in_),
+    'n_samples_seen': int(scaler.n_samples_seen_)
+}
+with open('scaler_params.json', 'w') as f:
+    json.dump(scaler_params, f, indent=2)
+print("✓ Scaler parameters saved as scaler_params.json (version-independent)")
+
+# Also save as old format for backward compatibility
+with open('xgboost_model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+print("✓ Model also saved as xgboost_model.pkl (backward compatibility)")

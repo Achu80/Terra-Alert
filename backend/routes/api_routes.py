@@ -37,8 +37,7 @@ def health():
     """API health check"""
     return jsonify({
         'status': 'healthy',
-        'timestamp': datetime.utcnow().isoformat(),
-        'mock_mode': MOCK_MODE
+        'timestamp': datetime.utcnow().isoformat()
     })
 
 @api_bp.route('/districts', methods=['GET'])
@@ -195,13 +194,14 @@ def predict():
             'prediction': {
                 'score': prediction['score'],
                 'level': prediction['level'],
-                'confidence': prediction['confidence']
+                'confidence': prediction['confidence'],
+                'prediction_class': prediction['prediction_class'],
+                'probabilities': prediction['probabilities'],
+                'model_type': prediction['model_type']
             },
-            'model_scores': prediction['model_scores'],
             'features': {
                 'values': processed_data['features'],
-                'names': processed_data['feature_names'],
-                'normalized': processed_data['normalized_features']
+                'names': processed_data['feature_names']
             },
             'derived_features': processed_data['derived_features'],
             'raw_data': processed_data['raw_data'],
