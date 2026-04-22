@@ -60,9 +60,17 @@ function MapClickHandler({ onLocationSelect }) {
 export default function InteractiveMap({ onLocationSelect, selectedLocation, className = '' }) {
     const mapRef = useRef(null)
     
-    // Default center: India (center of the country)
-    const defaultCenter = [20.5937, 78.9629]
-    const defaultZoom = 5
+    // Himachal Pradesh bounds
+    const HP_BOUNDS = {
+        north: 33.2,
+        south: 30.4,
+        east: 79.0,
+        west: 75.6
+    }
+    
+    // Center of Himachal Pradesh
+    const defaultCenter = [31.1048, 77.1734] // Shimla
+    const defaultZoom = 8
 
     useEffect(() => {
         // If a location is selected externally (e.g., from search), update map
@@ -86,6 +94,12 @@ export default function InteractiveMap({ onLocationSelect, selectedLocation, cla
                 ref={mapRef}
                 scrollWheelZoom={true}
                 zoomControl={true}
+                maxBounds={[
+                    [HP_BOUNDS.south, HP_BOUNDS.west],
+                    [HP_BOUNDS.north, HP_BOUNDS.east]
+                ]}
+                maxBoundsViscosity={1.0}
+                minZoom={7}
             >
                 {/* Base map tiles - OpenStreetMap */}
                 <TileLayer
@@ -126,7 +140,7 @@ export default function InteractiveMap({ onLocationSelect, selectedLocation, cla
                     Click anywhere on the map
                 </p>
                 <p className="text-xs text-gray-600">
-                    Select a location in India to get landslide risk prediction
+                    Select a location in Himachal Pradesh for landslide risk prediction
                 </p>
             </div>
         </div>
