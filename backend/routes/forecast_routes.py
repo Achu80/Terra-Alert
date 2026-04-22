@@ -5,7 +5,8 @@ from utils.data_processor import DataProcessor
 import requests
 from datetime import datetime, timedelta
 import os
-
+from services.alert_service import AlertService
+alert_service = AlertService()
 forecast_bp = Blueprint('forecast', __name__)
 
 gee_service = GEEService(project_id=os.getenv('GEE_PROJECT_ID'))
@@ -87,6 +88,15 @@ def predict_7day():
                 'risk_level': prediction['level'],
                 'confidence': float(prediction['confidence'])
             })
+
+            if prediction['score'] >= 3:
+                alert_service.send_landslide_alert(
+                    lat=lat,
+                    lon=lon,
+                    risk_score=float(prediction['score']),
+                    risk_level=prediction['level'],
+                    date=date
+    )
 
         return jsonify({
             'location': {'lat': lat, 'lon': lon},

@@ -4,6 +4,8 @@ from typing import Dict, List, Optional
 import joblib
 import pickle
 import xgboost as xgb
+import pandas as pd
+
 
 
 class ModelService:
@@ -72,67 +74,91 @@ class ModelService:
     
     def predict(self, features: List[float]) -> Dict:
         """
-        Make landslide prediction using XGBoost model
-        
-        Args:
-            features: List of 20 feature values in correct order
-        
-        Returns:
-            Dictionary with prediction results
-        """
-        # Load model if not already loaded
+    Make landslide prediction using XGBoost model
+    
+    Args:
+        features: List of 20 feature values in correct order
+    
+    Returns:
+        Dictionary with prediction results
+    """
+    # Load model if not already loaded
         if not self.model_loaded:
-            self.load_models()
-        
-        # If model still not loaded, return mock prediction
+          self.load_models()
+    
+    # If model still not loaded, return mock prediction
         if not self.model or not self.model_loaded:
-            print("⚠ Model not loaded, using mock prediction")
-            return self._mock_prediction(features)
-        
+          print("⚠ Model not loaded, using mock prediction")
+          return self._mock_prediction(features)
+    
         try:
-            # Log input features for debugging
-            print(f"\n🔍 DEBUG: Predicting with {len(features)} features")
-            print(f"Features: {features[:5]}... (showing first 5)")
-            
-            # Reshape features for sklearn
-            X = np.array(features).reshape(1, -1)
-            
-            # Apply StandardScaler (IMPORTANT!)
+        # Log input features for debugging
+          print(f"\n🔍 DEBUG: Predicting with {len(features)} features")
+          print(f"Features: {features[:5]}... (showing first 5)")
+        
+        # ADD THIS - Extract elevation and slope from features list
+        # Assuming: features[0]=elevation, features[1]=slope (VERIFY ORDER!)
+          elevation = features[0]  # First feature
+          slope = features[1]      # Second feature
+        
+        # Plains area override
+          if elevation < 800 and slope < 15:
+            print(f"⛰️ Plains override: elevation={elevation}m, slope={slope}°")
+            return {
+                'score': 5.0,
+                'level': 'low',
+                'confidence': 95.0,
+                'prediction_class': 0,
+                'probabilities': {
+                    'no_landslide': 0.95,
+                    'landslide': 0.05
+                },
+                'model_type': 'Rule-Based (Plains)',
+                'note': 'Low-risk plains area - outside mountainous prediction zone'
+            }
+        
+            feature_names = [
+                'elevation', 'slope', 'aspect', 'ndvi', 'ndwi', 'soil_type',
+                'rainfall_3d', 'rainfall_7d', 'rainfall_14d', 'rainfall_30d',
+                'rainfall_ratio_3d_7d', 'rainfall_ratio_7d_14d', 'rainfall_ratio_14d_30d',
+                'rainfall_acceleration', 'high_short_term_rain', 'sustained_heavy_rain',
+                'slope_elevation_product', 'steep_low_elevation', 'north_facing', 'low_veg_steep'
+            ]
+
+            # Create DataFrame with proper column names
+            X = pd.DataFrame([features], columns=feature_names)
+
             if self.scaler:
                 X_scaled = self.scaler.transform(X)
-                print(f"✓ Features scaled")
-            else:
-                print("⚠ Warning: No scaler found, using unscaled features")
-                X_scaled = X
-            
-            # Get probability of landslide (class 1)
-            proba = self.model.predict_proba(X_scaled)[0]
-            landslide_probability = float(proba[1])
-            
-            # Convert to 0-100 scale
-            risk_score = landslide_probability * 100
-            
-            print(f"✓ Prediction complete: Risk Score = {risk_score:.1f}")
-            print(f"  Probabilities: No Landslide={proba[0]:.3f}, Landslide={proba[1]:.3f}")
-            
-            # Determine risk level
-            risk_level = self._get_risk_level(risk_score)
-            
-            # Get prediction (0 or 1)
-            prediction_class = self.model.predict(X_scaled)[0]
-            
-            return {
-                'score': round(risk_score, 1),
-                'level': risk_level,
-                'confidence': round(max(proba) * 100, 1),  # Convert to percentage
-                'prediction_class': int(prediction_class),
-                'probabilities': {
-                    'no_landslide': round(float(proba[0]), 3),
-                    'landslide': round(float(proba[1]), 3)
-                },
-                'model_type': 'XGBoost'
-            }
-            
+        
+        # Get probability of landslide (class 1)
+          proba = self.model.predict_proba(X_scaled)[0]
+          landslide_probability = float(proba[1])
+        
+        # Convert to 0-100 scale
+          risk_score = landslide_probability * 100
+        
+          print(f"✓ Prediction complete: Risk Score = {risk_score:.1f}")
+          print(f"  Probabilities: No Landslide={proba[0]:.3f}, Landslide={proba[1]:.3f}")
+        
+        # Determine risk level
+          risk_level = self._get_risk_level(risk_score)
+        
+        # Get prediction (0 or 1)
+          prediction_class = self.model.predict(X_scaled)[0]
+        
+          return {
+            'score': round(risk_score, 1),
+            'level': risk_level,
+            'confidence': round(max(proba) * 100, 1),
+            'prediction_class': int(prediction_class),
+            'probabilities': {
+                'no_landslide': round(float(proba[0]), 3),
+                'landslide': round(float(proba[1]), 3)
+            },
+            'model_type': 'XGBoost'
+        }
+        
         except Exception as e:
             print(f"❌ Error making prediction: {e}")
             import traceback

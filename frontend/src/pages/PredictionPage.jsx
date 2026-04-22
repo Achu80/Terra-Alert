@@ -17,7 +17,7 @@ const BentoCard = ({ children, className = '', span = 1, tall = false }) => {
     }
     
     return (
-        <div 
+        <div
             className={`
                 ${theme.cardBg} ${theme.cardBorder} 
                 backdrop-blur-xl border rounded-2xl p-6
@@ -55,7 +55,7 @@ const MetricCard = ({ label, value, unit, trend, color = 'violet' }) => {
         red: 'text-red-400 bg-red-400/10',
         blue: 'text-blue-400 bg-blue-400/10'
     }
-    
+
     return (
         <div className={`p-4 rounded-xl ${colorClasses[color]} border border-${color}-400/20`}>
             <p className={`text-xs ${theme.textMuted} mb-1`}>{label}</p>
@@ -81,26 +81,26 @@ const LocationSelector = ({ onLocationSelect, loading }) => {
 
     const handleSearch = async () => {
         if (!searchQuery.trim()) return
-        
+
         try {
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)},Himachal Pradesh,India&format=json&limit=1`
             )
             const data = await response.json()
-            
+
             if (data && data.length > 0) {
                 const { lat, lon, display_name } = data[0]
                 const latitude = parseFloat(lat)
                 const longitude = parseFloat(lon)
-                
+
                 // Validate location is within Himachal Pradesh bounds
                 const HP_BOUNDS = { north: 33.2, south: 30.4, east: 79.0, west: 75.6 }
-                if (latitude < HP_BOUNDS.south || latitude > HP_BOUNDS.north || 
+                if (latitude < HP_BOUNDS.south || latitude > HP_BOUNDS.north ||
                     longitude < HP_BOUNDS.west || longitude > HP_BOUNDS.east) {
                     alert('Location must be within Himachal Pradesh. Please search for a location in Himachal Pradesh.')
                     return
                 }
-                
+
                 const coords = { lat: latitude, lon: longitude, name: display_name }
                 setSelectedCoords(coords)
             } else {
@@ -134,9 +134,9 @@ const LocationSelector = ({ onLocationSelect, loading }) => {
                 }>
                     Select Location
                 </SectionLabel>
-                
+
                 <div className="h-[calc(100%-3rem)] rounded-xl overflow-hidden border border-white/10">
-                    <InteractiveMap 
+                    <InteractiveMap
                         onLocationSelect={handleMapSelect}
                         selectedLocation={selectedCoords}
                     />
@@ -154,7 +154,7 @@ const LocationSelector = ({ onLocationSelect, loading }) => {
                     }>
                         Search Location
                     </SectionLabel>
-                    
+
                     <div className="space-y-3">
                         <input
                             type="text"
@@ -194,7 +194,7 @@ const LocationSelector = ({ onLocationSelect, loading }) => {
                                 </p>
                             </div>
                         </div>
-                        
+
                         <button
                             onClick={handleGetPrediction}
                             disabled={loading}
@@ -213,7 +213,7 @@ const LocationSelector = ({ onLocationSelect, loading }) => {
 const PredictionLoading = () => {
     const { theme } = useWeather()
     const [stage, setStage] = useState(0)
-    
+
     const stages = [
         'Fetching satellite data from Google Earth Engine...',
         'Processing terrain and rainfall data...',
@@ -254,15 +254,15 @@ const PredictionLoading = () => {
 const ForecastSection = ({ forecast }) => {
     const { theme } = useWeather()
     const [activeTab, setActiveTab] = useState('7days')
-    
+
     console.log('ForecastSection - Full forecast data:', forecast)
-    
+
     const tabs = [
         { id: '7days', label: '7 Days', icon: '📅' },
         { id: '14days', label: '14 Days', icon: '📊' },
         { id: '30days', label: '30 Days', icon: '📈' }
     ]
-    
+
     return (
         <BentoCard className="mt-4">
             <div className="flex items-center justify-between mb-4">
@@ -274,7 +274,7 @@ const ForecastSection = ({ forecast }) => {
                 }>
                     Risk Forecast
                 </SectionLabel>
-                
+
                 {/* Tab Buttons */}
                 <div className="flex gap-2">
                     {tabs.map(tab => (
@@ -283,8 +283,8 @@ const ForecastSection = ({ forecast }) => {
                             onClick={() => setActiveTab(tab.id)}
                             className={`
                                 px-4 py-2 rounded-xl text-sm font-medium transition-all
-                                ${activeTab === tab.id 
-                                    ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/30' 
+                                ${activeTab === tab.id
+                                    ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/30'
                                     : `${theme.textSecond} bg-white/5 hover:bg-white/10`
                                 }
                             `}
@@ -295,7 +295,7 @@ const ForecastSection = ({ forecast }) => {
                     ))}
                 </div>
             </div>
-            
+
             {/* Debug info */}
             <div className="mb-4 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded text-xs text-yellow-400">
                 <div>Active Tab: {activeTab}</div>
@@ -303,7 +303,7 @@ const ForecastSection = ({ forecast }) => {
                 <div>14days data: {forecast['14days']?.length || 0} items</div>
                 <div>30days data: {forecast['30days']?.length || 0} items</div>
             </div>
-            
+
             <div className="space-y-6">
                 {/* 7-Day View */}
                 {activeTab === '7days' && (
@@ -312,14 +312,14 @@ const ForecastSection = ({ forecast }) => {
                         <FourteenDayTrend forecast={forecast['7days']} />
                     </div>
                 )}
-                
+
                 {/* 14-Day View */}
                 {activeTab === '14days' && (
                     <div className="space-y-4">
                         <FourteenDayTrend forecast={forecast['14days']} />
                     </div>
                 )}
-                
+
                 {/* 30-Day View */}
                 {activeTab === '30days' && (
                     <div className="space-y-4">
@@ -388,8 +388,8 @@ const PredictionResults = ({ prediction, onNewPrediction }) => {
                             {riskLevel} RISK
                         </div>
                         <p className={`text-sm ${theme.textMuted} mt-4`}>
-                            Confidence: {prediction.prediction.confidence >= 1 
-                                ? `${prediction.prediction.confidence.toFixed(0)}%` 
+                            Confidence: {prediction.prediction.confidence >= 1
+                                ? `${prediction.prediction.confidence.toFixed(0)}%`
                                 : `${(prediction.prediction.confidence * 100).toFixed(0)}%`}
                         </p>
                     </div>
@@ -397,25 +397,25 @@ const PredictionResults = ({ prediction, onNewPrediction }) => {
 
                 {/* Key Metrics - 2 columns */}
                 <div className="md:col-span-2 grid grid-cols-2 gap-4">
-                    <MetricCard 
+                    <MetricCard
                         label="Elevation"
                         value={prediction.features.values[0]?.toFixed(0) || 0}
                         unit="m"
                         color="blue"
                     />
-                    <MetricCard 
+                    <MetricCard
                         label="Slope Angle"
                         value={prediction.features.values[1]?.toFixed(1) || 0}
                         unit="°"
                         color="orange"
                     />
-                    <MetricCard 
+                    <MetricCard
                         label="30-Day Rainfall"
                         value={prediction.features.values[9]?.toFixed(1) || 0}
                         unit="mm"
                         color="blue"
                     />
-                    <MetricCard 
+                    <MetricCard
                         label="Vegetation (NDVI)"
                         value={prediction.features.values[3]?.toFixed(2) || 0}
                         color="emerald"
@@ -423,19 +423,17 @@ const PredictionResults = ({ prediction, onNewPrediction }) => {
                 </div>
 
                 {/* Risk Heatmap */}
-                <BentoCard span={3} className="min-h-[400px] p-0 overflow-hidden">
-                    <div className="p-6 pb-3">
-                        <SectionLabel icon={
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                <circle cx="12" cy="10" r="3"></circle>
-                            </svg>
-                        }>
-                            Risk Heatmap
-                        </SectionLabel>
-                    </div>
-                    <div className="h-[450px] w-full">
-                        <RiskHeatmap 
+                <BentoCard span={2} className="min-h-[400px]">
+                    <SectionLabel icon={
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    }>
+                        Risk Heatmap
+                    </SectionLabel>
+                    <div className="h-[calc(100%-3rem)] rounded-xl overflow-hidden border border-white/10">
+                        <RiskHeatmap
                             location={{
                                 lat: prediction.location.lat,
                                 lon: prediction.location.lon,
@@ -466,8 +464,8 @@ const PredictionResults = ({ prediction, onNewPrediction }) => {
                                 {name.replace(/_/g, ' ')}
                             </p>
                             <p className={`text-base font-semibold ${theme.textPrimary}`}>
-                                {typeof prediction.features.values[index] === 'number' 
-                                    ? prediction.features.values[index].toFixed(2) 
+                                {typeof prediction.features.values[index] === 'number'
+                                    ? prediction.features.values[index].toFixed(2)
                                     : prediction.features.values[index]}
                             </p>
                         </div>
@@ -492,6 +490,7 @@ export default function PredictionPage() {
         setStep('loading')
 
         try {
+            // Existing predict call
             const response = await fetch('http://localhost:5000/api/predict', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -500,23 +499,27 @@ export default function PredictionPage() {
                     lon: location.lon,
                     days_back: 30,
                     buffer: 1000,
-                    use_cache: false  // Always get fresh prediction for individual locations
+                    use_cache: false
                 })
             })
 
             const data = await response.json()
-            
-            if (!response.ok) {
-                console.error('Server error:', data)
-                throw new Error(data.error || 'Prediction failed')
-            }
+
+            if (!response.ok) throw new Error(data.error || 'Prediction failed')
+
+            // Also call forecast endpoint (this triggers SMS if risk >= 70)
+            fetch('http://localhost:5000/api/forecast/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lat: location.lat, lon: location.lon })
+            }).catch(err => console.log('Forecast call failed:', err))
 
             setPrediction({ ...data, location })
             setStep('results')
         } catch (err) {
             console.error('Prediction error:', err)
             setStep('select')
-            alert(`Failed to get prediction: ${err.message}\n\nPlease check:\n1. Backend server is running\n2. GEE is authenticated\n3. Check backend console for errors`)
+            alert(`Failed to get prediction: ${err.message}`)
         }
     }
 
@@ -540,7 +543,7 @@ export default function PredictionPage() {
 
             {step === 'select' && (
                 <FadeInUp delay={0.1}>
-                    <LocationSelector 
+                    <LocationSelector
                         onLocationSelect={handleLocationSelect}
                         loading={false}
                     />
@@ -551,7 +554,7 @@ export default function PredictionPage() {
 
             {step === 'results' && prediction && (
                 <FadeInUp>
-                    <PredictionResults 
+                    <PredictionResults
                         prediction={prediction}
                         onNewPrediction={handleNewPrediction}
                     />
