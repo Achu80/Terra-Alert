@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useWeather } from "../context/WeatherContext"
 import { GlassCard, MetricCard, RiskBadge, SectionLabel, Divider, PrimaryButton, GhostButton, StatusDot, FactorBar } from "../components/ui/UIKit"
 
@@ -19,8 +20,9 @@ const ALL_DISTRICTS = [
 ]
 const SCORE_COLOR = s => s >= 80 ? "text-red-400" : s >= 60 ? "text-orange-400" : s >= 40 ? "text-yellow-400" : "text-emerald-400"
 
-export function RiskReportPage({ onNavigate }) {
+export function RiskReportPage() {
     const { theme } = useWeather()
+    const navigate = useNavigate()
     const [filter, setFilter] = useState("All")
     const [sortBy, setSortBy] = useState("score")
     const FILTERS = ["All", "Critical", "High", "Moderate", "Low"]
@@ -73,7 +75,7 @@ export function RiskReportPage({ onNavigate }) {
                             {rows.map((d, i) => {
                                 const isPri = top3ids.includes(d.id)
                                 return (
-                                    <tr key={d.id} onClick={() => onNavigate("map")}
+                                    <tr key={d.id} onClick={() => navigate("/map")}
                                         className={`border-b cursor-pointer transition-all duration-150 ${theme.divider}
                       ${isPri ? theme.accentBg : ""} hover:bg-white/[0.05]`}>
                                         <td className={`px-4 py-3 score-num ${theme.textMuted}`}>{i + 1}</td>

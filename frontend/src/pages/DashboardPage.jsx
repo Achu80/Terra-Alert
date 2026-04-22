@@ -1,146 +1,503 @@
-import { useWeather } from "../context/WeatherContext"
-import { GlassCard, MetricCard, RiskBadge, SectionLabel, Divider, FactorBar } from "../components/ui/UIKit"
+import { useState, useEffect } from 'react';
 
-const DIST_DATA = [
-    { name: "Nashik", score: 87, level: "CRITICAL", bar: "bg-red-400" },
-    { name: "Pune", score: 74, level: "HIGH", bar: "bg-orange-400" },
-    { name: "Raigad", score: 68, level: "HIGH", bar: "bg-orange-400" },
-    { name: "Satara", score: 55, level: "MODERATE", bar: "bg-yellow-400" },
-    { name: "Kolhapur", score: 48, level: "MODERATE", bar: "bg-yellow-400" },
-    { name: "Thane", score: 38, level: "LOW", bar: "bg-emerald-400" },
-    { name: "Amravati", score: 22, level: "LOW", bar: "bg-emerald-400" },
-]
+// Custom hook for dashboard data
+const useDashboardData = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
 
-const MODEL_TABLE = [
-    { model: "Random Forest", acc: 91.2, prec: 89.4, rec: 88.7, f1: 89.0, auc: 0.94 },
-    { model: "AdaBoost", acc: 88.6, prec: 86.2, rec: 87.1, f1: 86.6, auc: 0.91 },
-    { model: "Bagging", acc: 89.9, prec: 88.0, rec: 88.5, f1: 88.2, auc: 0.93 },
-    { model: "Ensemble", acc: 93.1, prec: 91.8, rec: 92.0, f1: 91.9, auc: 0.96 },
-]
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
 
-const FEATURES = [
-    { name: "Rainfall 7d", imp: 31, color: "bg-blue-400" },
-    { name: "Slope max", imp: 24, color: "bg-red-400" },
-    { name: "Rainfall 30d", imp: 18, color: "bg-blue-300" },
-    { name: "NDVI", imp: 12, color: "bg-emerald-400" },
-    { name: "Population density", imp: 9, color: "bg-violet-400" },
-    { name: "Soil type", imp: 6, color: "bg-yellow-400" },
-]
+      try {
+        // Fetch stats from backend
+        const response = await fetch('http://localhost:5000/api/stats');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const statsData = await response.json();
+        
+        setData({
+          stats: {
+            total_predictions: statsData.total_predictions || 0,
+            avg_risk_score: statsData.avg_risk_score || 0,
+            critical_count: statsData.critical_count || 0,
+            high_count: statsData.high_count || 0,
+            moderate_count: statsData.moderate_count || 0,
+            low_count: statsData.low_count || 0,
+            highest_risk_location: statsData.highest_risk_location || 'N/A'
+          },
+          score_distribution: statsData.score_distribution || [],
+          trend_7d: statsData.trend_7d || [],
+          recent_predictions: statsData.recent_predictions || []
+        });
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+        setError(err.message);
+        setLoading(false);
+      }
+    };
 
-export default function DashboardPage() {
-    const { theme } = useWeather()
+    fetchData();
+    
+    // Refresh data every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
+  return { data, loading, error };
+};
+
+// Metric Card Component
+const MetricCard = ({ title, value, subtitle, color, delay }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), delay);
+    return () => clearTimeout(timer);
+  }, [delay]);
+
+  return (
+    <div
+      className={`bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 transition-all duration-700 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}
+    >
+      <h3 className="text-sm font-medium text-white/60 mb-2">{title}</h3>
+      <div className={`text-3xl font-bold mb-1 ${color || 'text-white'}`}>
+        {value}
+      </div>
+      <p className="text-xs text-white/40">{subtitle}</p>
+    </div>
+  );
+};
+
+// Risk Score Distribution Chart
+const RiskScoreChart = ({ data }) => {
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!data || data.length === 0) return null;
+
+  const maxCount = Math.max(...data.map(d => d.count));
+  const chartHeight = 200;
+  const barWidth = 60;
+  const gap = 20;
+  const chartWidth = data.length * (barWidth + gap);
+
+  const colors = ['text-emerald-400', 'text-green-400', 'text-yellow-400', 'text-orange-400', 'text-red-400'];
+  const fillColors = ['fill-emerald-400', 'fill-green-400', 'fill-yellow-400', 'fill-orange-400', 'fill-red-400'];
+
+  return (
+    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
+      <h3 className="text-lg font-semibold text-white mb-6">Risk Score Distribution</h3>
+      <div className="flex items-end justify-center gap-5 h-64">
+        {data.map((item, index) => {
+          const barHeight = (item.count / maxCount) * chartHeight;
+          return (
+            <div key={index} className="flex flex-col items-center gap-2">
+              <span className={`text-sm font-semibold ${colors[index]}`}>
+                {item.count}
+              </span>
+              <div
+                className={`w-16 ${fillColors[index]} rounded-t-lg transition-all duration-1000 ease-out`}
+                style={{
+                  height: animated ? `${barHeight}px` : '0px'
+                }}
+              />
+              <span className="text-xs text-white/60 mt-2">{item.range}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Feature Importance Chart
+const FeatureImportanceChart = () => {
+  const features = [
+    { name: 'slope', importance: 31 },
+    { name: 'rainfall_30d', importance: 24 },
+    { name: 'rainfall_14d', importance: 14 },
+    { name: 'soil_type', importance: 10 },
+    { name: 'ndvi', importance: 8 },
+    { name: 'elevation', importance: 6 },
+    { name: 'rainfall_7d', importance: 4 },
+    { name: 'ndwi', importance: 2 },
+    { name: 'rainfall_3d', importance: 1 },
+    { name: 'aspect', importance: 0 }
+  ];
+
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
+      <h3 className="text-lg font-semibold text-white mb-6">XGBoost Feature Importance</h3>
+      <div className="space-y-3">
+        {features.map((feature, index) => (
+          <div key={feature.name} className="flex items-center gap-3">
+            <span className="text-sm text-white/80 w-28 text-right">{feature.name}</span>
+            <div className="flex-1 bg-white/5 rounded-full h-6 overflow-hidden">
+              <div
+                className={`h-full ${index < 3 ? 'bg-violet-400' : 'bg-violet-300'} rounded-full transition-all duration-1000 ease-out flex items-center justify-end pr-2`}
+                style={{
+                  width: animated ? `${feature.importance}%` : '0%'
+                }}
+              >
+                {animated && feature.importance > 0 && (
+                  <span className="text-xs font-semibold text-white">
+                    {feature.importance}%
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// 7-Day Trend Chart
+const TrendChart = ({ data }) => {
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!data || data.length === 0) return null;
+
+  const width = 800;
+  const height = 200;
+  const padding = { top: 20, right: 40, bottom: 40, left: 40 };
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+
+  const maxValue = Math.max(...data.map(d => d.avg), 100);
+  const minValue = 0;
+
+  const xStep = chartWidth / (data.length - 1);
+  
+  const getY = (value) => {
+    return chartHeight - ((value - minValue) / (maxValue - minValue)) * chartHeight;
+  };
+
+  const pathData = data.map((point, index) => {
+    const x = index * xStep;
+    const y = getY(point.avg);
+    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+  }).join(' ');
+
+  const areaPath = `${pathData} L ${chartWidth} ${chartHeight} L 0 ${chartHeight} Z`;
+
+  const thresholdY = getY(60);
+
+  return (
+    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
+      <h3 className="text-lg font-semibold text-white mb-6">7-Day Risk Trend</h3>
+      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+        <g transform={`translate(${padding.left}, ${padding.top})`}>
+          {/* Threshold line */}
+          <line
+            x1="0"
+            y1={thresholdY}
+            x2={chartWidth}
+            y2={thresholdY}
+            stroke="rgb(167 139 250 / 0.3)"
+            strokeWidth="2"
+            strokeDasharray="5,5"
+          />
+          <text
+            x={chartWidth + 5}
+            y={thresholdY + 4}
+            fill="rgb(167 139 250 / 0.6)"
+            fontSize="10"
+            className="text-xs"
+          >
+            High risk
+          </text>
+
+          {/* Area under curve */}
+          <path
+            d={areaPath}
+            fill="rgb(167 139 250 / 0.1)"
+            className={`transition-opacity duration-1000 ${animated ? 'opacity-100' : 'opacity-0'}`}
+          />
+
+          {/* Line path */}
+          <path
+            d={pathData}
+            fill="none"
+            stroke="rgb(167 139 250)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={`transition-all duration-1000 ${animated ? 'opacity-100' : 'opacity-0'}`}
+          />
+
+          {/* Data points */}
+          {data.map((point, index) => {
+            const x = index * xStep;
+            const y = getY(point.avg);
+            return (
+              <g key={index}>
+                <circle
+                  cx={x}
+                  cy={y}
+                  r="5"
+                  fill="rgb(167 139 250)"
+                  className={`transition-all duration-1000 delay-${index * 100} ${
+                    animated ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                  }`}
+                />
+                <circle
+                  cx={x}
+                  cy={y}
+                  r="8"
+                  fill="none"
+                  stroke="rgb(167 139 250 / 0.3)"
+                  strokeWidth="2"
+                  className={`transition-all duration-1000 delay-${index * 100} ${
+                    animated ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                  }`}
+                />
+                {/* Value label */}
+                <text
+                  x={x}
+                  y={y - 15}
+                  fill="rgb(167 139 250)"
+                  fontSize="12"
+                  textAnchor="middle"
+                  className={`font-semibold transition-all duration-1000 delay-${index * 100} ${
+                    animated ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  {point.avg}
+                </text>
+                {/* Date label */}
+                <text
+                  x={x}
+                  y={chartHeight + 20}
+                  fill="rgb(255 255 255 / 0.6)"
+                  fontSize="11"
+                  textAnchor="middle"
+                >
+                  {point.date}
+                </text>
+              </g>
+            );
+          })}
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+// Recent Predictions Table
+const RecentPredictionsTable = ({ predictions, onViewOnMap }) => {
+  const getRiskColor = (score) => {
+    if (score >= 80) return 'text-red-400';
+    if (score >= 60) return 'text-orange-400';
+    if (score >= 40) return 'text-yellow-400';
+    return 'text-emerald-400';
+  };
+
+  const getLevelBadgeClass = (level) => {
+    const classes = {
+      CRITICAL: 'bg-red-400/10 text-red-400',
+      HIGH: 'bg-orange-400/10 text-orange-400',
+      MODERATE: 'bg-yellow-400/10 text-yellow-400',
+      LOW: 'bg-emerald-400/10 text-emerald-400'
+    };
+    return classes[level] || classes.LOW;
+  };
+
+  return (
+    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
+      <h3 className="text-lg font-semibold text-white mb-6">Recent Predictions</h3>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="text-left text-sm font-medium text-white/60 pb-3 px-4">Location</th>
+              <th className="text-left text-sm font-medium text-white/60 pb-3 px-4">Risk Score</th>
+              <th className="text-left text-sm font-medium text-white/60 pb-3 px-4">Risk Level</th>
+              <th className="text-left text-sm font-medium text-white/60 pb-3 px-4">Top Factor</th>
+              <th className="text-left text-sm font-medium text-white/60 pb-3 px-4">Time</th>
+              <th className="text-left text-sm font-medium text-white/60 pb-3 px-4">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {predictions.map((pred, index) => (
+              <tr
+                key={pred.id}
+                className={`border-b border-white/5 ${
+                  index % 2 === 1 ? 'bg-white/[0.02]' : ''
+                } hover:bg-white/[0.05] transition-colors`}
+              >
+                <td className="py-4 px-4">
+                  <div className="text-sm text-white">{pred.location}</div>
+                  <div className="text-xs text-white/40">
+                    {pred.lat.toFixed(2)}, {pred.lon.toFixed(2)}
+                  </div>
+                </td>
+                <td className="py-4 px-4">
+                  <span className={`text-lg font-bold ${getRiskColor(pred.score)}`}>
+                    {pred.score}
+                  </span>
+                </td>
+                <td className="py-4 px-4">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getLevelBadgeClass(
+                      pred.level
+                    )}`}
+                  >
+                    {pred.level}
+                  </span>
+                </td>
+                <td className="py-4 px-4 text-sm text-white/80">{pred.top_factor}</td>
+                <td className="py-4 px-4 text-sm text-white/60">{pred.ts}</td>
+                <td className="py-4 px-4">
+                  <button
+                    onClick={() => onViewOnMap(pred.lat, pred.lon)}
+                    className="px-3 py-1.5 text-xs font-medium text-violet-400 hover:text-violet-300 hover:bg-violet-400/10 rounded-lg transition-colors border border-violet-400/20 hover:border-violet-400/40"
+                  >
+                    View on Map
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// Main Dashboard Component
+const DashboardPage = ({ onViewOnMap = () => {} }) => {
+  const { data, loading, error } = useDashboardData();
+
+  if (loading) {
     return (
-        <div className="page-enter flex flex-col gap-5">
-
-            {/* Metric cards */}
-            <div className="grid grid-cols-4 gap-4">
-                <MetricCard label="Avg Risk Score" value="55.2" sub="Across all districts" />
-                <MetricCard label="Critical Zones" value="3" sub="Require immediate action" accent />
-                <MetricCard label="Pop. Exposed" value="18.1M" sub="In high/critical zones" />
-                <MetricCard label="Roads at Risk" value="12" sub="Highway segments affected" />
-            </div>
-
-            {/* Bar chart + Impact analysis */}
-            <div className="grid grid-cols-[1.6fr_1fr] gap-5">
-
-                <GlassCard>
-                    <SectionLabel>District Risk Scores</SectionLabel>
-                    <div className="flex flex-col gap-2.5">
-                        {DIST_DATA.map(d => (
-                            <div key={d.name} className="flex items-center gap-3">
-                                <span className={`w-20 text-xs flex-shrink-0 ${theme.textSecond}`}>{d.name}</span>
-                                <div className="flex-1 h-5 rounded bg-white/[0.05] overflow-hidden relative">
-                                    <div
-                                        className={`h-full rounded transition-all duration-700 ${d.bar} opacity-70`}
-                                        style={{ width: `${d.score}%` }}
-                                    />
-                                    <div
-                                        className={`absolute right-0 top-0 h-full w-0.5 ${d.bar}`}
-                                        style={{ left: `${d.score}%` }}
-                                    />
-                                </div>
-                                <span className={`w-8 text-xs score-num font-bold text-right ${d.score >= 80 ? "text-red-400" :
-                                        d.score >= 60 ? "text-orange-400" :
-                                            d.score >= 40 ? "text-yellow-400" : "text-emerald-400"
-                                    }`}>{d.score}</span>
-                                <RiskBadge level={d.level} size="sm" />
-                            </div>
-                        ))}
-                    </div>
-                </GlassCard>
-
-                <GlassCard>
-                    <SectionLabel>Impact Analysis</SectionLabel>
-                    <div className="flex flex-col gap-3">
-                        {[
-                            { label: "Road proximity impact", value: "67%", sub: "of critical districts have highway exposure", color: "text-red-400", bg: "bg-red-400" },
-                            { label: "Population exposure index", value: "2.4M", sub: "people in zones with risk score above 60", color: "text-orange-400", bg: "bg-orange-400" },
-                            { label: "Isolation risk count", value: "5", sub: "communities at risk of losing road access", color: "text-yellow-400", bg: "bg-yellow-400" },
-                        ].map(item => (
-                            <div key={item.label}
-                                className={`p-3 rounded-xl bg-white/[0.04] border ${theme.cardBorder}`}>
-                                <p className={`text-2xl score-num font-bold ${item.color}`}>{item.value}</p>
-                                <p className={`text-xs font-medium mt-1 ${theme.textPrimary}`}>{item.label}</p>
-                                <p className={`text-[11px] mt-0.5 leading-relaxed ${theme.textMuted}`}>{item.sub}</p>
-                            </div>
-                        ))}
-                    </div>
-                </GlassCard>
-            </div>
-
-            {/* ML table + Feature importances */}
-            <div className="grid grid-cols-[1.4fr_1fr] gap-5">
-
-                <GlassCard>
-                    <SectionLabel>ML Model Comparison</SectionLabel>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-xs border-collapse">
-                            <thead>
-                                <tr>
-                                    {["Model", "Accuracy", "Precision", "Recall", "F1", "AUC-ROC"].map(h => (
-                                        <th key={h} className={`text-left pb-3 pr-3 label-caps ${theme.textMuted}`}>{h}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {MODEL_TABLE.map((m, i) => {
-                                    const isEnsemble = i === 3
-                                    return (
-                                        <tr key={m.model} className={`border-t ${theme.divider}`}>
-                                            <td className={`py-2.5 pr-3 ${isEnsemble ? `font-semibold ${theme.accentText}` : theme.textPrimary}`}>
-                                                {m.model}
-                                            </td>
-                                            {[m.acc, m.prec, m.rec, m.f1].map((v, j) => (
-                                                <td key={j} className={`py-2.5 pr-3 score-num ${isEnsemble ? theme.accentText : theme.textSecond}`}>
-                                                    {v}%
-                                                </td>
-                                            ))}
-                                            <td className={`py-2.5 pr-3 score-num font-semibold ${isEnsemble ? theme.accentText : theme.textSecond}`}>
-                                                {m.auc}
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                </GlassCard>
-
-                <GlassCard>
-                    <SectionLabel>Top Feature Importances</SectionLabel>
-                    {FEATURES.map(f => (
-                        <FactorBar
-                            key={f.name}
-                            label={f.name}
-                            value={f.imp}
-                            max={100}
-                            colorClass={f.color}
-                        />
-                    ))}
-                </GlassCard>
-
-            </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-violet-400/30 border-t-violet-400 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/60">Loading Himachal Pradesh dashboard...</p>
         </div>
-    )
-}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <div className="bg-red-400/10 border border-red-400/20 rounded-2xl p-6 max-w-md">
+          <h3 className="text-red-400 font-semibold mb-2">Error Loading Dashboard</h3>
+          <p className="text-white/60 text-sm mb-4">{error}</p>
+          <p className="text-white/40 text-xs">Make sure the backend server is running on http://localhost:5000</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-white/60">No data available</p>
+      </div>
+    );
+  }
+
+  const { stats, score_distribution, trend_7d, recent_predictions } = data;
+
+  const getScoreColor = (score) => {
+    if (score >= 70) return 'text-red-400';
+    if (score >= 40) return 'text-yellow-400';
+    return 'text-emerald-400';
+  };
+
+  return (
+    <div className="min-h-screen p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">Himachal Pradesh Dashboard</h1>
+          <p className="text-white/60">Real-time landslide risk monitoring and analytics</p>
+        </div>
+
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <MetricCard
+            title="Total Predictions"
+            value={stats.total_predictions.toLocaleString()}
+            subtitle="Since launch"
+            delay={0}
+          />
+          <MetricCard
+            title="Avg Risk Score"
+            value={stats.avg_risk_score.toFixed(1)}
+            subtitle="Out of 100"
+            color={getScoreColor(stats.avg_risk_score)}
+            delay={100}
+          />
+          <MetricCard
+            title="Critical + High Detections"
+            value={(stats.critical_count + stats.high_count).toLocaleString()}
+            subtitle="Needs attention"
+            color="text-orange-400"
+            delay={200}
+          />
+          <MetricCard
+            title="Highest Risk Area"
+            value={stats.highest_risk_location}
+            subtitle="Current hotspot"
+            delay={300}
+          />
+        </div>
+
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <RiskScoreChart data={score_distribution} />
+          <FeatureImportanceChart />
+        </div>
+
+        {/* 7-Day Trend */}
+        {trend_7d && trend_7d.length > 0 && <TrendChart data={trend_7d} />}
+
+        {/* Recent Predictions Table */}
+        {recent_predictions && recent_predictions.length > 0 && (
+          <RecentPredictionsTable predictions={recent_predictions} onViewOnMap={onViewOnMap} />
+        )}
+        
+        {/* Empty state for predictions */}
+        {(!recent_predictions || recent_predictions.length === 0) && (
+          <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
+            <p className="text-white/60 mb-2">No predictions available yet</p>
+            <p className="text-white/40 text-sm">Start making predictions to see them here</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default DashboardPage;
