@@ -1,5 +1,12 @@
 import os
-from twilio.rest import Client
+
+# Make Twilio optional
+try:
+    from twilio.rest import Client
+    TWILIO_AVAILABLE = True
+except ImportError:
+    TWILIO_AVAILABLE = False
+    print("⚠ Twilio not installed. SMS alerts will be disabled.")
 
 class AlertService:
     def __init__(self):
@@ -7,10 +14,24 @@ class AlertService:
         self.auth_token = os.getenv('TWILIO_AUTH_TOKEN')
         self.from_number = os.getenv('TWILIO_PHONE_NUMBER')
         self.alert_number = os.getenv('ALERT_PHONE_NUMBER')
-        self.client = Client(self.account_sid, self.auth_token)
+        
+        if TWILIO_AVAILABLE and self.account_sid and self.auth_token:
+            self.client = Client(self.account_sid, self.auth_token)
+            self.enabled = True
+        else:
+            self.client = None
+            self.enabled = False
+            if not TWILIO_AVAILABLE:
+                print("⚠ SMS alerts disabled: Twilio not installed")
+            else:
+                print("⚠ SMS alerts disabled: Twilio credentials not configured")
 
     def send_sms(self, message: str, to_number: str = None):
         """Send SMS alert"""
+        if not self.enabled:
+            print(f"ℹ SMS alert skipped (disabled): {message[:50]}...")
+            return False
+            
         try:
             to = to_number or self.alert_number
             msg = self.client.messages.create(

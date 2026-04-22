@@ -11,3 +11,7 @@ websockets>=13.0
 scikit-learn==1.5.2
 joblib==1.5.3
 xgboost==2.1.3
+
+# Optional dependencies
+# Uncomment to enable SMS alerts
+# twilio>=8.0.0
