@@ -137,12 +137,12 @@ class RiskHistoryRepository:
         return result.data
     
     def get_recent_predictions(self, limit: int = 8) -> List[Dict]:
-        """Get recent predictions with district info"""
+        """Get recent predictions with location info"""
         if not self.supabase:
             return []
         try:
             result = self.supabase.table('risk_history')\
-                .select('*, districts(name, geometry)')\
+                .select('*')\
                 .order('created_at', desc=True)\
                 .limit(limit)\
                 .execute()
@@ -150,17 +150,30 @@ class RiskHistoryRepository:
             predictions = []
             for item in result.data:
                 try:
-                    district = item.get('districts', {})
-                    # Extract lat/lon from geometry if available
-                    geometry = district.get('geometry') if district else None
+                    # Extract lat/lon from district_id if it's a location-based prediction
+                    district_id = item.get('district_id', '')
                     lat, lon = 31.1048, 77.1734  # Default to Shimla, HP
+                    location_name = district_id
                     
-                    if geometry and isinstance(geometry, dict) and 'coordinates' in geometry:
-                        # Get centroid of polygon
-                        coords = geometry['coordinates'][0] if geometry['coordinates'] else []
-                        if coords and len(coords) > 0:
-                            lon = sum(c[0] for c in coords) / len(coords)
-                            lat = sum(c[1] for c in coords) / len(coords)
+                    # Check if it's a location-based prediction (format: loc_31.1048_77.1734)
+                    if district_id.startswith('loc_'):
+                        try:
+                            parts = district_id.replace('loc_', '').split('_')
+                            if len(parts) >= 2:
+                                lat = float(parts[0])
+                                lon = float(parts[1])
+                        except:
+                            pass
+                    
+                    # Try to get location name from features
+                    features = item.get('features', {})
+                    if features and isinstance(features, dict):
+                        if 'location_name' in features:
+                            location_name = features['location_name']
+                        else:
+                            location_name = f"({lat:.4f}, {lon:.4f})"
+                    else:
+                        location_name = f"({lat:.4f}, {lon:.4f})"
                     
                     # Calculate time ago
                     created_at = datetime.fromisoformat(item['created_at'].replace('Z', '+00:00'))
@@ -174,14 +187,23 @@ class RiskHistoryRepository:
                         ts = f"{int(time_diff.days)} days ago"
                     
                     # Get top factor from features
-                    features = item.get('features', {})
                     top_factor = "N/A"
                     if features and isinstance(features, dict):
-                        # Find highest value feature
-                        numeric_features = {k: v for k, v in features.items() if isinstance(v, (int, float))}
+                        # Find highest value feature (excluding certain fields)
+                        exclude_keys = ['lat', 'lon', 'location_key', 'district_id', 'location_name']
+                        numeric_features = {
+                            k: v for k, v in features.items() 
+                            if isinstance(v, (int, float)) and k not in exclude_keys
+                        }
                         if numeric_features:
+                            # Get feature with highest absolute value
                             max_key = max(numeric_features, key=lambda k: abs(numeric_features[k]))
-                            top_factor = f"{max_key}: {numeric_features[max_key]}"
+                            value = numeric_features[max_key]
+                            # Format nicely
+                            if isinstance(value, float):
+                                top_factor = f"{max_key}: {value:.2f}"
+                            else:
+                                top_factor = f"{max_key}: {value}"
                     
                     predictions.append({
                         'id': item.get('id', ''),
@@ -191,7 +213,8 @@ class RiskHistoryRepository:
                         'level': item.get('risk_level', 'LOW'),
                         'top_factor': top_factor,
                         'ts': ts,
-                        'location': district.get('name', item.get('district_id', 'Unknown')) if district else item.get('district_id', 'Unknown')
+                        'location': location_name,
+                        'created_at': item.get('created_at', '')
                     })
                 except Exception as e:
                     print(f"Error processing prediction item: {e}")
@@ -252,6 +275,92 @@ class RiskHistoryRepository:
         except Exception as e:
             print(f"Error in get_7day_trend: {e}")
             return []
+    
+    def get_all_predictions(self, limit: int = 100) -> List[Dict]:
+        """Get all predictions with pagination"""
+        if not self.supabase:
+            return []
+        try:
+            result = self.supabase.table('risk_history')\
+                .select('*')\
+                .order('created_at', desc=True)\
+                .limit(limit)\
+                .execute()
+            
+            return result.data
+        except Exception as e:
+            print(f"Error in get_all_predictions: {e}")
+            return []
+    
+    def get_predictions_by_risk_level(self, level: str) -> List[Dict]:
+        """Get predictions filtered by risk level"""
+        if not self.supabase:
+            return []
+        try:
+            result = self.supabase.table('risk_history')\
+                .select('*')\
+                .eq('risk_level', level)\
+                .order('created_at', desc=True)\
+                .execute()
+            
+            return result.data
+        except Exception as e:
+            print(f"Error in get_predictions_by_risk_level: {e}")
+            return []
+    
+    def get_prediction_stats(self) -> Dict:
+        """Get statistics about all predictions"""
+        if not self.supabase:
+            return {
+                'total': 0,
+                'critical': 0,
+                'high': 0,
+                'moderate': 0,
+                'low': 0,
+                'avg_score': 0
+            }
+        try:
+            result = self.supabase.table('risk_history')\
+                .select('risk_level, risk_score')\
+                .execute()
+            
+            data = result.data
+            total = len(data)
+            
+            if total == 0:
+                return {
+                    'total': 0,
+                    'critical': 0,
+                    'high': 0,
+                    'moderate': 0,
+                    'low': 0,
+                    'avg_score': 0
+                }
+            
+            critical = sum(1 for d in data if d.get('risk_level') == 'CRITICAL')
+            high = sum(1 for d in data if d.get('risk_level') == 'HIGH')
+            moderate = sum(1 for d in data if d.get('risk_level') == 'MODERATE')
+            low = sum(1 for d in data if d.get('risk_level') == 'LOW')
+            avg_score = sum(d.get('risk_score', 0) for d in data) / total
+            
+            return {
+                'total': total,
+                'critical': critical,
+                'high': high,
+                'moderate': moderate,
+                'low': low,
+                'avg_score': round(avg_score, 1)
+            }
+        except Exception as e:
+            print(f"Error in get_prediction_stats: {e}")
+            return {
+                'total': 0,
+                'critical': 0,
+                'high': 0,
+                'moderate': 0,
+                'low': 0,
+                'avg_score': 0
+            }
 
 
 class AlertRepository:

@@ -71,7 +71,7 @@ const NAV = [
 export default function Sidebar({ active }) {
     const { theme } = useWeather()
     return (
-        <aside className={`w-[72px] min-h-screen flex flex-col items-center py-5 sticky top-0 z-50 border-r ${theme.navBg} ${theme.navBorder} transition-all duration-[1500ms] flex-shrink-0 backdrop-blur-2xl`}>
+        <aside className={`w-[72px] h-screen flex flex-col items-center py-5 fixed left-0 top-0 z-50 border-r ${theme.navBg} ${theme.navBorder} transition-all duration-[1500ms] flex-shrink-0 backdrop-blur-2xl`}>
             {/* Logo */}
             <Link to="/" className={`w-10 h-10 rounded-xl flex items-center justify-center text-base mb-7 border ${theme.accentBg} ${theme.accentBorder} font-bold`}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

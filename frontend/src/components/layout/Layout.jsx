@@ -23,13 +23,13 @@ export default function Layout({ children }) {
                 {/* Fixed Sidebar */}
                 <Sidebar active={active} />
                 
-                {/* Main content area with fixed topbar */}
-                <div className="flex flex-col flex-1 min-w-0">
+                {/* Main content area with left margin for fixed sidebar */}
+                <div className="flex flex-col flex-1 min-w-0 ml-[72px]">
                     {/* Fixed TopBar */}
                     <TopBar active={active} />
                     
                     {/* Scrollable main content */}
-                    <main className="flex-1 p-6 overflow-y-auto overflow-x-hidden scroll-smooth">
+                    <main className="flex-1 p-8 overflow-y-auto overflow-x-hidden scroll-smooth">
                         {children}
                     </main>
                 </div>
