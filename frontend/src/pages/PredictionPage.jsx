@@ -8,13 +8,21 @@ import { SevenDayForecast, FourteenDayTrend, ThirtyDaySummary, ThirtyDayChart } 
 // Bento Card Component
 const BentoCard = ({ children, className = '', span = 1, tall = false }) => {
     const { theme } = useWeather()
+    
+    // Determine column span class
+    const getColSpanClass = () => {
+        if (span === 3) return 'col-span-1 md:col-span-3'
+        if (span === 2) return 'col-span-1 md:col-span-2'
+        return 'col-span-1'
+    }
+    
     return (
         <div
             className={`
                 ${theme.cardBg} ${theme.cardBorder} 
                 backdrop-blur-xl border rounded-2xl p-6
                 transition-all duration-300 hover:border-violet-400/30
-                ${span === 2 ? 'col-span-2' : 'col-span-1'}
+                ${getColSpanClass()}
                 ${tall ? 'row-span-2' : 'row-span-1'}
                 ${className}
             `}
@@ -435,63 +443,6 @@ const PredictionResults = ({ prediction, onNewPrediction }) => {
                         />
                     </div>
                 </BentoCard>
-
-                {/* Recommendations */}
-                <BentoCard>
-                    <SectionLabel icon={
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                        </svg>
-                    }>
-                        Recommendations
-                    </SectionLabel>
-                    <div className="space-y-3">
-                        {riskLevel === 'CRITICAL' && (
-                            <>
-                                <div className="flex gap-2 text-sm">
-                                    <svg className="flex-shrink-0 text-red-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-                                    </svg>
-                                    <p className={theme.textSecond}>Evacuate if possible</p>
-                                </div>
-                                <div className="flex gap-2 text-sm">
-                                    <svg className="flex-shrink-0 text-red-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                                    </svg>
-                                    <p className={theme.textSecond}>Contact authorities</p>
-                                </div>
-                            </>
-                        )}
-                        {riskLevel === 'HIGH' && (
-                            <div className="flex gap-2 text-sm">
-                                <svg className="flex-shrink-0 text-orange-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                                </svg>
-                                <p className={theme.textSecond}>Monitor conditions closely</p>
-                            </div>
-                        )}
-                        {riskLevel === 'MODERATE' && (
-                            <div className="flex gap-2 text-sm">
-                                <svg className="flex-shrink-0 text-yellow-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                                <p className={theme.textSecond}>Stay vigilant</p>
-                            </div>
-                        )}
-                        {riskLevel === 'LOW' && (
-                            <div className="flex gap-2 text-sm">
-                                <svg className="flex-shrink-0 text-emerald-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                <p className={theme.textSecond}>Conditions are favorable</p>
-                            </div>
-                        )}
-                    </div>
-                </BentoCard>
-
             </div>
 
             {/* All Features Grid - Full Width Below */}

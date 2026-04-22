@@ -361,6 +361,68 @@ def predict():
         # Step 3: Make prediction with ML model
         prediction = model_service.predict(processed_data['features'])
         
+        # Step 3.5: Save prediction to Supabase (risk_history table)
+        try:
+            if history_repo.supabase:  # Only if Supabase is available
+                # Create a location identifier
+                location_name = f"Location ({lat:.4f}, {lon:.4f})"
+                
+                # Try to get actual location name using reverse geocoding
+                try:
+                    import requests
+                    geocode_url = f"https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&format=json"
+                    headers = {'User-Agent': 'GeoSafe-Landslide-Prediction/1.0'}
+                    geocode_response = requests.get(geocode_url, headers=headers, timeout=3)
+                    
+                    if geocode_response.status_code == 200:
+                        geocode_data = geocode_response.json()
+                        address = geocode_data.get('address', {})
+                        
+                        # Build a nice location name
+                        location_parts = []
+                        if address.get('village'):
+                            location_parts.append(address['village'])
+                        elif address.get('town'):
+                            location_parts.append(address['town'])
+                        elif address.get('city'):
+                            location_parts.append(address['city'])
+                        
+                        if address.get('state_district'):
+                            location_parts.append(address['state_district'])
+                        elif address.get('county'):
+                            location_parts.append(address['county'])
+                        
+                        if address.get('state'):
+                            location_parts.append(address['state'])
+                        
+                        if location_parts:
+                            location_name = ', '.join(location_parts)
+                        else:
+                            location_name = geocode_data.get('display_name', location_name).split(',')[0]
+                        
+                        print(f"📍 Resolved location: {location_name}")
+                except Exception as geocode_error:
+                    print(f"⚠️  Geocoding failed: {geocode_error}, using coordinates")
+                
+                # Add location name to features
+                features_with_location = processed_data['raw_data'].copy()
+                features_with_location['location_name'] = location_name
+                features_with_location['lat'] = lat
+                features_with_location['lon'] = lon
+                
+                # Save to risk_history for dashboard display
+                history_repo.add_entry(
+                    district_id=f"loc_{lat:.4f}_{lon:.4f}",  # Unique ID for this location
+                    score=float(prediction['score']),
+                    level=prediction['level'],
+                    features=features_with_location,
+                    model_scores={'xgboost': float(prediction['score'])}
+                )
+                print(f"💾 Saved prediction to Supabase: {location_name} - Score: {prediction['score']:.1f}")
+        except Exception as save_error:
+            print(f"⚠️  Failed to save to Supabase: {save_error}")
+            # Continue even if save fails
+        
         # Step 4: Generate forecast for 7, 14, and 30 days
         forecast_7d = generate_forecast(processed_data['raw_data'], days=7, base_score=prediction['score'])
         forecast_14d = generate_forecast(processed_data['raw_data'], days=14, base_score=prediction['score'])
@@ -535,21 +597,39 @@ def get_history(district_id):
 def get_stats():
     """Get aggregate statistics with enhanced dashboard data"""
     try:
-        # Get basic stats
-        stats = stats_repo.get_dashboard_stats()
+        # Get prediction statistics from risk_history
+        prediction_stats = history_repo.get_prediction_stats()
         
-        # Initialize response with basic stats
+        # Get basic district stats (if any districts exist)
+        try:
+            district_stats = stats_repo.get_dashboard_stats()
+        except:
+            district_stats = {
+                'total_districts': 0,
+                'critical_count': 0,
+                'high_count': 0,
+                'moderate_count': 0,
+                'low_count': 0,
+                'avg_risk_score': 0,
+                'last_refresh': None
+            }
+        
+        # Initialize response with prediction stats (primary data source)
         response = {
-            'total_districts': stats.get('total_districts', 0),
-            'critical_count': stats.get('critical_count', 0),
-            'high_count': stats.get('high_count', 0),
-            'moderate_count': stats.get('moderate_count', 0),
-            'low_count': stats.get('low_count', 0),
-            'avg_risk_score': stats.get('avg_risk_score', 0),
-            'last_refresh': stats.get('last_refresh'),
+            # Prediction statistics (from all predictions made)
+            'total_predictions': prediction_stats['total'],
+            'critical_count': prediction_stats['critical'],
+            'high_count': prediction_stats['high'],
+            'moderate_count': prediction_stats['moderate'],
+            'low_count': prediction_stats['low'],
+            'avg_risk_score': prediction_stats['avg_score'],
+            
+            # District statistics (if districts are defined)
+            'total_districts': district_stats.get('total_districts', 0),
+            'last_refresh': district_stats.get('last_refresh'),
         }
         
-        # Try to get additional data, but don't fail if it's not available
+        # Try to get additional data
         try:
             response['recent_predictions'] = history_repo.get_recent_predictions(limit=8)
         except Exception as e:
@@ -563,23 +643,48 @@ def get_stats():
             response['trend_7d'] = []
         
         try:
-            response['score_distribution'] = stats_repo.get_score_distribution()
+            # Get score distribution from predictions
+            all_predictions = history_repo.get_all_predictions(limit=1000)
+            ranges = {
+                '0–20': 0,
+                '21–40': 0,
+                '41–60': 0,
+                '61–80': 0,
+                '81–100': 0
+            }
+            
+            for pred in all_predictions:
+                score = pred.get('risk_score', 0)
+                if score <= 20:
+                    ranges['0–20'] += 1
+                elif score <= 40:
+                    ranges['21–40'] += 1
+                elif score <= 60:
+                    ranges['41–60'] += 1
+                elif score <= 80:
+                    ranges['61–80'] += 1
+                else:
+                    ranges['81–100'] += 1
+            
+            response['score_distribution'] = [{'range': k, 'count': v} for k, v in ranges.items()]
         except Exception as e:
             print(f"Error getting score distribution: {e}")
             response['score_distribution'] = []
         
         try:
-            highest_risk = district_repo.get_highest_risk_district()
-            response['highest_risk_location'] = highest_risk.get('name', 'N/A') if highest_risk else 'N/A'
+            # Get highest risk from recent predictions
+            recent = history_repo.get_recent_predictions(limit=100)
+            if recent:
+                highest = max(recent, key=lambda x: x.get('score', 0))
+                response['highest_risk_location'] = highest.get('location', 'N/A')
+                response['highest_risk_score'] = highest.get('score', 0)
+            else:
+                response['highest_risk_location'] = 'N/A'
+                response['highest_risk_score'] = 0
         except Exception as e:
-            print(f"Error getting highest risk district: {e}")
+            print(f"Error getting highest risk: {e}")
             response['highest_risk_location'] = 'N/A'
-        
-        try:
-            response['total_predictions'] = stats_repo.get_total_predictions()
-        except Exception as e:
-            print(f"Error getting total predictions: {e}")
-            response['total_predictions'] = 0
+            response['highest_risk_score'] = 0
         
         return jsonify(response)
     except Exception as e:

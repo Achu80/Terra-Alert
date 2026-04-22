@@ -2,7 +2,7 @@ import { useWeather, THEMES } from "../../context/WeatherContext"
 import { StalenessIndicator } from "../ui/UIKit"
 
 const PAGE_TITLES = {
-    home: "TerraAlert", map: "Map Explorer", dashboard: "Analytics Dashboard",
+    home: "Landslide Predictions", map: "Map Explorer", dashboard: "Analytics Dashboard",
     report: "Risk Report", history: "Historical View", sources: "Data Sources", settings: "Settings",
 }
 
@@ -57,13 +57,13 @@ const WeatherIcon = ({ type }) => {
 export default function TopBar({ active }) {
     const { theme, stateName, setStateName } = useWeather()
     return (
-        <header className={`h-[60px] flex-shrink-0 flex items-center justify-between px-6 sticky top-0 z-40 border-b ${theme.navBg} ${theme.navBorder} backdrop-blur-2xl transition-all duration-[1500ms]`}>
+        <header className={`h-[80px] flex-shrink-0 flex items-center justify-between px-8 sticky top-0 z-40 border-b ${theme.navBg} ${theme.navBorder} backdrop-blur-2xl transition-all duration-[1500ms]`}>
             <div>
-                <h1 className={`text-base font-semibold leading-none ${theme.textPrimary}`}>{PAGE_TITLES[active]}</h1>
-                <p className={`text-[11px] mt-0.5 ${theme.textMuted}`}>Himachal Pradesh · Real-time monitoring</p>
+                <h1 className={`text-2xl font-bold leading-none ${theme.textPrimary} mb-1`}>{PAGE_TITLES[active]}</h1>
+                <p className={`text-sm ${theme.textMuted}`}>Himachal Pradesh · Real-time monitoring</p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
                 <StalenessIndicator minutesOld={8} />
 
                 {/* Weather dev toggle */}
@@ -73,7 +73,7 @@ export default function TopBar({ active }) {
                             key={ws.name}
                             onClick={() => setStateName(ws.name)}
                             title={ws.label}
-                            className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center
+                            className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center
                 ${stateName === ws.name ? `${theme.accentBg} ${theme.accentText}` : `bg-transparent ${theme.textMuted}`}`}
                         >
                             <WeatherIcon type={ws.name} />
@@ -81,7 +81,7 @@ export default function TopBar({ active }) {
                     ))}
                 </div>
 
-                <div className={`glass px-3 py-1.5 rounded-lg text-xs ${theme.textSecond} border ${theme.cardBorder}`}>
+                <div className={`glass px-4 py-2 rounded-lg text-sm ${theme.textSecond} border ${theme.cardBorder}`}>
                     {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                 </div>
             </div>

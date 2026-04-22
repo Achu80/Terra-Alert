@@ -8,13 +8,25 @@ export default function Layout({ children }) {
     const { theme } = useWeather()
     const location = useLocation()
     
+    // Check if we're on the landing page
+    const isLandingPage = location.pathname === '/'
+    
     // Map routes to page IDs
     const getActiveFromPath = (pathname) => {
-        if (pathname === '/') return 'home'
+        if (pathname === '/home') return 'home'
         return pathname.slice(1) // Remove leading slash
     }
     
     const active = getActiveFromPath(location.pathname)
+    
+    // Landing page without sidebar/topbar
+    if (isLandingPage) {
+        return (
+            <div className="min-h-screen">
+                {children}
+            </div>
+        )
+    }
     
     return (
         <div className={`min-h-screen flex font-sans ${theme.textPrimary} transition-colors duration-[1500ms]`}>
@@ -23,13 +35,13 @@ export default function Layout({ children }) {
                 {/* Fixed Sidebar */}
                 <Sidebar active={active} />
                 
-                {/* Main content area with fixed topbar */}
-                <div className="flex flex-col flex-1 min-w-0">
+                {/* Main content area with left margin for fixed sidebar */}
+                <div className="flex flex-col flex-1 min-w-0 ml-[72px]">
                     {/* Fixed TopBar */}
                     <TopBar active={active} />
                     
                     {/* Scrollable main content */}
-                    <main className="flex-1 p-6 overflow-y-auto overflow-x-hidden scroll-smooth">
+                    <main className="flex-1 p-8 overflow-y-auto overflow-x-hidden scroll-smooth">
                         {children}
                     </main>
                 </div>

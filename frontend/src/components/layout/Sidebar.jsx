@@ -59,7 +59,7 @@ const SettingsIcon = () => (
 )
 
 const NAV = [
-    { id: "home", path: "/", icon: HomeIcon, label: "Home" },
+    { id: "home", path: "/home", icon: HomeIcon, label: "Predictions" },
     { id: "map", path: "/map", icon: MapIcon, label: "Map Explorer" },
     { id: "dashboard", path: "/dashboard", icon: DashboardIcon, label: "Dashboard" },
     { id: "report", path: "/report", icon: ReportIcon, label: "Risk Report" },
@@ -71,7 +71,7 @@ const NAV = [
 export default function Sidebar({ active }) {
     const { theme } = useWeather()
     return (
-        <aside className={`w-[72px] min-h-screen flex flex-col items-center py-5 sticky top-0 z-50 border-r ${theme.navBg} ${theme.navBorder} transition-all duration-[1500ms] flex-shrink-0 backdrop-blur-2xl`}>
+        <aside className={`w-[72px] h-screen flex flex-col items-center py-5 fixed left-0 top-0 z-50 border-r ${theme.navBg} ${theme.navBorder} transition-all duration-[1500ms] flex-shrink-0 backdrop-blur-2xl`}>
             {/* Logo */}
             <Link to="/" className={`w-10 h-10 rounded-xl flex items-center justify-center text-base mb-7 border ${theme.accentBg} ${theme.accentBorder} font-bold`}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -101,10 +101,14 @@ export default function Sidebar({ active }) {
                 })}
             </nav>
 
-            {/* Avatar */}
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold border ${theme.accentBg} ${theme.cardBorder} ${theme.textSecond} mt-auto`}>
+            {/* Avatar - Link to Landing Page */}
+            <Link 
+                to="/" 
+                title="Back to Landing Page"
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold border ${theme.accentBg} ${theme.cardBorder} ${theme.textSecond} mt-auto hover:bg-white/[0.06] transition-all duration-200 cursor-pointer`}
+            >
                 GS
-            </div>
+            </Link>
         </aside>
     )
 }
