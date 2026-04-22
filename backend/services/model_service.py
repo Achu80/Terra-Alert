@@ -4,6 +4,8 @@ from typing import Dict, List, Optional
 import joblib
 import pickle
 import xgboost as xgb
+import pandas as pd
+
 
 
 class ModelService:
@@ -100,7 +102,7 @@ class ModelService:
           slope = features[1]      # Second feature
         
         # Plains area override
-          if elevation < 500 or slope < 10:
+          if elevation < 800 and slope < 15:
             print(f"⛰️ Plains override: elevation={elevation}m, slope={slope}°")
             return {
                 'score': 5.0,
@@ -115,16 +117,19 @@ class ModelService:
                 'note': 'Low-risk plains area - outside mountainous prediction zone'
             }
         
-        # Reshape features for sklearn
-          X = np.array(features).reshape(1, -1)
-        
-        # Apply StandardScaler (IMPORTANT!)
-          if self.scaler:
-            X_scaled = self.scaler.transform(X)
-            print(f"✓ Features scaled")
-          else:
-            print("⚠ Warning: No scaler found, using unscaled features")
-            X_scaled = X
+            feature_names = [
+                'elevation', 'slope', 'aspect', 'ndvi', 'ndwi', 'soil_type',
+                'rainfall_3d', 'rainfall_7d', 'rainfall_14d', 'rainfall_30d',
+                'rainfall_ratio_3d_7d', 'rainfall_ratio_7d_14d', 'rainfall_ratio_14d_30d',
+                'rainfall_acceleration', 'high_short_term_rain', 'sustained_heavy_rain',
+                'slope_elevation_product', 'steep_low_elevation', 'north_facing', 'low_veg_steep'
+            ]
+
+            # Create DataFrame with proper column names
+            X = pd.DataFrame([features], columns=feature_names)
+
+            if self.scaler:
+                X_scaled = self.scaler.transform(X)
         
         # Get probability of landslide (class 1)
           proba = self.model.predict_proba(X_scaled)[0]
