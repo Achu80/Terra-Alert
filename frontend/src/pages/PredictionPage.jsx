@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useWeather } from '../context/WeatherContext'
 import InteractiveMap from '../components/map/InteractiveMap'
 import RiskHeatmap from '../components/map/RiskHeatmap'
+import { PageTransition, FadeInUp, ScaleIn, SlideIn } from '../components/animations/PageTransition'
+import { SevenDayForecast, FourteenDayTrend, ThirtyDaySummary, ThirtyDayChart } from '../components/forecast/ForecastDisplay'
 
 // Bento Card Component
 const BentoCard = ({ children, className = '', span = 1, tall = false }) => {
@@ -74,16 +76,27 @@ const LocationSelector = ({ onLocationSelect, loading }) => {
         
         try {
             const response = await fetch(
-                `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)},India&format=json&limit=1`
+                `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)},Himachal Pradesh,India&format=json&limit=1`
             )
             const data = await response.json()
             
             if (data && data.length > 0) {
                 const { lat, lon, display_name } = data[0]
-                const coords = { lat: parseFloat(lat), lon: parseFloat(lon), name: display_name }
+                const latitude = parseFloat(lat)
+                const longitude = parseFloat(lon)
+                
+                // Validate location is within Himachal Pradesh bounds
+                const HP_BOUNDS = { north: 33.2, south: 30.4, east: 79.0, west: 75.6 }
+                if (latitude < HP_BOUNDS.south || latitude > HP_BOUNDS.north || 
+                    longitude < HP_BOUNDS.west || longitude > HP_BOUNDS.east) {
+                    alert('Location must be within Himachal Pradesh. Please search for a location in Himachal Pradesh.')
+                    return
+                }
+                
+                const coords = { lat: latitude, lon: longitude, name: display_name }
                 setSelectedCoords(coords)
             } else {
-                alert('Location not found. Please try another search.')
+                alert('Location not found in Himachal Pradesh. Please try another search.')
             }
         } catch (error) {
             console.error('Geocoding error:', error)
@@ -140,7 +153,7 @@ const LocationSelector = ({ onLocationSelect, loading }) => {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                            placeholder="Enter city name..."
+                            placeholder="Enter city/town in HP..."
                             className={`w-full px-4 py-3 rounded-xl bg-white/5 border ${theme.cardBorder} ${theme.textPrimary} placeholder-white/40 focus:outline-none focus:border-violet-400 transition-colors text-sm`}
                             disabled={loading}
                         />
@@ -229,6 +242,88 @@ const PredictionLoading = () => {
     )
 }
 
+// Forecast Section with Tabs
+const ForecastSection = ({ forecast }) => {
+    const { theme } = useWeather()
+    const [activeTab, setActiveTab] = useState('7days')
+    
+    console.log('ForecastSection - Full forecast data:', forecast)
+    
+    const tabs = [
+        { id: '7days', label: '7 Days', icon: '📅' },
+        { id: '14days', label: '14 Days', icon: '📊' },
+        { id: '30days', label: '30 Days', icon: '📈' }
+    ]
+    
+    return (
+        <BentoCard className="mt-4">
+            <div className="flex items-center justify-between mb-4">
+                <SectionLabel icon={
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                }>
+                    Risk Forecast
+                </SectionLabel>
+                
+                {/* Tab Buttons */}
+                <div className="flex gap-2">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`
+                                px-4 py-2 rounded-xl text-sm font-medium transition-all
+                                ${activeTab === tab.id 
+                                    ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/30' 
+                                    : `${theme.textSecond} bg-white/5 hover:bg-white/10`
+                                }
+                            `}
+                        >
+                            <span className="mr-2">{tab.icon}</span>
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+            
+            {/* Debug info */}
+            <div className="mb-4 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded text-xs text-yellow-400">
+                <div>Active Tab: {activeTab}</div>
+                <div>7days data: {forecast['7days']?.length || 0} items</div>
+                <div>14days data: {forecast['14days']?.length || 0} items</div>
+                <div>30days data: {forecast['30days']?.length || 0} items</div>
+            </div>
+            
+            <div className="space-y-6">
+                {/* 7-Day View */}
+                {activeTab === '7days' && (
+                    <div className="space-y-4">
+                        <SevenDayForecast forecast={forecast['7days']} />
+                        <FourteenDayTrend forecast={forecast['7days']} />
+                    </div>
+                )}
+                
+                {/* 14-Day View */}
+                {activeTab === '14days' && (
+                    <div className="space-y-4">
+                        <FourteenDayTrend forecast={forecast['14days']} />
+                    </div>
+                )}
+                
+                {/* 30-Day View */}
+                {activeTab === '30days' && (
+                    <div className="space-y-4">
+                        <ThirtyDaySummary forecast={forecast['30days']} />
+                        <FourteenDayTrend forecast={forecast['30days']} />
+                    </div>
+                )}
+            </div>
+        </BentoCard>
+    )
+}
+
 // Results Component with Bento Layout
 const PredictionResults = ({ prediction, onNewPrediction }) => {
     const { theme } = useWeather()
@@ -285,7 +380,9 @@ const PredictionResults = ({ prediction, onNewPrediction }) => {
                             {riskLevel} RISK
                         </div>
                         <p className={`text-sm ${theme.textMuted} mt-4`}>
-                            Confidence: {(prediction.prediction.confidence * 100).toFixed(0)}%
+                            Confidence: {prediction.prediction.confidence >= 1 
+                                ? `${prediction.prediction.confidence.toFixed(0)}%` 
+                                : `${(prediction.prediction.confidence * 100).toFixed(0)}%`}
                         </p>
                     </div>
                 </BentoCard>
@@ -424,6 +521,11 @@ const PredictionResults = ({ prediction, onNewPrediction }) => {
                     ))}
                 </div>
             </BentoCard>
+
+            {/* Future Forecast - Full Width with Tabs */}
+            {prediction.forecast && (
+                <ForecastSection forecast={prediction.forecast} />
+            )}
         </div>
     )
 }
@@ -444,7 +546,8 @@ export default function PredictionPage() {
                     lat: location.lat,
                     lon: location.lon,
                     days_back: 30,
-                    buffer: 1000
+                    buffer: 1000,
+                    use_cache: false  // Always get fresh prediction for individual locations
                 })
             })
 
@@ -470,31 +573,37 @@ export default function PredictionPage() {
     }
 
     return (
-        <div className="page-enter">
+        <PageTransition>
             <div className="mb-6">
-                <h1 className="text-3xl font-bold text-white mb-2">
-                    Landslide Risk Prediction
-                </h1>
-                <p className="text-white/60 text-sm">
-                    Real-time risk assessment powered by satellite data and machine learning
-                </p>
+                <FadeInUp>
+                    <h1 className="text-3xl font-bold text-white mb-2">
+                        Landslide Risk Prediction
+                    </h1>
+                    <p className="text-white/60 text-sm">
+                        Real-time risk assessment powered by satellite data and machine learning
+                    </p>
+                </FadeInUp>
             </div>
 
             {step === 'select' && (
-                <LocationSelector 
-                    onLocationSelect={handleLocationSelect}
-                    loading={false}
-                />
+                <FadeInUp delay={0.1}>
+                    <LocationSelector 
+                        onLocationSelect={handleLocationSelect}
+                        loading={false}
+                    />
+                </FadeInUp>
             )}
 
             {step === 'loading' && <PredictionLoading />}
 
             {step === 'results' && prediction && (
-                <PredictionResults 
-                    prediction={prediction}
-                    onNewPrediction={handleNewPrediction}
-                />
+                <FadeInUp>
+                    <PredictionResults 
+                        prediction={prediction}
+                        onNewPrediction={handleNewPrediction}
+                    />
+                </FadeInUp>
             )}
-        </div>
+        </PageTransition>
     )
 }
