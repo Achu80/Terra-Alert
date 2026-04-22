@@ -89,7 +89,7 @@ def predict_7day():
                 'confidence': float(prediction['confidence'])
             })
 
-            if prediction['score'] >= 70:
+            if prediction['score'] >= 3:
                 alert_service.send_landslide_alert(
                     lat=lat,
                     lon=lon,
