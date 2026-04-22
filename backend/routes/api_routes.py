@@ -41,6 +41,185 @@ def health():
         'timestamp': datetime.utcnow().isoformat()
     })
 
+@api_bp.route('/districts/himachal', methods=['GET'])
+def get_himachal_districts():
+    """Get all Himachal Pradesh districts with real-time GEE data (optimized with parallel processing and caching)"""
+    try:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        import time
+        
+        # Check if we should use cache
+        use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        force_refresh = request.args.get('force_refresh', 'false').lower() == 'true'
+        
+        # Try to get from cache first (30 minutes max age)
+        if use_cache and not force_refresh:
+            try:
+                from database.cache_repository import DistrictCache
+                cache = DistrictCache()
+                cached_data = cache.get_all_districts(max_age_minutes=30)
+                
+                if cached_data:
+                    print(f"✅ Returning cached district data ({len(cached_data)} districts)")
+                    return jsonify({
+                        'districts': cached_data,
+                        'count': len(cached_data),
+                        'state': 'Himachal Pradesh',
+                        'cached': True,
+                        'cache_age_minutes': cache.get_cache_age_minutes(),
+                        'timestamp': datetime.utcnow().isoformat()
+                    })
+            except Exception as cache_error:
+                print(f"Cache read failed: {cache_error}, fetching fresh data...")
+        
+        # Himachal Pradesh districts with their coordinates
+        HP_DISTRICTS = [
+            {"id": "shimla", "name": "Shimla", "lat": 31.1048, "lon": 77.1734},
+            {"id": "mandi", "name": "Mandi", "lat": 31.7084, "lon": 76.9318},
+            {"id": "kullu", "name": "Kullu", "lat": 31.9578, "lon": 77.1093},
+            {"id": "kangra", "name": "Kangra", "lat": 32.0998, "lon": 76.2691},
+            {"id": "chamba", "name": "Chamba", "lat": 32.5562, "lon": 76.1262},
+            {"id": "hamirpur", "name": "Hamirpur", "lat": 31.6838, "lon": 76.5178},
+            {"id": "una", "name": "Una", "lat": 31.4685, "lon": 76.2708},
+            {"id": "bilaspur", "name": "Bilaspur", "lat": 31.3409, "lon": 76.7568},
+            {"id": "solan", "name": "Solan", "lat": 30.9045, "lon": 77.0967},
+            {"id": "sirmaur", "name": "Sirmaur", "lat": 30.5628, "lon": 77.2839},
+            {"id": "kinnaur", "name": "Kinnaur", "lat": 31.5830, "lon": 78.3830},
+            {"id": "lahaul_spiti", "name": "Lahaul and Spiti", "lat": 32.5667, "lon": 77.1500},
+        ]
+        
+        start_time = time.time()
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=30)
+        
+        def fetch_district_data(district):
+            """Fetch data for a single district"""
+            try:
+                # Fetch GEE data for district center
+                gee_data = gee_service.get_all_features(
+                    district['lat'], 
+                    district['lon'],
+                    start_date.strftime('%Y-%m-%d'),
+                    end_date.strftime('%Y-%m-%d'),
+                    buffer=5000  # 5km buffer for district center
+                )
+                
+                if gee_data:
+                    # Process data
+                    processed_data = data_processor.prepare_model_input(gee_data)
+                    
+                    # Get prediction
+                    prediction = model_service.predict(processed_data['features'])
+                    
+                    # Build district data
+                    return {
+                        'id': district['id'],
+                        'name': district['name'],
+                        'lat': district['lat'],
+                        'lon': district['lon'],
+                        'score': float(prediction['score']),
+                        'level': prediction['level'],
+                        'confidence': float(prediction['confidence']),
+                        'elevation': float(gee_data.get('elevation', 0)),
+                        'slope': float(gee_data.get('slope', 0)),
+                        'rainfall_30d': float(gee_data.get('rainfall_30d', 0)),
+                        'ndvi': float(gee_data.get('ndvi', 0)),
+                        'ndwi': float(gee_data.get('ndwi', 0)),
+                        'soil_type': int(gee_data.get('soil_type', 0)),
+                        'last_updated': datetime.utcnow().isoformat(),
+                        'success': True
+                    }
+                else:
+                    # Fallback if GEE data not available
+                    return {
+                        'id': district['id'],
+                        'name': district['name'],
+                        'lat': district['lat'],
+                        'lon': district['lon'],
+                        'score': 0,
+                        'level': 'UNKNOWN',
+                        'confidence': 0,
+                        'error': 'No GEE data available',
+                        'success': False
+                    }
+            except Exception as e:
+                print(f"❌ Error fetching data for {district['name']}: {e}")
+                return {
+                    'id': district['id'],
+                    'name': district['name'],
+                    'lat': district['lat'],
+                    'lon': district['lon'],
+                    'score': 0,
+                    'level': 'ERROR',
+                    'confidence': 0,
+                    'error': str(e),
+                    'success': False
+                }
+        
+        # Parallel processing - fetch all districts simultaneously
+        print(f"🚀 Fetching data for {len(HP_DISTRICTS)} districts in parallel...")
+        districts_data = []
+        
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            # Submit all tasks
+            future_to_district = {
+                executor.submit(fetch_district_data, district): district 
+                for district in HP_DISTRICTS
+            }
+            
+            # Collect results as they complete
+            for future in as_completed(future_to_district):
+                district = future_to_district[future]
+                try:
+                    result = future.result()
+                    districts_data.append(result)
+                    if result.get('success'):
+                        print(f"✅ {district['name']}: Score {result['score']:.1f}")
+                    else:
+                        print(f"⚠️  {district['name']}: {result.get('error', 'Unknown error')}")
+                except Exception as e:
+                    print(f"❌ Exception for {district['name']}: {e}")
+                    districts_data.append({
+                        'id': district['id'],
+                        'name': district['name'],
+                        'lat': district['lat'],
+                        'lon': district['lon'],
+                        'score': 0,
+                        'level': 'ERROR',
+                        'confidence': 0,
+                        'error': str(e),
+                        'success': False
+                    })
+        
+        elapsed_time = time.time() - start_time
+        print(f"⏱️  Fetched {len(districts_data)} districts in {elapsed_time:.2f} seconds")
+        
+        # Save to cache for future requests
+        if use_cache:
+            try:
+                from database.cache_repository import DistrictCache
+                cache = DistrictCache()
+                cache.save_districts(districts_data)
+                print("💾 Saved district data to cache")
+            except Exception as cache_error:
+                print(f"⚠️  Cache save failed: {cache_error}")
+        
+        return jsonify({
+            'districts': districts_data,
+            'count': len(districts_data),
+            'state': 'Himachal Pradesh',
+            'cached': False,
+            'fetch_time_seconds': round(elapsed_time, 2),
+            'timestamp': datetime.utcnow().isoformat()
+        })
+    
+    except Exception as e:
+        import traceback
+        print(f"❌ Error in /api/districts/himachal: {e}")
+        print(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+
 @api_bp.route('/districts', methods=['GET'])
 def get_districts():
     """Get all districts with current risk data"""

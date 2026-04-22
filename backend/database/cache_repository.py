@@ -1,93 +1,115 @@
 """
-Cache repository for storing recent predictions
-Avoids re-fetching GEE data for same locations
+Simple in-memory cache for district data and predictions
+This avoids hitting GEE API repeatedly for the same data
 """
-from typing import Optional, Dict
+
 from datetime import datetime, timedelta
-from database.supabase_client import get_supabase
-import math
+import json
+
+class DistrictCache:
+    """In-memory cache for district data"""
+    
+    # Class-level variables (shared across all instances)
+    _cache = {}
+    _cache_timestamp = None
+    
+    def save_districts(self, districts_data):
+        """Save all districts data to cache"""
+        DistrictCache._cache['districts'] = districts_data
+        DistrictCache._cache_timestamp = datetime.utcnow()
+        print(f"💾 Cached {len(districts_data)} districts at {DistrictCache._cache_timestamp}")
+        print(f"💾 Cache now contains: {list(DistrictCache._cache.keys())}")
+    
+    def get_all_districts(self, max_age_minutes=30):
+        """Get all districts from cache if not expired (default: 30 minutes)"""
+        print(f"🔍 Checking cache... Timestamp: {DistrictCache._cache_timestamp}, Keys: {list(DistrictCache._cache.keys())}")
+        
+        if not DistrictCache._cache_timestamp:
+            print("❌ Cache miss: No timestamp found")
+            return None
+        
+        age = datetime.utcnow() - DistrictCache._cache_timestamp
+        if age > timedelta(minutes=max_age_minutes):
+            print(f"⏰ Cache expired (age: {age.total_seconds()/60:.1f} minutes, max: {max_age_minutes} minutes)")
+            return None
+        
+        districts = DistrictCache._cache.get('districts')
+        if districts:
+            print(f"✅ Cache hit! Returning {len(districts)} districts (age: {age.total_seconds()/60:.1f} minutes)")
+        else:
+            print("❌ Cache miss: No districts in cache")
+        return districts
+    
+    def get_cache_age_minutes(self):
+        """Get cache age in minutes"""
+        if not DistrictCache._cache_timestamp:
+            return None
+        age = datetime.utcnow() - DistrictCache._cache_timestamp
+        return round(age.total_seconds() / 60, 1)
+    
+    def clear(self):
+        """Clear the cache"""
+        DistrictCache._cache = {}
+        DistrictCache._cache_timestamp = None
+        print("🗑️  Cache cleared")
 
 
 class PredictionCache:
-    """Cache for location-based predictions"""
+    """In-memory cache for individual predictions"""
     
-    def __init__(self):
-        self.supabase = get_supabase()
+    # Class-level variable (shared across all instances)
+    _predictions = {}
     
-    def _location_key(self, lat: float, lon: float, precision: int = 3) -> str:
-        """Create location key (rounded to reduce duplicates)"""
-        return f"{round(lat, precision)}_{round(lon, precision)}"
+    def _get_key(self, lat, lon):
+        """Generate cache key from coordinates (rounded to 4 decimals)"""
+        return f"{round(lat, 4)}_{round(lon, 4)}"
     
-    def get_cached(self, lat: float, lon: float, max_age_hours: int = 2) -> Optional[Dict]:
-        """
-        Get cached prediction for location if recent enough
-        
-        Args:
-            lat: Latitude
-            lon: Longitude
-            max_age_hours: Maximum age of cached data in hours
-        
-        Returns:
-            Cached prediction or None
-        """
-        location_key = self._location_key(lat, lon)
-        cutoff_time = (datetime.utcnow() - timedelta(hours=max_age_hours)).isoformat()
-        
-        try:
-            result = self.supabase.table('prediction_cache')\
-                .select('*')\
-                .eq('location_key', location_key)\
-                .gte('created_at', cutoff_time)\
-                .order('created_at', desc=True)\
-                .limit(1)\
-                .execute()
-            
-            if result.data:
-                return result.data[0]
-            return None
-        except:
-            # Table might not exist yet
-            return None
-    
-    def save_prediction(self, lat: float, lon: float, prediction_data: Dict) -> Dict:
-        """
-        Save prediction to cache
-        
-        Args:
-            lat: Latitude
-            lon: Longitude
-            prediction_data: Full prediction result
-        
-        Returns:
-            Saved cache entry
-        """
-        location_key = self._location_key(lat, lon)
-        
-        cache_entry = {
-            'location_key': location_key,
-            'lat': lat,
-            'lon': lon,
+    def save_prediction(self, lat, lon, prediction_data):
+        """Save a prediction to cache"""
+        key = self._get_key(lat, lon)
+        PredictionCache._predictions[key] = {
             'prediction_data': prediction_data,
             'created_at': datetime.utcnow().isoformat()
         }
-        
-        try:
-            result = self.supabase.table('prediction_cache')\
-                .insert(cache_entry)\
-                .execute()
-            return result.data[0] if result.data else cache_entry
-        except:
-            # If table doesn't exist, just return the data
-            return cache_entry
+        print(f"💾 Cached prediction for {lat:.4f}, {lon:.4f}")
     
-    def clear_old_cache(self, days: int = 7):
-        """Delete cache entries older than specified days"""
-        cutoff_time = (datetime.utcnow() - timedelta(days=days)).isoformat()
+    def get_cached(self, lat, lon, max_age_hours=2):
+        """Get cached prediction if available and not expired"""
+        key = self._get_key(lat, lon)
+        cached = PredictionCache._predictions.get(key)
         
-        try:
-            self.supabase.table('prediction_cache')\
-                .delete()\
-                .lt('created_at', cutoff_time)\
-                .execute()
-        except:
-            pass
+        if not cached:
+            return None
+        
+        created_at = datetime.fromisoformat(cached['created_at'])
+        age = datetime.utcnow() - created_at
+        
+        if age > timedelta(hours=max_age_hours):
+            # Expired, remove from cache
+            del PredictionCache._predictions[key]
+            return None
+        
+        print(f"✅ Cache hit for {lat:.4f}, {lon:.4f} (age: {age.total_seconds()/60:.1f} minutes)")
+        return cached
+    
+    def clear(self):
+        """Clear all cached predictions"""
+        PredictionCache._predictions = {}
+        print("🗑️  Prediction cache cleared")
+    
+    def cleanup_expired(self, max_age_hours=2):
+        """Remove expired predictions from cache"""
+        now = datetime.utcnow()
+        expired_keys = []
+        
+        for key, cached in PredictionCache._predictions.items():
+            created_at = datetime.fromisoformat(cached['created_at'])
+            age = now - created_at
+            if age > timedelta(hours=max_age_hours):
+                expired_keys.append(key)
+        
+        for key in expired_keys:
+            del PredictionCache._predictions[key]
+        
+        if expired_keys:
+            print(f"🗑️  Cleaned up {len(expired_keys)} expired predictions")

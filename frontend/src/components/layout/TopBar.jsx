@@ -2,7 +2,7 @@ import { useWeather, THEMES } from "../../context/WeatherContext"
 import { StalenessIndicator } from "../ui/UIKit"
 
 const PAGE_TITLES = {
-    home: "Overview", map: "Map Explorer", dashboard: "Analytics Dashboard",
+    home: "TerraAlert", map: "Map Explorer", dashboard: "Analytics Dashboard",
     report: "Risk Report", history: "Historical View", sources: "Data Sources", settings: "Settings",
 }
 

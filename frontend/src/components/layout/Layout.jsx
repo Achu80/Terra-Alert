@@ -20,10 +20,16 @@ export default function Layout({ children }) {
         <div className={`min-h-screen flex font-sans ${theme.textPrimary} transition-colors duration-[1500ms]`}>
             <WeatherBackground />
             <div className="relative z-10 flex w-full">
+                {/* Fixed Sidebar */}
                 <Sidebar active={active} />
+                
+                {/* Main content area with fixed topbar */}
                 <div className="flex flex-col flex-1 min-w-0">
+                    {/* Fixed TopBar */}
                     <TopBar active={active} />
-                    <main className="flex-1 p-6 overflow-y-auto overflow-x-hidden">
+                    
+                    {/* Scrollable main content */}
+                    <main className="flex-1 p-6 overflow-y-auto overflow-x-hidden scroll-smooth">
                         {children}
                     </main>
                 </div>
