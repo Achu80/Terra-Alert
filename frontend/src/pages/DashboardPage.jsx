@@ -768,14 +768,20 @@ const DashboardPage = ({ onViewOnMap = () => {} }) => {
           />
           <MetricCard
             title="Highest Risk Area"
-            value={stats.highest_risk_location || 'No data yet'}
-            subtitle={stats.highest_risk_score ? `Score: ${stats.highest_risk_score.toFixed(1)}` : 'Make predictions to see data'}
-            color="text-red-400"
+            value={stats.highest_risk_location ? stats.highest_risk_location : '✓ All Safe'}
+            subtitle={stats.highest_risk_location ? (stats.highest_risk_score ? `Score: ${stats.highest_risk_score.toFixed(1)}` : 'Analyzing...') : 'No high-risk areas detected'}
+            color={stats.highest_risk_location ? "text-red-400" : "text-emerald-400"}
             icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
+              stats.highest_risk_location ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )
             }
             delay={300}
           />
@@ -787,17 +793,9 @@ const DashboardPage = ({ onViewOnMap = () => {} }) => {
           <FeatureImportanceChart />
         </div>
 
-        {/* Recent Predictions Table */}
-        {recent_predictions && recent_predictions.length > 0 && (
-          <RecentPredictionsTable predictions={recent_predictions} onViewOnMap={onViewOnMap} />
-        )}
-        
-        {/* Empty state for predictions */}
-        {(!recent_predictions || recent_predictions.length === 0) && (
-          <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-            <p className="text-white/60 mb-2">No predictions available yet</p>
-            <p className="text-white/40 text-sm">Start making predictions to see them here</p>
-          </div>
+        {/* 7-Day Trend Chart */}
+        {trend_7d && trend_7d.length > 0 && (
+          <TrendChart data={trend_7d} />
         )}
       </div>
     </div>

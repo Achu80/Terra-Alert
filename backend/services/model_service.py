@@ -128,12 +128,17 @@ class ModelService:
             # Create DataFrame with proper column names
             X = pd.DataFrame([features], columns=feature_names)
 
+            # Scale features if scaler is available
             if self.scaler:
                 X_scaled = self.scaler.transform(X)
+            else:
+                # Use unscaled features if scaler not available
+                print("⚠ Scaler not available, using unscaled features")
+                X_scaled = X.values
         
-        # Get probability of landslide (class 1)
-          proba = self.model.predict_proba(X_scaled)[0]
-          landslide_probability = float(proba[1])
+            # Get probability of landslide (class 1)
+            proba = self.model.predict_proba(X_scaled)[0]
+            landslide_probability = float(proba[1])
         
         # Convert to 0-100 scale
           risk_score = landslide_probability * 100

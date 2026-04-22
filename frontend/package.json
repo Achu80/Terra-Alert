@@ -12,6 +12,8 @@
     "@supabase/supabase-js": "^2.104.0",
     "axios": "^1.15.2",
     "framer-motion": "^12.38.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",
     "lucide-react": "^1.8.0",

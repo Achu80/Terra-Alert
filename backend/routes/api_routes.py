@@ -672,18 +672,42 @@ def get_stats():
             response['score_distribution'] = []
         
         try:
-            # Get highest risk from recent predictions
+            # Get highest risk from RECENT predictions (last 24 hours only)
+            # Only consider HIGH or CRITICAL risk levels (score >= 60)
+            from datetime import datetime, timedelta
+            
             recent = history_repo.get_recent_predictions(limit=100)
             if recent:
-                highest = max(recent, key=lambda x: x.get('score', 0))
-                response['highest_risk_location'] = highest.get('location', 'N/A')
-                response['highest_risk_score'] = highest.get('score', 0)
+                # Filter for predictions from last 24 hours
+                now = datetime.utcnow()
+                recent_24h = []
+                
+                for pred in recent:
+                    try:
+                        created_at = datetime.fromisoformat(pred.get('created_at', '').replace('Z', '+00:00'))
+                        time_diff = now.replace(tzinfo=created_at.tzinfo) - created_at
+                        
+                        # Only include predictions from last 24 hours with score >= 60
+                        if time_diff.total_seconds() < 86400 and pred.get('score', 0) >= 60:
+                            recent_24h.append(pred)
+                    except:
+                        continue
+                
+                if recent_24h:
+                    # Get the highest risk from recent high-risk predictions
+                    highest = max(recent_24h, key=lambda x: x.get('score', 0))
+                    response['highest_risk_location'] = highest.get('location', 'N/A')
+                    response['highest_risk_score'] = highest.get('score', 0)
+                else:
+                    # No high-risk areas in last 24 hours
+                    response['highest_risk_location'] = None
+                    response['highest_risk_score'] = 0
             else:
-                response['highest_risk_location'] = 'N/A'
+                response['highest_risk_location'] = None
                 response['highest_risk_score'] = 0
         except Exception as e:
             print(f"Error getting highest risk: {e}")
-            response['highest_risk_location'] = 'N/A'
+            response['highest_risk_location'] = None
             response['highest_risk_score'] = 0
         
         return jsonify(response)

@@ -214,7 +214,19 @@ class RiskHistoryRepository:
                         'top_factor': top_factor,
                         'ts': ts,
                         'location': location_name,
-                        'created_at': item.get('created_at', '')
+                        'created_at': item.get('created_at', ''),
+                        # Add feature data for export
+                        'elevation': round(features.get('elevation', 0), 1) if features else 0,
+                        'slope': round(features.get('slope', 0), 1) if features else 0,
+                        'aspect': round(features.get('aspect', 0), 1) if features else 0,
+                        'ndvi': round(features.get('ndvi', 0), 3) if features else 0,
+                        'ndwi': round(features.get('ndwi', 0), 3) if features else 0,
+                        'soil_type': int(features.get('soil_type', 0)) if features else 0,
+                        'rainfall_3d': round(features.get('rainfall_3d', 0), 1) if features else 0,
+                        'rainfall_7d': round(features.get('rainfall_7d', 0), 1) if features else 0,
+                        'rainfall_14d': round(features.get('rainfall_14d', 0), 1) if features else 0,
+                        'rainfall_30d': round(features.get('rainfall_30d', 0), 1) if features else 0,
+                        'confidence': round(item.get('confidence', 85), 1)
                     })
                 except Exception as e:
                     print(f"Error processing prediction item: {e}")
