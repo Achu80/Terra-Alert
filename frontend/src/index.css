@@ -145,6 +145,17 @@
   }
 }
 
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.4s cubic-bezier(0.6, -0.05, 0.01, 0.99) forwards;
 }
@@ -171,6 +182,10 @@
 
 .animate-slideInDown {
   animation: slideInDown 0.5s cubic-bezier(0.6, -0.05, 0.01, 0.99) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.6, -0.05, 0.01, 0.99) forwards;
 }
 
 /* Leaflet Map Container Fix */
