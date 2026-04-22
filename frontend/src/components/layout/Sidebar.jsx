@@ -59,7 +59,7 @@ const SettingsIcon = () => (
 )
 
 const NAV = [
-    { id: "home", path: "/", icon: HomeIcon, label: "Home" },
+    { id: "home", path: "/home", icon: HomeIcon, label: "Predictions" },
     { id: "map", path: "/map", icon: MapIcon, label: "Map Explorer" },
     { id: "dashboard", path: "/dashboard", icon: DashboardIcon, label: "Dashboard" },
     { id: "report", path: "/report", icon: ReportIcon, label: "Risk Report" },
@@ -101,10 +101,14 @@ export default function Sidebar({ active }) {
                 })}
             </nav>
 
-            {/* Avatar */}
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold border ${theme.accentBg} ${theme.cardBorder} ${theme.textSecond} mt-auto`}>
+            {/* Avatar - Link to Landing Page */}
+            <Link 
+                to="/" 
+                title="Back to Landing Page"
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold border ${theme.accentBg} ${theme.cardBorder} ${theme.textSecond} mt-auto hover:bg-white/[0.06] transition-all duration-200 cursor-pointer`}
+            >
                 GS
-            </div>
+            </Link>
         </aside>
     )
 }

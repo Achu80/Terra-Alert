@@ -5,7 +5,8 @@ import Layout from './components/layout/Layout'
 import './App.css'
 
 // Lazy load pages for better performance
-const HomePage = lazy(() => import('./pages/HomePage'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const HomePage = lazy(() => import('./pages/PredictionPage'))
 const MapExplorerPage = lazy(() => import('./pages/MapExplorerPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const RiskReportPage = lazy(() => import('./pages/OtherPages').then(module => ({ default: module.RiskReportPage })))
@@ -30,7 +31,8 @@ function App() {
         <Layout>
           <Suspense fallback={<PageLoader />}>
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/home" element={<HomePage />} />
               <Route path="/map" element={<MapExplorerPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/report" element={<RiskReportPage />} />

@@ -8,13 +8,25 @@ export default function Layout({ children }) {
     const { theme } = useWeather()
     const location = useLocation()
     
+    // Check if we're on the landing page
+    const isLandingPage = location.pathname === '/'
+    
     // Map routes to page IDs
     const getActiveFromPath = (pathname) => {
-        if (pathname === '/') return 'home'
+        if (pathname === '/home') return 'home'
         return pathname.slice(1) // Remove leading slash
     }
     
     const active = getActiveFromPath(location.pathname)
+    
+    // Landing page without sidebar/topbar
+    if (isLandingPage) {
+        return (
+            <div className="min-h-screen">
+                {children}
+            </div>
+        )
+    }
     
     return (
         <div className={`min-h-screen flex font-sans ${theme.textPrimary} transition-colors duration-[1500ms]`}>
