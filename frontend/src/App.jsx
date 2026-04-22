@@ -1,47 +1,47 @@
-import { useState } from 'react'
+import { lazy, Suspense } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { WeatherProvider } from './context/WeatherContext'
 import Layout from './components/layout/Layout'
-import HomePage from './pages/HomePage'
-import DashboardPage from './pages/DashboardPage'
-import MapExplorerPage from './pages/MapExplorerPage'
-import { RiskReportPage, HistoricalPage, DataSourcesPage, SettingsPage } from './pages/OtherPages'
 import './App.css'
 
-function AppContent() {
-  const [activePage, setActivePage] = useState('home')
+// Lazy load pages for better performance
+const HomePage = lazy(() => import('./pages/HomePage'))
+const MapExplorerPage = lazy(() => import('./pages/MapExplorerPage'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const RiskReportPage = lazy(() => import('./pages/OtherPages').then(module => ({ default: module.RiskReportPage })))
+const HistoricalPage = lazy(() => import('./pages/OtherPages').then(module => ({ default: module.HistoricalPage })))
+const DataSourcesPage = lazy(() => import('./pages/OtherPages').then(module => ({ default: module.DataSourcesPage })))
+const SettingsPage = lazy(() => import('./pages/OtherPages').then(module => ({ default: module.SettingsPage })))
 
-  const renderPage = () => {
-    switch (activePage) {
-      case 'home':
-        return <HomePage onNavigate={setActivePage} />
-      case 'map':
-        return <MapExplorerPage />
-      case 'dashboard':
-        return <DashboardPage />
-      case 'report':
-        return <RiskReportPage onNavigate={setActivePage} />
-      case 'history':
-        return <HistoricalPage />
-      case 'sources':
-        return <DataSourcesPage />
-      case 'settings':
-        return <SettingsPage />
-      default:
-        return <HomePage onNavigate={setActivePage} />
-    }
-  }
-
-  return (
-    <Layout active={activePage} onNav={setActivePage}>
-      {renderPage()}
-    </Layout>
-  )
-}
+// Loading component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-violet-400/30 border-t-violet-400 rounded-full animate-spin mx-auto mb-4" />
+      <p className="text-white/60">Loading...</p>
+    </div>
+  </div>
+)
 
 function App() {
   return (
     <WeatherProvider>
-      <AppContent />
+      <BrowserRouter>
+        <Layout>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/map" element={<MapExplorerPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/report" element={<RiskReportPage />} />
+              <Route path="/history" element={<HistoricalPage />} />
+              <Route path="/sources" element={<DataSourcesPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </Layout>
+      </BrowserRouter>
     </WeatherProvider>
   )
 }

@@ -75,9 +75,7 @@ class ModelService:
         Make landslide prediction using XGBoost model
         
         Args:
-            features: List of 10 feature values in correct order:
-                     [soil_type, ndvi, ndwi, rainfall_3d, rainfall_7d, 
-                      rainfall_14d, rainfall_30d, elevation, slope, aspect]
+            features: List of 20 feature values in correct order
         
         Returns:
             Dictionary with prediction results
@@ -88,15 +86,21 @@ class ModelService:
         
         # If model still not loaded, return mock prediction
         if not self.model or not self.model_loaded:
+            print("⚠ Model not loaded, using mock prediction")
             return self._mock_prediction(features)
         
         try:
+            # Log input features for debugging
+            print(f"\n🔍 DEBUG: Predicting with {len(features)} features")
+            print(f"Features: {features[:5]}... (showing first 5)")
+            
             # Reshape features for sklearn
             X = np.array(features).reshape(1, -1)
             
             # Apply StandardScaler (IMPORTANT!)
             if self.scaler:
                 X_scaled = self.scaler.transform(X)
+                print(f"✓ Features scaled")
             else:
                 print("⚠ Warning: No scaler found, using unscaled features")
                 X_scaled = X
@@ -108,6 +112,9 @@ class ModelService:
             # Convert to 0-100 scale
             risk_score = landslide_probability * 100
             
+            print(f"✓ Prediction complete: Risk Score = {risk_score:.1f}")
+            print(f"  Probabilities: No Landslide={proba[0]:.3f}, Landslide={proba[1]:.3f}")
+            
             # Determine risk level
             risk_level = self._get_risk_level(risk_score)
             
@@ -117,7 +124,7 @@ class ModelService:
             return {
                 'score': round(risk_score, 1),
                 'level': risk_level,
-                'confidence': round(max(proba), 2),  # Confidence is max probability
+                'confidence': round(max(proba) * 100, 1),  # Convert to percentage
                 'prediction_class': int(prediction_class),
                 'probabilities': {
                     'no_landslide': round(float(proba[0]), 3),
@@ -127,7 +134,7 @@ class ModelService:
             }
             
         except Exception as e:
-            print(f"Error making prediction: {e}")
+            print(f"❌ Error making prediction: {e}")
             import traceback
             print(traceback.format_exc())
             return self._mock_prediction(features)

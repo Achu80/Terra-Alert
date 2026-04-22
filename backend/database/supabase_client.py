@@ -9,6 +9,8 @@ class SupabaseClient:
     """Singleton Supabase client with lazy initialization"""
     _instance = None
     _client: Client = None
+    _initialized = False
+    _error = None
     
     def __new__(cls):
         if cls._instance is None:
@@ -17,17 +19,19 @@ class SupabaseClient:
     
     def _initialize(self):
         """Initialize Supabase client"""
-        if self._client is not None:
+        if self._initialized:
             return
+        
+        self._initialized = True
             
         url = os.getenv('SUPABASE_URL')
         key = os.getenv('SUPABASE_SERVICE_KEY')
         
         if not url or not key:
-            raise ValueError(
-                "Missing Supabase credentials!\n"
-                "Please ensure SUPABASE_URL and SUPABASE_SERVICE_KEY are set in .env file."
-            )
+            self._error = "Missing Supabase credentials (SUPABASE_URL or SUPABASE_SERVICE_KEY)"
+            print(f"⚠ Warning: {self._error}")
+            print("  Backend will run with limited functionality (no database)")
+            return
         
         print(f"Connecting to Supabase: {url}")
         
@@ -39,15 +43,31 @@ class SupabaseClient:
             )
             print("✓ Supabase client initialized")
         except Exception as e:
-            print(f"Error creating client: {e}")
-            raise
+            self._error = f"Error creating Supabase client: {e}"
+            print(f"⚠ Warning: {self._error}")
+            print("  Backend will run with limited functionality (no database)")
     
     @property
     def client(self) -> Client:
         """Get Supabase client instance"""
-        if self._client is None:
+        if not self._initialized:
             self._initialize()
+        
+        if self._client is None:
+            # Return a mock client that raises helpful errors
+            raise ConnectionError(
+                f"Supabase not available: {self._error}\n"
+                "Please configure SUPABASE_URL and SUPABASE_SERVICE_KEY in .env file"
+            )
+        
         return self._client
+    
+    @property
+    def is_available(self) -> bool:
+        """Check if Supabase is available"""
+        if not self._initialized:
+            self._initialize()
+        return self._client is not None
 
 # Global instance
 _supabase_instance = None
@@ -58,3 +78,10 @@ def get_supabase() -> Client:
     if _supabase_instance is None:
         _supabase_instance = SupabaseClient()
     return _supabase_instance.client
+
+def is_supabase_available() -> bool:
+    """Check if Supabase is configured and available"""
+    global _supabase_instance
+    if _supabase_instance is None:
+        _supabase_instance = SupabaseClient()
+    return _supabase_instance.is_available

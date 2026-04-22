@@ -76,6 +76,10 @@ class GEEService:
             features['soil_type'] = soil_features.get('soil_type_class', 0)
             
             print(f"✓ Fetched {len(features)} features successfully")
+            print(f"🔍 DEBUG - GEE Features:")
+            for key, value in features.items():
+                print(f"  {key}: {value}")
+            
             return features
             
         except Exception as e:

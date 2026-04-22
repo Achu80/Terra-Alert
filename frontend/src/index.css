@@ -1,3 +1,6 @@
+/* Leaflet Map Styles - Must be imported first */
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -56,4 +59,15 @@
   .rain-streak {
     @apply absolute w-px bg-gradient-to-b from-transparent via-blue-200/30 to-transparent animate-rain;
   }
+}
+
+/* Leaflet Map Container Fix */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.leaflet-tile-pane {
+  opacity: 1 !important;
 }
