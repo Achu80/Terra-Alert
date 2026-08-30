@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { WeatherProvider } from './context/WeatherContext'
 import Layout from './components/layout/Layout'
 import './App.css'
+import { PredictionProvider } from './context/PredictionContext'
 
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./pages/LandingPage'))
@@ -13,6 +14,7 @@ const RiskReportPage = lazy(() => import('./pages/RiskReportPage'))
 const HistoricalPage = lazy(() => import('./pages/OtherPages').then(module => ({ default: module.HistoricalPage })))
 const DataSourcesPage = lazy(() => import('./pages/OtherPages').then(module => ({ default: module.DataSourcesPage })))
 const SettingsPage = lazy(() => import('./pages/OtherPages').then(module => ({ default: module.SettingsPage })))
+const AssistantPage = lazy(() => import('./pages/AssistantPage'))
 
 // Loading component
 const PageLoader = () => (
@@ -27,23 +29,26 @@ const PageLoader = () => (
 function App() {
   return (
     <WeatherProvider>
-      <BrowserRouter>
-        <Layout>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/map" element={<MapExplorerPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/report" element={<RiskReportPage />} />
-              <Route path="/history" element={<HistoricalPage />} />
-              <Route path="/sources" element={<DataSourcesPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </Layout>
-      </BrowserRouter>
+      <PredictionProvider>
+        <BrowserRouter>
+          <Layout>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/map" element={<MapExplorerPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/report" element={<RiskReportPage />} />
+                <Route path="/history" element={<HistoricalPage />} />
+                <Route path="/sources" element={<DataSourcesPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="/assistant" element={<AssistantPage />} />
+              </Routes>
+            </Suspense>
+          </Layout>
+        </BrowserRouter>
+      </PredictionProvider>
     </WeatherProvider>
   )
 }

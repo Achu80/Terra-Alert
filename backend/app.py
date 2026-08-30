@@ -3,6 +3,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from routes.api_routes import api_bp
 from routes.forecast_routes import forecast_bp
+from routes.chatbot import chatbot_bp
 
 load_dotenv()
 
@@ -12,6 +13,7 @@ CORS(app)
 # Register blueprints
 app.register_blueprint(api_bp, url_prefix='/api')
 app.register_blueprint(forecast_bp, url_prefix='/api/forecast')
+app.register_blueprint(chatbot_bp, url_prefix='/api')
 
 @app.route('/')
 def home():
