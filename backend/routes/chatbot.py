@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from datetime import datetime, timedelta
+from routes.forecast_routes import fetch_7day_forecast, gee_service, model_service, data_processor
+
 chatbot_bp = Blueprint('chatbot', __name__)
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
@@ -16,6 +19,14 @@ Answer first-aid questions with a landslide-emergency focus (crush injury, buria
 debris trauma, fire/burns from ruptured gas lines, evacuation) unless the user
 clearly asks something unrelated. Always advise contacting emergency services
 (108/112) for serious injuries.
+
+You can also answer questions about a location's landslide risk data using tools:
+- get_terrain_parameters: current elevation, slope, vegetation (NDVI), soil type,
+  and rainfall totals for a location.
+- get_landslide_forecast: 7-day rainfall and predicted risk score/level for a location.
+Use the location from the user's context if they don't specify coordinates.
+When reporting risk scores or rainfall figures, state the numbers plainly and
+mention the date range they cover.
 """
 import requests
 
@@ -93,6 +104,79 @@ def get_route(origin_lat: float, origin_lon: float, dest_lat: float, dest_lon: f
         'duration_min': duration_min
     }
 
+def get_landslide_forecast(lat: float, lon: float) -> list:
+    """Get a 7-day landslide risk forecast for a location, including daily
+    rainfall and predicted risk score/level for each of the next 7 days.
+
+    Args:
+        lat: Latitude of the location.
+        lon: Longitude of the location.
+    """
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+    gee_data = gee_service.get_all_features(
+        lat, lon,
+        start_date.strftime('%Y-%m-%d'),
+        end_date.strftime('%Y-%m-%d'),
+        1000
+    )
+    if not gee_data:
+        gee_data = {
+            'elevation': 700, 'slope': 25, 'aspect': 180,
+            'ndvi': 0.4, 'ndwi': -0.1, 'soil_type': 3,
+            'rainfall_3d': 0, 'rainfall_7d': 0,
+            'rainfall_14d': 0, 'rainfall_30d': 0
+        }
+
+    daily_forecast = fetch_7day_forecast(lat, lon)
+
+    results = []
+    rain_history = []
+    cumulative_rain = 0
+
+    for i, (date, rain_mm) in enumerate(daily_forecast):
+        rain_history.append(rain_mm)
+        cumulative_rain += rain_mm
+
+        gee_data['rainfall_3d'] = sum(rain_history[-3:])
+        gee_data['rainfall_7d'] = sum(rain_history)
+        gee_data['rainfall_14d'] = gee_data.get('rainfall_14d', cumulative_rain)
+        gee_data['rainfall_30d'] = gee_data.get('rainfall_30d', cumulative_rain)
+
+        processed = data_processor.prepare_model_input(gee_data)
+        if not processed:
+            continue
+
+        prediction = model_service.predict(processed['features'])
+        results.append({
+            'date': date,
+            'day': i + 1,
+            'rainfall_mm': round(float(rain_mm), 1),
+            'risk_score': float(prediction['score']),
+            'risk_level': prediction['level']
+        })
+
+    return results
+
+def get_terrain_parameters(lat: float, lon: float) -> dict:
+    """Get current terrain and environmental parameters for a location:
+    elevation, slope, aspect, vegetation index (NDVI), water index (NDWI),
+    soil type, and cumulative rainfall over 3/7/14/30 days.
+
+    Args:
+        lat: Latitude of the location.
+        lon: Longitude of the location.
+    """
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+    gee_data = gee_service.get_all_features(
+        lat, lon,
+        start_date.strftime('%Y-%m-%d'),
+        end_date.strftime('%Y-%m-%d'),
+        1000
+    )
+    return gee_data or {'error': 'Terrain data unavailable for this location'}
+
 active_chats = {}
 
 @chatbot_bp.route('/chatbot', methods=['POST'])
@@ -108,9 +192,9 @@ def chatbot():
             model="gemini-3.5-flash-lite",
             config=types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT,
-                tools=[find_nearest_hospital, get_route]
+                tools=[find_nearest_hospital, get_route, get_landslide_forecast, get_terrain_parameters]
+            )
         )
-    )
 
     chat = active_chats[session_id]
 
