@@ -4,18 +4,19 @@ import InteractiveMap from '../components/map/InteractiveMap'
 import RiskHeatmap from '../components/map/RiskHeatmap'
 import { PageTransition, FadeInUp, ScaleIn, SlideIn } from '../components/animations/PageTransition'
 import { SevenDayForecast, FourteenDayTrend, ThirtyDaySummary, ThirtyDayChart } from '../components/forecast/ForecastDisplay'
+import { usePrediction } from '../context/PredictionContext'
 
 // Bento Card Component
 const BentoCard = ({ children, className = '', span = 1, tall = false }) => {
     const { theme } = useWeather()
-    
+
     // Determine column span class
     const getColSpanClass = () => {
         if (span === 3) return 'col-span-1 md:col-span-3'
         if (span === 2) return 'col-span-1 md:col-span-2'
         return 'col-span-1'
     }
-    
+
     return (
         <div
             className={`
@@ -473,6 +474,8 @@ const PredictionResults = ({ prediction, onNewPrediction }) => {
                 </div>
             </BentoCard>
 
+
+
             {/* Future Forecast - Full Width with Tabs */}
             {prediction.forecast && (
                 <ForecastSection forecast={prediction.forecast} />
@@ -484,7 +487,7 @@ const PredictionResults = ({ prediction, onNewPrediction }) => {
 // Main Component
 export default function PredictionPage() {
     const [step, setStep] = useState('select')
-    const [prediction, setPrediction] = useState(null)
+    const { prediction, setPrediction } = usePrediction()
 
     const handleLocationSelect = async (location) => {
         setStep('loading')

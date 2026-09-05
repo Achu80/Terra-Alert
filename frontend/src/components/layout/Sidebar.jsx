@@ -58,6 +58,12 @@ const SettingsIcon = () => (
     </svg>
 )
 
+const AssistantIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+    </svg>
+)
+
 const NAV = [
     { id: "home", path: "/home", icon: HomeIcon, label: "Predictions" },
     { id: "map", path: "/map", icon: MapIcon, label: "Map Explorer" },
@@ -66,6 +72,7 @@ const NAV = [
     { id: "history", path: "/history", icon: HistoryIcon, label: "Historical" },
     { id: "sources", path: "/sources", icon: DataIcon, label: "Data Sources" },
     { id: "settings", path: "/settings", icon: SettingsIcon, label: "Settings" },
+    { id: "assistant", path: "/assistant", icon: AssistantIcon, label: "Assistant" },
 ]
 
 export default function Sidebar({ active }) {
@@ -102,8 +109,8 @@ export default function Sidebar({ active }) {
             </nav>
 
             {/* Avatar - Link to Landing Page */}
-            <Link 
-                to="/" 
+            <Link
+                to="/"
                 title="Back to Landing Page"
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold border ${theme.accentBg} ${theme.cardBorder} ${theme.textSecond} mt-auto hover:bg-white/[0.06] transition-all duration-200 cursor-pointer`}
             >
