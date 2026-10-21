@@ -117,28 +117,28 @@ class ModelService:
                 'note': 'Low-risk plains area - outside mountainous prediction zone'
             }
         
-            feature_names = [
-                'elevation', 'slope', 'aspect', 'ndvi', 'ndwi', 'soil_type',
-                'rainfall_3d', 'rainfall_7d', 'rainfall_14d', 'rainfall_30d',
-                'rainfall_ratio_3d_7d', 'rainfall_ratio_7d_14d', 'rainfall_ratio_14d_30d',
-                'rainfall_acceleration', 'high_short_term_rain', 'sustained_heavy_rain',
-                'slope_elevation_product', 'steep_low_elevation', 'north_facing', 'low_veg_steep'
-            ]
+          feature_names = [
+              'elevation', 'slope', 'aspect', 'ndvi', 'ndwi', 'soil_type',
+              'rainfall_3d', 'rainfall_7d', 'rainfall_14d', 'rainfall_30d',
+              'rainfall_ratio_3d_7d', 'rainfall_ratio_7d_14d', 'rainfall_ratio_14d_30d',
+              'rainfall_acceleration', 'high_short_term_rain', 'sustained_heavy_rain',
+              'slope_elevation_product', 'steep_low_elevation', 'north_facing', 'low_veg_steep'
+          ]
 
-            # Create DataFrame with proper column names
-            X = pd.DataFrame([features], columns=feature_names)
+          # Create DataFrame with proper column names
+          X = pd.DataFrame([features], columns=feature_names)
 
-            # Scale features if scaler is available
-            if self.scaler:
-                X_scaled = self.scaler.transform(X)
-            else:
-                # Use unscaled features if scaler not available
-                print("⚠ Scaler not available, using unscaled features")
-                X_scaled = X.values
-        
-            # Get probability of landslide (class 1)
-            proba = self.model.predict_proba(X_scaled)[0]
-            landslide_probability = float(proba[1])
+          # Scale features if scaler is available
+          if self.scaler:
+              X_scaled = self.scaler.transform(X)
+          else:
+              # Use unscaled features if scaler not available
+              print("⚠ Scaler not available, using unscaled features")
+              X_scaled = X.values
+      
+          # Get probability of landslide (class 1)
+          proba = self.model.predict_proba(X_scaled)[0]
+          landslide_probability = float(proba[1])
         
         # Convert to 0-100 scale
           risk_score = landslide_probability * 100

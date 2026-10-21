@@ -1,16 +1,11 @@
-import { StyleSheet, Text } from 'react-native';
+import BackendStatus from '@/components/BackendStatus';
 import Screen from '@/components/Screen';
-import { colors } from '@/theme/colors';
 
-// TODO: port from the web frontend
+// TODO: port the rest from the web frontend
 export default function SettingsScreen() {
     return (
         <Screen title="Settings" subtitle="Preferences and notifications">
-            <Text style={styles.placeholder}>Coming soon</Text>
+            <BackendStatus />
         </Screen>
     );
 }
-
-const styles = StyleSheet.create({
-    placeholder: { color: colors.textMuted },
-});

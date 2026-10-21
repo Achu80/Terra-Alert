@@ -29,7 +29,9 @@
         {
           "locationWhenInUsePermission": "Terra Alert uses your location to show landslide risk near you."
         }
-      ]
+      ],
+      "expo-font",
+      "expo-status-bar"
     ],
     "scheme": "terraalert"
   }
