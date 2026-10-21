@@ -2,7 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { colors } from '@/theme/colors';
 
-const icon = (name) => ({ color, size }) => <Ionicons name={name} color={color} size={size} />;
+const icon = (name) => {
+    const TabBarIcon = ({ color, size }) => <Ionicons name={name} color={color} size={size} />;
+    return TabBarIcon;
+};
 
 export default function TabLayout() {
     return (

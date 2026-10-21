@@ -13,4 +13,5 @@ export const colors = {
     text: '#e5e7eb',
     textMuted: '#94a3b8',
     primary: '#38bdf8',
+    info: '#60a5fa',
 };
