@@ -68,8 +68,9 @@ function WelcomeScreen({ onGetStarted }) {
             <View style={styles.stats}>
                 <View style={styles.stat}>
                     <Ionicons name="analytics-outline" size={20} color="#46d6c3" />
-                    <Text style={styles.statValue}>97%</Text>
-                    <Text style={styles.statLabel}>Model accuracy</Text>
+                    {/* Held-out test accuracy of ai-module/xgboost_model_v2 (30% stratified split, random_state=42) */}
+                    <Text style={styles.statValue}>90%</Text>
+                    <Text style={styles.statLabel}>Test accuracy</Text>
                 </View>
                 <View style={styles.statDivider} />
                 <View style={styles.stat}>

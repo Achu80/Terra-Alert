@@ -498,15 +498,15 @@ def predict():
 
 def generate_forecast(raw_data, days=7, base_score=50):
     """
-    Generate risk forecast for future days based on current conditions
-    This is a simplified forecast - in production, you'd use weather forecast data
-    
+    Project the current risk forward from recent conditions (30-day rainfall trend and season).
+    This is a deterministic estimate, not a weather forecast - /api/forecast/predict uses real
+    rainfall forecasts for the next days.
+
     Args:
         raw_data: Dictionary of raw GEE data (not the feature vector)
         days: Number of days to forecast
         base_score: Current risk score to base forecast on
     """
-    import random
     from datetime import datetime, timedelta
     
     forecast = []
@@ -538,12 +538,11 @@ def generate_forecast(raw_data, days=7, base_score=50):
     for i in range(days):
         date = current_date + timedelta(days=i+1)
         
-        # Add some randomness and trend
-        variation = random.uniform(-5, 5)
+        # Gradual drift with the rainfall trend (no random noise, so the same inputs give the same projection)
         trend_effect = trend * i * 0.5
-        
+
         # Calculate forecasted score
-        score = base_score + trend_effect + variation
+        score = base_score + trend_effect
         score = score * monsoon_factor
         
         # Keep within bounds
