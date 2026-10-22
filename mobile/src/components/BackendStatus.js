@@ -33,22 +33,22 @@ export default function BackendStatus() {
         runCheck();
     };
 
-    return (
-        <Card>
-            <SectionLabel icon="server-outline">Backend</SectionLabel>
-            <Text style={styles.url}>{API_BASE_URL}</Text>
-            {status === 'checking' ? (
-                <ActivityIndicator color={colors.primary} style={styles.row} />
-            ) : (
-                <Text style={[styles.row, { color: status === 'online' ? RISK_COLORS.Low : RISK_COLORS.Critical }]}>
-                    {status === 'online' ? '● Connected' : `● Unreachable${error ? ` — ${error}` : ''}`}
-                </Text>
-            )}
-            <Pressable onPress={retry} style={styles.button}>
-                <Text style={styles.buttonText}>Retry</Text>
-            </Pressable>
-        </Card>
-    );
+    // return (
+    //     <Card>
+    //         <SectionLabel icon="server-outline">Backend</SectionLabel>
+    //         <Text style={styles.url}>{API_BASE_URL}</Text>
+    //         {status === 'checking' ? (
+    //             <ActivityIndicator color={colors.primary} style={styles.row} />
+    //         ) : (
+    //             <Text style={[styles.row, { color: status === 'online' ? RISK_COLORS.Low : RISK_COLORS.Critical }]}>
+    //                 {status === 'online' ? '● Connected' : `● Unreachable${error ? ` — ${error}` : ''}`}
+    //             </Text>
+    //         )}
+    //         <Pressable onPress={retry} style={styles.button}>
+    //             <Text style={styles.buttonText}>Retry</Text>
+    //         </Pressable>
+    //     </Card>
+    // );
 }
 
 const styles = StyleSheet.create({
