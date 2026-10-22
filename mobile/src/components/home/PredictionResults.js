@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card, SectionLabel } from '@/components/Card';
 import ForecastSection from '@/components/home/ForecastSection';
 import RiskHeatmap from '@/components/home/RiskHeatmap';
 import { useSettings } from '@/context/SettingsContext';
+import { forecastAPI } from '@/services/api';
 import { colors, RISK_COLORS } from '@/theme/colors';
 import { formatConfidence, getRiskColor, getRiskLevel, withAlpha } from '@/utils/risk';
 
@@ -35,6 +37,25 @@ export default function PredictionResults({ result, onNewAssessment }) {
     const level = getRiskLevel(prediction.score, thresholds);
     const color = getRiskColor(level);
     const values = features.values;
+
+    // Real rainfall-forecast-based risk, loaded in the background after the results appear.
+    // While weather.key differs from weatherKey, the request for this location is still running.
+    const weatherKey = `${location.lat},${location.lon}`;
+    const [weather, setWeather] = useState({ key: null, days: [], error: null });
+    useEffect(() => {
+        let cancelled = false;
+        forecastAPI
+            .predict(location.lat, location.lon)
+            .then((r) => {
+                if (!cancelled) setWeather({ key: weatherKey, days: r.forecast ?? [], error: null });
+            })
+            .catch((e) => {
+                if (!cancelled) setWeather({ key: weatherKey, days: [], error: e.message });
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [weatherKey, location.lat, location.lon]);
 
     // Indexes follow the backend FEATURE_ORDER (0 elevation, 1 slope, 3 ndvi, 9 rainfall_30d)
     const metrics = [
@@ -101,7 +122,12 @@ export default function PredictionResults({ result, onNewAssessment }) {
                 </View>
             </Card>
 
-            {forecast ? <ForecastSection forecast={forecast} /> : null}
+            {forecast ? (
+                <ForecastSection
+                    forecast={forecast}
+                    weather={{ loading: weather.key !== weatherKey, days: weather.days, error: weather.error }}
+                />
+            ) : null}
         </View>
     );
 }

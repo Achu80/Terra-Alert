@@ -82,10 +82,19 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+-- districts names its timestamp column last_updated (not updated_at), so it needs its own function
+CREATE OR REPLACE FUNCTION update_last_updated_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_updated = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
 -- Trigger for districts table
 DROP TRIGGER IF EXISTS update_districts_updated_at ON districts;
 CREATE TRIGGER update_districts_updated_at BEFORE UPDATE ON districts
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    FOR EACH ROW EXECUTE FUNCTION update_last_updated_column();
 
 -- Trigger for settings table
 DROP TRIGGER IF EXISTS update_settings_updated_at ON settings;
@@ -116,11 +125,8 @@ SELECT
     MAX(created_at) as last_prediction
 FROM risk_history;
 
--- Enable Row Level Security (optional, for production)
--- ALTER TABLE districts ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE risk_history ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE alerts ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
+-- Row Level Security: run rls_policies.sql next. Supabase may enable RLS on new tables automatically,
+-- and without policies the mobile app and website (anon key) see no rows.
 
 -- Success message
 SELECT 'Schema v2 created successfully! No foreign key constraints.' AS status;

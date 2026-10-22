@@ -14,7 +14,7 @@ model_service = ModelService()
 model_service.load_models()
 data_processor = DataProcessor()
 
-OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY', '3351d9ba25e20ade8767a4c2dcb02922')
+OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 
 def fetch_7day_forecast(lat, lon):
     url = f"http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric"
@@ -35,7 +35,9 @@ def predict_7day():
         data = request.json
         lat = data.get('lat')
         lon = data.get('lon')
-        
+        # Callers that only display the forecast (mobile app) pass notify=false so no SMS alerts are sent
+        notify = data.get('notify', True)
+
         if not all([lat, lon]):
             return jsonify({'error': 'Missing lat/lon'}), 400
 
@@ -89,7 +91,7 @@ def predict_7day():
                 'confidence': float(prediction['confidence'])
             })
 
-            if prediction['score'] >= 3:
+            if notify and prediction['score'] >= 3:
                 alert_service.send_landslide_alert(
                     lat=lat,
                     lon=lon,

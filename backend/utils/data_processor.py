@@ -15,7 +15,11 @@ class DataProcessor:
     
     @staticmethod
     def _engineer_features(gee_data: Dict) -> Dict:
-        """Calculate the 10 engineered features from base features"""
+        """Calculate the 10 engineered features from base features.
+
+        These MUST match ai-module/feature_engineering.py exactly - the model was trained on
+        features computed that way, and different formulas give meaningless predictions.
+        """
         r3 = gee_data.get('rainfall_3d', 0) or 0
         r7 = gee_data.get('rainfall_7d', 0) or 0
         r14 = gee_data.get('rainfall_14d', 0) or 0
@@ -29,13 +33,13 @@ class DataProcessor:
             'rainfall_ratio_3d_7d': r3 / r7 if r7 > 0 else 0,
             'rainfall_ratio_7d_14d': r7 / r14 if r14 > 0 else 0,
             'rainfall_ratio_14d_30d': r14 / r30 if r30 > 0 else 0,
-            'rainfall_acceleration': (r3 / 3) / (r30 / 30) if r30 > 0 else 0,
-            'high_short_term_rain': 1 if r3 > 50 else 0,
-            'sustained_heavy_rain': 1 if r7 > 100 else 0,
-            'slope_elevation_product': slope * elevation,
-            'steep_low_elevation': 1 if (slope > 30 and elevation < 1000) else 0,
+            'rainfall_acceleration': (r7 - r3) / r3 if r3 > 0 else 0,
+            'high_short_term_rain': 1 if r3 > 100 else 0,
+            'sustained_heavy_rain': 1 if r30 > 400 else 0,
+            'slope_elevation_product': slope * elevation / 1000,
+            'steep_low_elevation': 1 if (slope > 25 and elevation < 2000) else 0,
             'north_facing': 1 if (aspect >= 315 or aspect <= 45) else 0,
-            'low_veg_steep': 1 if (ndvi < 0.3 and slope > 25) else 0,
+            'low_veg_steep': 1 if (ndvi < 0.3 and slope > 20) else 0,
         }
         return engineered
 

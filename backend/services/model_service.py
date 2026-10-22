@@ -106,7 +106,7 @@ class ModelService:
             print(f"⛰️ Plains override: elevation={elevation}m, slope={slope}°")
             return {
                 'score': 5.0,
-                'level': 'low',
+                'level': 'LOW',
                 'confidence': 95.0,
                 'prediction_class': 0,
                 'probabilities': {
