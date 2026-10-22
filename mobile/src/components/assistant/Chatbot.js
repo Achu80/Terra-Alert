@@ -194,10 +194,11 @@ export default function Chatbot({ prediction }) {
 const styles = StyleSheet.create({
     card: {
         flex: 1,
-        backgroundColor: colors.surface,
-        borderColor: colors.border,
+        backgroundColor: colors.glass,
+        borderColor: colors.glassBorder,
+        borderTopColor: colors.glassHighlight,
         borderWidth: 1,
-        borderRadius: 16,
+        borderRadius: 22,
         padding: 12,
     },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 },

@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AdminScreenGate } from '@/components/admin/AdminOnly';
 import { SettingsRow, SettingsSection } from '@/components/settings/SettingsList';
 import { useBackendStatus } from '@/hooks/useBackendStatus';
 import { colors, RISK_COLORS } from '@/theme/colors';
@@ -21,7 +22,7 @@ const TIPS = [
     { icon: 'shield-checkmark', text: 'Allow Python through Windows Firewall if Windows asks.' },
 ];
 
-export default function BackendScreen() {
+function BackendContent() {
     const backend = useBackendStatus();
     const status = STATUS[backend.status];
 
@@ -60,6 +61,15 @@ export default function BackendScreen() {
                 </SettingsSection>
             ) : null}
         </ScrollView>
+    );
+}
+
+// Admin-only page: regular users see an "Admin only" notice instead
+export default function BackendScreen() {
+    return (
+        <AdminScreenGate>
+            <BackendContent />
+        </AdminScreenGate>
     );
 }
 

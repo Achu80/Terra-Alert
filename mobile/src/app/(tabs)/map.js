@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
+import AdminOnly from '@/components/admin/AdminOnly';
 import Screen from '@/components/Screen';
 import LeafletMap from '@/components/map/LeafletMap';
 import { predictionAPI } from '@/services/api';
@@ -128,6 +129,8 @@ export default function MapScreen() {
     return (
         <Screen title="Map Explorer" subtitle="Himachal Pradesh district risk">
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+                {/* Data freshness + full refresh (re-fetches satellite data for all 12 districts): admin only */}
+                <AdminOnly>
                 <View style={styles.mapHeader}>
                     <View style={styles.freshness}>
                         <View style={[styles.statusDot, { backgroundColor: cacheAge > 120 ? '#eab308' : '#10b981' }]} />
@@ -146,6 +149,7 @@ export default function MapScreen() {
                         <Text style={styles.refreshText}>{refreshing ? 'Refreshing' : 'Refresh'}</Text>
                     </Pressable>
                 </View>
+                </AdminOnly>
 
                 <View style={styles.mapWrap}>
                     <LeafletMap
@@ -268,7 +272,7 @@ const styles = StyleSheet.create({
     pressed: { opacity: 0.75 },
     mapWrap: { height: 260, borderRadius: 12, overflow: 'hidden', position: 'relative' },
     map: { flex: 1 },
-    mapOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#0b1220aa', alignItems: 'center', justifyContent: 'center', gap: 10 },
+    mapOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: `${colors.background}aa`, alignItems: 'center', justifyContent: 'center', gap: 10 },
     overlayText: { color: colors.text, fontSize: 13 },
     errorPanel: { padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#ef444466', backgroundColor: '#ef444411', gap: 6 },
     errorText: { color: '#fca5a5', fontSize: 13 },
@@ -277,7 +281,7 @@ const styles = StyleSheet.create({
     legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     legendDot: { width: 9, height: 9, borderRadius: 5 },
     legendText: { color: colors.textMuted, fontSize: 10, fontWeight: '600' },
-    locationNotice: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 8, backgroundColor: '#38bdf811', borderWidth: 1, borderColor: '#38bdf844' },
+    locationNotice: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 8, backgroundColor: `${colors.primary}14`, borderWidth: 1, borderColor: `${colors.primary}44` },
     locationText: { color: colors.text, fontSize: 12, flexShrink: 1 },
     panel: { backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border, padding: 14 },
     panelHeading: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 },
@@ -305,7 +309,7 @@ const styles = StyleSheet.create({
     count: { color: colors.textMuted, fontSize: 11 },
     districtList: { borderTopWidth: 1, borderTopColor: colors.border },
     districtRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: colors.border },
-    districtRowActive: { backgroundColor: '#38bdf811' },
+    districtRowActive: { backgroundColor: `${colors.primary}14` },
     rowName: { color: colors.text, fontSize: 13, fontWeight: '600', flex: 1 },
     rowScore: { color: colors.text, fontSize: 12, fontWeight: '700', width: 38, textAlign: 'right', fontVariant: ['tabular-nums'] },
 });

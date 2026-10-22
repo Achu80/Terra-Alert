@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AdminScreenGate } from '@/components/admin/AdminOnly';
 import { SettingsRow, SettingsSection } from '@/components/settings/SettingsList';
 import { statsAPI } from '@/services/api';
 import { colors, RISK_COLORS } from '@/theme/colors';
@@ -22,7 +23,7 @@ const SERVICES = [
     { icon: 'server', color: '#3ecf8e', title: 'Supabase', subtitle: 'Stores every prediction' },
 ];
 
-export default function SourcesScreen() {
+function SourcesContent() {
     // Live numbers from the backend (/api/stats reads Supabase with the server key)
     const [stats, setStats] = useState({ loaded: false, data: null, error: null });
 
@@ -72,6 +73,15 @@ export default function SourcesScreen() {
                 ))}
             </SettingsSection>
         </ScrollView>
+    );
+}
+
+// Admin-only page: regular users see an "Admin only" notice instead
+export default function SourcesScreen() {
+    return (
+        <AdminScreenGate>
+            <SourcesContent />
+        </AdminScreenGate>
     );
 }
 

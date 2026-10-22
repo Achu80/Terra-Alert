@@ -33,18 +33,17 @@ CREATE POLICY "Public acknowledge alerts" ON alerts
     FOR UPDATE TO anon, authenticated USING (true) WITH CHECK (true);
 
 -- ---------------------------------------------------------------
--- settings: read + save (website Settings page writes directly; the mobile app saves through the backend)
+-- settings: read-only. Changes go through the backend (POST /api/settings), which requires the
+-- admin PIN and writes with the service_role key. Allowing anon writes here would let anyone
+-- holding the public anon key skip the admin PIN.
 -- ---------------------------------------------------------------
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read settings" ON settings;
 CREATE POLICY "Public read settings" ON settings
     FOR SELECT TO anon, authenticated USING (true);
+-- Remove write policies created by an earlier version of this file
 DROP POLICY IF EXISTS "Public insert settings" ON settings;
-CREATE POLICY "Public insert settings" ON settings
-    FOR INSERT TO anon, authenticated WITH CHECK (true);
 DROP POLICY IF EXISTS "Public update settings" ON settings;
-CREATE POLICY "Public update settings" ON settings
-    FOR UPDATE TO anon, authenticated USING (true) WITH CHECK (true);
 
 -- ---------------------------------------------------------------
 -- prediction_cache: read, add and clear (website caches predictions directly)

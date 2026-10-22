@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
+import GlassView from '@/components/GlassView';
 import { colors } from '@/theme/colors';
 
-// Mobile counterparts of the web BentoCard and SectionLabel
+// Mobile counterparts of the web BentoCard and SectionLabel, in the dark glass style
 export function Card({ style, children }) {
-    return <View style={[styles.card, style]}>{children}</View>;
+    return <GlassView style={[styles.card, style]}>{children}</GlassView>;
 }
 
 export function SectionLabel({ icon, children }) {
@@ -17,7 +18,7 @@ export function SectionLabel({ icon, children }) {
 }
 
 const styles = StyleSheet.create({
-    card: { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: 16, padding: 16 },
+    card: { padding: 16 },
     labelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
     label: { color: colors.textMuted, fontSize: 13, fontWeight: '600', letterSpacing: 0.5, textTransform: 'uppercase' },
 });

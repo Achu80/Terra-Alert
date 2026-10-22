@@ -37,9 +37,12 @@
         {
           "microphonePermission": "Terra Alert uses the microphone so you can ask the assistant questions by voice.",
           "speechRecognitionPermission": "Terra Alert uses speech recognition to turn your voice into a message for the assistant.",
-          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+          "androidSpeechServicePackages": [
+            "com.google.android.googlequicksearchbox"
+          ]
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "scheme": "terraalert"
   }

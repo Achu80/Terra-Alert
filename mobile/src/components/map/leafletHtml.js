@@ -19,7 +19,7 @@ export function buildLeafletHtml(config) {
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-  html, body, #map { margin: 0; padding: 0; height: 100%; width: 100%; background: #0b1220; }
+  html, body, #map { margin: 0; padding: 0; height: 100%; width: 100%; background: #0a0a0c; }
   .leaflet-control-attribution { font-size: 9px; }
 </style>
 </head>

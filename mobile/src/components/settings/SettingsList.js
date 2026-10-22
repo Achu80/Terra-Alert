@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Children, Fragment } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import GlassView from '@/components/GlassView';
 import { colors } from '@/theme/colors';
 import { withAlpha } from '@/utils/risk';
 
@@ -13,14 +14,14 @@ export function SettingsSection({ title, footer, children }) {
     return (
         <View style={styles.section}>
             {title ? <Text style={styles.sectionTitle}>{title}</Text> : null}
-            <View style={styles.group}>
+            <GlassView radius={20}>
                 {rows.map((row, i) => (
                     <Fragment key={i}>
                         {i > 0 ? <View style={styles.divider} /> : null}
                         {row}
                     </Fragment>
                 ))}
-            </View>
+            </GlassView>
             {footer ? <Text style={styles.footer}>{footer}</Text> : null}
         </View>
     );
@@ -68,8 +69,7 @@ export function SettingsRow({ icon, iconColor = colors.primary, title, subtitle,
 const styles = StyleSheet.create({
     section: { gap: 8 },
     sectionTitle: { color: colors.textMuted, fontSize: 12, fontWeight: '700', letterSpacing: 0.8, marginLeft: 4 },
-    group: { backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
-    divider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.border, marginLeft: 60 },
+    divider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.glassBorder, marginLeft: 60 },
     footer: { color: colors.textMuted, fontSize: 12, lineHeight: 17, marginHorizontal: 4 },
     row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, minHeight: 56 },
     rowPressed: { backgroundColor: 'rgba(255,255,255,0.05)' },

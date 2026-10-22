@@ -1,12 +1,33 @@
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
-import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import AdminUnlockModal from '@/components/admin/AdminUnlockModal';
 import { SettingsRow, SettingsSection } from '@/components/settings/SettingsList';
+import { useAdmin } from '@/context/AdminContext';
 import { colors, RISK_COLORS } from '@/theme/colors';
 import { withAlpha } from '@/utils/risk';
 
+// Hidden admin entry: tap "Version" this many times, each tap within TAP_GAP_MS of the previous one
+const TAPS_TO_UNLOCK = 7;
+const TAP_GAP_MS = 1500;
+
 export default function AboutScreen() {
     const config = Constants.expoConfig ?? {};
+    const { isAdmin } = useAdmin();
+    const [unlockOpen, setUnlockOpen] = useState(false);
+    const taps = useRef({ count: 0, last: 0 });
+
+    const onVersionTap = () => {
+        const now = Date.now();
+        const count = now - taps.current.last < TAP_GAP_MS ? taps.current.count + 1 : 1;
+        taps.current = { count, last: now };
+        if (count < TAPS_TO_UNLOCK) return;
+
+        taps.current = { count: 0, last: 0 };
+        if (isAdmin) Alert.alert('Admin mode', 'Admin mode is already on for this phone.');
+        else setUnlockOpen(true);
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.content}>
@@ -19,7 +40,9 @@ export default function AboutScreen() {
             </View>
 
             <SettingsSection title="APP">
-                <SettingsRow icon="pricetag" iconColor={colors.primary} title="Version" value={config.version ?? '1.0.0'} />
+                <Pressable onPress={onVersionTap}>
+                    <SettingsRow icon="pricetag" iconColor={colors.primary} title="Version" value={config.version ?? '1.0.0'} />
+                </Pressable>
                 <SettingsRow icon="logo-react" iconColor={colors.info} title="Expo SDK" value={config.sdkVersion ?? '-'} />
             </SettingsSection>
 
@@ -48,6 +71,12 @@ export default function AboutScreen() {
             </SettingsSection>
 
             <Text style={styles.footer}>Made with care for the hills ⛰️</Text>
+
+            <AdminUnlockModal
+                visible={unlockOpen}
+                onClose={() => setUnlockOpen(false)}
+                onUnlocked={() => Alert.alert('Admin mode on', 'Admin tools are now visible on this phone. Turn them off in Settings.')}
+            />
         </ScrollView>
     );
 }

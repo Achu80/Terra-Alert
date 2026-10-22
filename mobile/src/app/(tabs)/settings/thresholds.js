@@ -1,6 +1,7 @@
 import Slider from '@react-native-community/slider';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AdminScreenGate } from '@/components/admin/AdminOnly';
 import { Card } from '@/components/Card';
 import { useSettings } from '@/context/SettingsContext';
 import { colors, RISK_COLORS } from '@/theme/colors';
@@ -21,7 +22,7 @@ function clampOrder(key, value, t) {
 
 const sameThresholds = (a, b) => a.critical === b.critical && a.high === b.high && a.moderate === b.moderate;
 
-export default function ThresholdsScreen() {
+function ThresholdsContent() {
     const { thresholds, saveThresholds } = useSettings();
     const [draft, setDraft] = useState(thresholds);
     const [saving, setSaving] = useState(false);
@@ -142,6 +143,15 @@ export default function ThresholdsScreen() {
 
             <Text style={styles.note}>Saved on the Terra Alert server, so they stay the same after reinstalling the app.</Text>
         </ScrollView>
+    );
+}
+
+// Admin-only page: regular users see an "Admin only" notice instead
+export default function ThresholdsScreen() {
+    return (
+        <AdminScreenGate>
+            <ThresholdsContent />
+        </AdminScreenGate>
     );
 }
 
