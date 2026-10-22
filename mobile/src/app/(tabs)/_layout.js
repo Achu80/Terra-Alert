@@ -20,6 +20,7 @@ export default function TabLayout() {
             <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: icon('home') }} />
             <Tabs.Screen name="map" options={{ title: 'Map', tabBarIcon: icon('map') }} />
             <Tabs.Screen name="alerts" options={{ title: 'Alerts', tabBarIcon: icon('warning') }} />
+            <Tabs.Screen name="history" options={{ title: 'History', tabBarIcon: icon('time') }} />
             <Tabs.Screen name="assistant" options={{ title: 'Assistant', tabBarIcon: icon('chatbubbles') }} />
             <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarIcon: icon('settings') }} />
         </Tabs>

@@ -1,24 +1,24 @@
--- Optional: Add prediction cache table
--- Run this in Supabase SQL Editor if you want caching
-
-CREATE TABLE IF NOT EXISTS prediction_cache (
+CREATE TABLE IF NOT EXISTS public.prediction_cache (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     location_key TEXT NOT NULL,
-    lat FLOAT NOT NULL,
-    lon FLOAT NOT NULL,
+    lat DOUBLE PRECISION NOT NULL,
+    lon DOUBLE PRECISION NOT NULL,
     prediction_data JSONB NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Index for fast lookups
-CREATE INDEX idx_prediction_cache_location ON prediction_cache(location_key);
-CREATE INDEX idx_prediction_cache_created ON prediction_cache(created_at DESC);
+CREATE INDEX IF NOT EXISTS prediction_cache_location_created_idx
+    ON public.prediction_cache (location_key, created_at DESC);
 
--- Auto-delete old cache entries (older than 7 days)
-CREATE OR REPLACE FUNCTION delete_old_cache()
-RETURNS void AS $$
+CREATE INDEX IF NOT EXISTS prediction_cache_created_idx
+    ON public.prediction_cache (created_at);
+
+CREATE OR REPLACE FUNCTION public.delete_old_cache()
+RETURNS void
+LANGUAGE plpgsql
+AS $$
 BEGIN
-    DELETE FROM prediction_cache
+    DELETE FROM public.prediction_cache
     WHERE created_at < NOW() - INTERVAL '7 days';
 END;
-$$ LANGUAGE plpgsql;
+$$;

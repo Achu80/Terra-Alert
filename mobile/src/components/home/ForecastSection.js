@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Defs, Line, LinearGradient, Path, Stop, Text as SvgText } from 'react-native-svg';
 import { Card, SectionLabel } from '@/components/Card';
+import TrendChart from '@/components/charts/TrendChart';
 import { colors, RISK_COLORS } from '@/theme/colors';
 import { getRiskColor, withAlpha } from '@/utils/risk';
 
@@ -35,80 +35,6 @@ function ForecastCards({ days }) {
                     );
                 })}
             </ScrollView>
-        </View>
-    );
-}
-
-const CHART_HEIGHT = 180;
-const PAD = { top: 10, right: 12, bottom: 24, left: 30 };
-const GRID_VALUES = [0, 25, 50, 75, 100];
-
-function TrendChart({ days }) {
-    // Svg needs pixel sizes, so measure the available width first
-    const [width, setWidth] = useState(0);
-
-    const graphW = width - PAD.left - PAD.right;
-    const graphH = CHART_HEIGHT - PAD.top - PAD.bottom;
-    const yOf = (score) => PAD.top + graphH - (score / 100) * graphH;
-    const points = days.map((day, i) => ({
-        x: PAD.left + (days.length > 1 ? (i / (days.length - 1)) * graphW : graphW / 2),
-        y: yOf(day.score),
-        day,
-    }));
-
-    const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-    const baseY = CHART_HEIGHT - PAD.bottom;
-    const areaPath = points.length
-        ? `${linePath} L ${points[points.length - 1].x} ${baseY} L ${points[0].x} ${baseY} Z`
-        : '';
-    const labelEvery = days.length <= 7 ? 1 : days.length <= 14 ? 2 : 3;
-
-    return (
-        <View style={styles.chartBlock}>
-            <Text style={styles.subTitle}>{days.length}-Day Risk Trend</Text>
-            <View style={styles.chartBox} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
-                {width > 0 ? (
-                    <Svg width={width} height={CHART_HEIGHT}>
-                        <Defs>
-                            <LinearGradient id="area" x1="0" y1="0" x2="0" y2="1">
-                                <Stop offset="0" stopColor={colors.primary} stopOpacity="0.3" />
-                                <Stop offset="1" stopColor={colors.primary} stopOpacity="0.02" />
-                            </LinearGradient>
-                        </Defs>
-
-                        {GRID_VALUES.map((v) => (
-                            <Line
-                                key={`grid-${v}`}
-                                x1={PAD.left}
-                                x2={width - PAD.right}
-                                y1={yOf(v)}
-                                y2={yOf(v)}
-                                stroke="rgba(255,255,255,0.1)"
-                                strokeDasharray="3,3"
-                            />
-                        ))}
-                        {GRID_VALUES.map((v) => (
-                            <SvgText key={`y-${v}`} x={PAD.left - 6} y={yOf(v) + 4} fill={colors.textMuted} fontSize="10" textAnchor="end">
-                                {v}
-                            </SvgText>
-                        ))}
-
-                        <Path d={areaPath} fill="url(#area)" />
-                        <Path d={linePath} fill="none" stroke={colors.primary} strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
-
-                        {points.map((p) => (
-                            <Circle key={`pt-${p.day.date}`} cx={p.x} cy={p.y} r={days.length > 14 ? 2.5 : 4} fill={colors.primary} stroke="#fff" strokeWidth={1.5} />
-                        ))}
-                        {points.map((p, i) =>
-                            i % labelEvery === 0 ? (
-                                <SvgText key={`x-${p.day.date}`} x={p.x} y={baseY + 16} fill={colors.textMuted} fontSize="10" textAnchor="middle">
-                                    {dateOf(p.day)}
-                                </SvgText>
-                            ) : null
-                        )}
-                    </Svg>
-                ) : null}
-            </View>
         </View>
     );
 }
@@ -165,7 +91,10 @@ export default function ForecastSection({ forecast }) {
                 <View style={styles.content}>
                     {tab === '7days' ? <ForecastCards days={days} /> : null}
                     {tab === '30days' ? <ThirtyDaySummary days={days} /> : null}
-                    <TrendChart days={days} />
+                    <TrendChart
+                        title={`${days.length}-Day Risk Trend`}
+                        points={days.map((d) => ({ key: d.date, label: dateOf(d), score: d.score }))}
+                    />
                 </View>
             )}
         </Card>
@@ -187,8 +116,6 @@ const styles = StyleSheet.create({
     dayDate: { fontSize: 11, opacity: 0.7 },
     dayScore: { fontSize: 22, fontWeight: '700', marginVertical: 4 },
     dayConfidence: { fontSize: 10, opacity: 0.7 },
-    chartBlock: {},
-    chartBox: { backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 12, borderWidth: 1, borderColor: colors.border },
     summaryRow: { flexDirection: 'row', gap: 8 },
     summaryTile: { flex: 1, borderWidth: 1, borderColor: colors.border, borderRadius: 12, padding: 10, backgroundColor: 'rgba(255,255,255,0.03)' },
     summaryLabel: { color: colors.textMuted, fontSize: 11 },
