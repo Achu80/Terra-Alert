@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card, SectionLabel } from '@/components/Card';
 import ForecastSection from '@/components/home/ForecastSection';
 import RiskHeatmap from '@/components/home/RiskHeatmap';
+import { useSettings } from '@/context/SettingsContext';
 import { colors, RISK_COLORS } from '@/theme/colors';
 import { formatConfidence, getRiskColor, getRiskLevel, withAlpha } from '@/utils/risk';
 
@@ -30,7 +31,8 @@ const prettyName = (name) => name.replace(/_/g, ' ');
  */
 export default function PredictionResults({ result, onNewAssessment }) {
     const { prediction, features, forecast, location } = result;
-    const level = getRiskLevel(prediction.score);
+    const { thresholds } = useSettings();
+    const level = getRiskLevel(prediction.score, thresholds);
     const color = getRiskColor(level);
     const values = features.values;
 

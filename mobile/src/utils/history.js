@@ -95,13 +95,14 @@ export function buildTrend(rows, range, now = new Date()) {
         }));
 }
 
-export function summarize(rows) {
+// highThreshold: score from which a prediction counts as HIGH (Settings -> Risk thresholds)
+export function summarize(rows, highThreshold = 60) {
     if (rows.length === 0) return null;
     const total = rows.reduce((sum, r) => sum + r.score, 0);
     return {
         count: rows.length,
         average: total / rows.length,
-        highOrCritical: rows.filter((r) => r.score >= 60).length,
+        highOrCritical: rows.filter((r) => r.score >= highThreshold).length,
     };
 }
 

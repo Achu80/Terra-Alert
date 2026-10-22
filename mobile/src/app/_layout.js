@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LocationProvider } from '@/context/LocationContext';
 import { PredictionProvider } from '@/context/PredictionContext';
+import { SettingsProvider } from '@/context/SettingsContext';
 import { colors } from '@/theme/colors';
 
 const WELCOME_KEY = 'terra-alert-welcome-complete';
@@ -119,14 +120,16 @@ export default function RootLayout() {
     };
 
     return (
-        <LocationProvider>
-            <PredictionProvider>
-                <StatusBar style="light" />
-                {startup === 'loading' ? <LaunchScreen /> : null}
-                {startup === 'welcome' ? <WelcomeScreen onGetStarted={finishWelcome} /> : null}
-                {startup === 'app' ? <Stack screenOptions={{ headerShown: false }} /> : null}
-            </PredictionProvider>
-        </LocationProvider>
+        <SettingsProvider>
+            <LocationProvider>
+                <PredictionProvider>
+                    <StatusBar style="light" />
+                    {startup === 'loading' ? <LaunchScreen /> : null}
+                    {startup === 'welcome' ? <WelcomeScreen onGetStarted={finishWelcome} /> : null}
+                    {startup === 'app' ? <Stack screenOptions={{ headerShown: false }} /> : null}
+                </PredictionProvider>
+            </LocationProvider>
+        </SettingsProvider>
     );
 }
 
