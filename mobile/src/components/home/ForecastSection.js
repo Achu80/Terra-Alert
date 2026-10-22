@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Card, SectionLabel } from '@/components/Card';
 import TrendChart from '@/components/charts/TrendChart';
+import { useSettings } from '@/context/SettingsContext';
 import { colors, RISK_COLORS } from '@/theme/colors';
-import { getRiskColor, withAlpha } from '@/utils/risk';
+import { getRiskColor, getRiskLevel, withAlpha } from '@/utils/risk';
 
 const TABS = [
     { id: '7days', label: '7 Days' },
@@ -16,12 +17,14 @@ const monthOf = (day) => day.day.split(' ')[0];
 const dateOf = (day) => day.day.split(' ')[1];
 
 function ForecastCards({ days }) {
+    const { thresholds } = useSettings();
     return (
         <View>
             <Text style={styles.subTitle}>Next {days.length} Days</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardsRow}>
                 {days.map((day) => {
-                    const color = getRiskColor(day.level);
+                    // Colour by the user's thresholds rather than the backend's fixed level
+                    const color = getRiskColor(getRiskLevel(day.score, thresholds));
                     return (
                         <View
                             key={day.date}

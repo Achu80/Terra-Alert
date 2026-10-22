@@ -5,6 +5,7 @@ import TrendChart from '@/components/charts/TrendChart';
 import Screen from '@/components/Screen';
 import { HP_DISTRICTS } from '@/constants/himachal';
 import { useSelectedLocation } from '@/context/LocationContext';
+import { useSettings } from '@/context/SettingsContext';
 import { fetchRiskHistory } from '@/services/history';
 import { colors, RISK_COLORS } from '@/theme/colors';
 import { assignDistrict, buildTrend, formatEventTime, HISTORY_RANGES, rangeStart, summarize } from '@/utils/history';
@@ -27,6 +28,7 @@ function Chip({ label, active, onPress }) {
  */
 export default function HistoryScreen() {
     const { location } = useSelectedLocation();
+    const { thresholds } = useSettings();
 
     // Start on the district of the location chosen on Home, if there is one
     const [region, setRegion] = useState(() =>
@@ -61,7 +63,7 @@ export default function HistoryScreen() {
         [result.rows, region]
     );
     const trend = useMemo(() => buildTrend(regionRows, range), [regionRows, range]);
-    const summary = useMemo(() => summarize(regionRows), [regionRows]);
+    const summary = useMemo(() => summarize(regionRows, thresholds.high), [regionRows, thresholds.high]);
     const events = useMemo(() => [...regionRows].reverse().slice(0, TIMELINE_LIMIT), [regionRows]);
     const regionName = REGIONS.find((r) => r.id === region)?.name;
 
@@ -127,7 +129,7 @@ export default function HistoryScreen() {
                         <Text style={styles.empty}>{result.error ? 'Timeline unavailable.' : 'No events yet.'}</Text>
                     ) : (
                         events.map((e, i) => {
-                            const level = getRiskLevel(e.score);
+                            const level = getRiskLevel(e.score, thresholds);
                             const color = getRiskColor(level);
                             const last = i === events.length - 1;
                             return (

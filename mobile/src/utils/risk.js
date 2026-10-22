@@ -1,11 +1,22 @@
 import { RISK_COLORS } from '@/theme/colors';
 
-// Same thresholds as the backend forecast and the web PredictionPage.
-// The level is derived from the score because the backend returns mixed casing ('low' vs 'LOW').
-export function getRiskLevel(score) {
-    if (score >= 80) return 'CRITICAL';
-    if (score >= 60) return 'HIGH';
-    if (score >= 40) return 'MODERATE';
+// Defaults match the backend forecast and the web PredictionPage; users can change them in Settings
+export const DEFAULT_THRESHOLDS = { critical: 80, high: 60, moderate: 40 };
+
+// Thresholds must be ordered moderate < high < critical within 1-100
+export const isValidThresholds = (t) =>
+    !!t &&
+    [t.moderate, t.high, t.critical].every(Number.isFinite) &&
+    t.moderate > 0 &&
+    t.moderate < t.high &&
+    t.high < t.critical &&
+    t.critical <= 100;
+
+// The level is derived from the score because the backend returns mixed casing ('low' vs 'LOW')
+export function getRiskLevel(score, thresholds = DEFAULT_THRESHOLDS) {
+    if (score >= thresholds.critical) return 'CRITICAL';
+    if (score >= thresholds.high) return 'HIGH';
+    if (score >= thresholds.moderate) return 'MODERATE';
     return 'LOW';
 }
 

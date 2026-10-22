@@ -5,6 +5,7 @@ import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Markdown from '@/components/assistant/Markdown';
 import { useVoiceInput } from '@/components/assistant/useVoiceInput';
+import { useSettings } from '@/context/SettingsContext';
 import { chatbotAPI } from '@/services/api';
 import { colors, RISK_COLORS } from '@/theme/colors';
 import { getRiskLevel, withAlpha } from '@/utils/risk';
@@ -21,10 +22,12 @@ const toSpeech = (text) =>
  * and speak questions through the microphone.
  */
 export default function Chatbot({ prediction }) {
+    const { thresholds, voiceReplies } = useSettings();
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
-    const [speechEnabled, setSpeechEnabled] = useState(true);
+    // Starts from the Settings preference; the speaker button changes it for this chat only
+    const [speechEnabled, setSpeechEnabled] = useState(voiceReplies);
 
     // The backend creates a session on the first message and returns its id; reuse it for chat memory
     const sessionIdRef = useRef(null);
@@ -57,7 +60,7 @@ export default function Chatbot({ prediction }) {
                   longitude: prediction.location.lon,
                   location_name: prediction.location.name || 'Selected location',
                   risk_score: prediction.prediction.score,
-                  risk_level: getRiskLevel(prediction.prediction.score),
+                  risk_level: getRiskLevel(prediction.prediction.score, thresholds),
               }
             : null;
 
