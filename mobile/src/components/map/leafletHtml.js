@@ -70,6 +70,26 @@ export function buildLeafletHtml(config) {
 
   map.setView([cfg.center.lat, cfg.center.lon], cfg.zoom);
 
+  var districtLayer = L.layerGroup().addTo(map);
+  window.setDistricts = function (data) {
+    districtLayer.clearLayers();
+    (data.districts || []).forEach(function (district) {
+      var color = district.color || '#6b7280';
+      var selected = district.id === data.selectedDistrictId;
+      var circle = L.circleMarker([district.lat, district.lon], {
+        radius: selected ? 11 : 8,
+        fillColor: color,
+        fillOpacity: 0.9,
+        color: selected ? '#ffffff' : color,
+        weight: selected ? 3 : 2,
+      }).addTo(districtLayer);
+      circle.bindPopup('<b>' + esc(district.name) + '</b><br>Risk score: ' + esc(district.scoreLabel) + '<br>' + esc(district.level));
+      circle.on('click', function () {
+        send({ type: 'districtPress', id: district.id });
+      });
+    });
+  };
+
   // ---- marker ----
   var marker = null;
   window.setMarker = function (m) {
@@ -131,6 +151,7 @@ export function buildLeafletHtml(config) {
 
   window.setMarker(cfg.marker);
   window.setHeat(cfg.heat);
+  window.setDistricts({ districts: cfg.districts || [], selectedDistrictId: cfg.selectedDistrictId });
   send({ type: 'ready' });
 })();
 </script>

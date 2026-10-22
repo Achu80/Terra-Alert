@@ -20,21 +20,24 @@ export default function LeafletMap({
     zoom = 8,
     bounds,
     marker = null,
+    districts = [],
+    selectedDistrictId = null,
     heat = null,
     flyZoom = 11,
     interactive = true,
     onPress,
+    onDistrictPress,
     onTouchChange,
     style,
 }) {
     const webRef = useRef(null);
     const readyRef = useRef(false);
-    const latestRef = useRef({ marker, heat });
+    const latestRef = useRef({ marker, heat, districts, selectedDistrictId });
     const [error, setError] = useState(null);
 
     // Built once from the first props; later changes are pushed in, so the map never reloads
     const [html] = useState(() =>
-        buildLeafletHtml({ center, zoom, bounds, marker, heat, interactive, tappable: !!onPress })
+        buildLeafletHtml({ center, zoom, bounds, marker, heat, districts, selectedDistrictId, interactive, tappable: !!onPress })
     );
 
     const run = useCallback((js) => {
@@ -51,6 +54,12 @@ export default function LeafletMap({
         run(call('setMarker', next));
         if (next) run(call('flyTo', { lat: mLat, lon: mLon, zoom: flyZoom }));
     }, [mLat, mLon, mTitle, mSubtitle, flyZoom, run]);
+
+    useEffect(() => {
+        latestRef.current.districts = districts;
+        latestRef.current.selectedDistrictId = selectedDistrictId;
+        run(call('setDistricts', { districts, selectedDistrictId }));
+    }, [districts, selectedDistrictId, run]);
 
     const hLat = heat?.lat;
     const hLon = heat?.lon;
@@ -75,8 +84,14 @@ export default function LeafletMap({
             // Catch up on anything that changed while the page was loading
             run(call('setMarker', latestRef.current.marker));
             run(call('setHeat', latestRef.current.heat));
+            run(call('setDistricts', {
+                districts: latestRef.current.districts,
+                selectedDistrictId: latestRef.current.selectedDistrictId,
+            }));
         } else if (msg.type === 'press') {
             onPress?.({ latitude: msg.lat, longitude: msg.lon });
+        } else if (msg.type === 'districtPress') {
+            onDistrictPress?.(msg.id);
         } else if (msg.type === 'error') {
             setError(msg.message);
         }
