@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Card, SectionLabel } from '@/components/Card';
+import AdminOnly, { AdminBadge } from '@/components/admin/AdminOnly';
 import TrendChart from '@/components/charts/TrendChart';
 import Screen from '@/components/Screen';
 import { HP_DISTRICTS } from '@/constants/himachal';
+import { useAdmin } from '@/context/AdminContext';
 import { useSelectedLocation } from '@/context/LocationContext';
 import { useSettings } from '@/context/SettingsContext';
 import { fetchRiskHistory } from '@/services/history';
@@ -29,6 +31,7 @@ function Chip({ label, active, onPress }) {
 export default function HistoryScreen() {
     const { location } = useSelectedLocation();
     const { thresholds } = useSettings();
+    const { isAdmin } = useAdmin();
 
     // Start on the district of the location chosen on Home, if there is one
     const [region, setRegion] = useState(() =>
@@ -108,21 +111,38 @@ export default function HistoryScreen() {
                         </Text>
                     ) : (
                         <>
-                            <Text style={styles.summary}>
-                                {summary.count} prediction{summary.count === 1 ? '' : 's'} · average {summary.average.toFixed(1)} ·{' '}
-                                {summary.highOrCritical} high or critical
-                            </Text>
+                            <AdminOnly>
+                                <Text style={styles.summary}>
+                                    {summary.count} prediction{summary.count === 1 ? '' : 's'} · average {summary.average.toFixed(1)} ·{' '}
+                                    {summary.highOrCritical} high or critical
+                                </Text>
+                            </AdminOnly>
                             <TrendChart
-                                points={trend}
+                                points={trend.map((p) => ({
+                                    ...p,
+                                    // Prediction counts are usage data, so only admins see them
+                                    detail: isAdmin
+                                        ? `${range.bucket === 'week' ? 'Week avg' : 'Day avg'} of ${p.count} prediction${p.count === 1 ? '' : 's'}`
+                                        : range.bucket === 'week'
+                                          ? 'Weekly average'
+                                          : 'Daily average',
+                                }))}
+                                height={280}
+                                bands={thresholds}
                                 baseline={summary.average}
                                 baselineLabel="Period average"
+                                yAxisLabel="Risk score (0–100)"
+                                xAxisLabel={range.bucket === 'week' ? 'Week starting' : 'Date'}
                             />
                         </>
                     )}
                 </Card>
 
+                {/* Lists places other people checked, so it is admin only */}
+                <AdminOnly>
                 <Card>
                     <SectionLabel icon="time-outline">Event Timeline</SectionLabel>
+                    <AdminBadge />
                     {firstLoad ? (
                         <ActivityIndicator color={colors.primary} style={styles.loader} />
                     ) : events.length === 0 ? (
@@ -150,6 +170,7 @@ export default function HistoryScreen() {
                         })
                     )}
                 </Card>
+                </AdminOnly>
             </ScrollView>
         </Screen>
     );

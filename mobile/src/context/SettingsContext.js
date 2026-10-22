@@ -6,6 +6,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useAdmin } from '@/context/AdminContext';
 import { settingsAPI } from '@/services/api';
 import { DEFAULT_THRESHOLDS, isValidThresholds } from '@/utils/risk';
 
@@ -16,6 +17,7 @@ const SettingsContext = createContext(null);
 const pickThresholds = (t) => ({ critical: Number(t.critical), high: Number(t.high), moderate: Number(t.moderate) });
 
 export function SettingsProvider({ children }) {
+    const { adminPin } = useAdmin();
     const [thresholds, setThresholds] = useState(DEFAULT_THRESHOLDS);
     const [voiceReplies, setVoiceRepliesState] = useState(true);
 
@@ -37,13 +39,16 @@ export function SettingsProvider({ children }) {
             .catch(() => {});
     }, []);
 
-    // Throws if the backend rejects the save, so the screen can show the error
-    const saveThresholds = useCallback(async (next) => {
-        const clean = pickThresholds(next);
-        if (!isValidThresholds(clean)) throw new Error('Thresholds must be ordered: Moderate < High < Critical.');
-        await settingsAPI.update({ thresholds: clean });
-        setThresholds(clean);
-    }, []);
+    // Admin only (the backend checks the PIN). Throws if the backend rejects the save, so the screen can show the error
+    const saveThresholds = useCallback(
+        async (next) => {
+            const clean = pickThresholds(next);
+            if (!isValidThresholds(clean)) throw new Error('Thresholds must be ordered: Moderate < High < Critical.');
+            await settingsAPI.update({ thresholds: clean }, adminPin);
+            setThresholds(clean);
+        },
+        [adminPin]
+    );
 
     const setVoiceReplies = useCallback((value) => {
         setVoiceRepliesState(value);

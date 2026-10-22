@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(11,18,32,0.35)',
+        backgroundColor: `${colors.background}59`,
         borderRadius: 12,
     },
     searchField: {
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
     },
     searchPlaceholder: { color: colors.textMuted, fontSize: 15 },
-    selectedCard: { backgroundColor: 'rgba(56,189,248,0.08)', borderColor: 'rgba(56,189,248,0.3)' },
+    selectedCard: { backgroundColor: `${colors.primary}14`, borderColor: `${colors.primary}4d` },
     selectedRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
     selectedText: { flex: 1 },
     selectedLabel: { color: colors.primary, fontSize: 13, fontWeight: '600' },

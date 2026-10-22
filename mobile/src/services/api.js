@@ -66,7 +66,18 @@ export const chatbotAPI = {
 
 export const settingsAPI = {
     get: () => fetchAPI('/settings'),
-    update: (settings) => post('/settings', settings),
+    // Changing settings is admin-only; the backend checks the PIN header
+    update: (settings, adminPin) =>
+        fetchAPI('/settings', {
+            method: 'POST',
+            body: JSON.stringify(settings),
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Pin': adminPin ?? '' },
+        }),
+};
+
+export const adminAPI = {
+    // Resolves to true/false; throws on network errors or when too many wrong PINs were tried
+    verify: (pin) => post('/admin/verify', { pin }).then((r) => r.valid === true),
 };
 
 export const healthCheck = () => fetchAPI('/health');

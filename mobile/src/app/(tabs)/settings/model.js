@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AdminScreenGate } from '@/components/admin/AdminOnly';
 import { SettingsRow, SettingsSection } from '@/components/settings/SettingsList';
 import { colors, RISK_COLORS } from '@/theme/colors';
 import { withAlpha } from '@/utils/risk';
@@ -27,7 +28,7 @@ const FEATURE_GROUPS = [
     },
 ];
 
-export default function ModelScreen() {
+function ModelContent() {
     return (
         <ScrollView contentContainerStyle={styles.content}>
             <View style={styles.hero}>
@@ -75,6 +76,15 @@ export default function ModelScreen() {
                 </View>
             ))}
         </ScrollView>
+    );
+}
+
+// Admin-only page: regular users see an "Admin only" notice instead
+export default function ModelScreen() {
+    return (
+        <AdminScreenGate>
+            <ModelContent />
+        </AdminScreenGate>
     );
 }
 

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from services.gee_service import GEEService
 from services.model_service import ModelService
 from utils.data_processor import DataProcessor
+from routes.admin_routes import is_admin_request
 from database.repositories import (
     DistrictRepository, 
     RiskHistoryRepository, 
@@ -737,6 +738,9 @@ def settings():
             settings = settings_repo.get_settings()
             return jsonify(settings)
         else:
+            # Changing settings affects every user, so it needs the admin PIN
+            if not is_admin_request():
+                return jsonify({'error': 'Admin PIN required to change settings'}), 403
             data = request.json
             updated = settings_repo.update_settings(data)
             return jsonify(updated)

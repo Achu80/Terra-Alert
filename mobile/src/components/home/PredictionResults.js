@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import AdminOnly, { AdminBadge } from '@/components/admin/AdminOnly';
 import { Card, SectionLabel } from '@/components/Card';
 import ForecastSection from '@/components/home/ForecastSection';
 import RiskHeatmap from '@/components/home/RiskHeatmap';
@@ -110,8 +111,10 @@ export default function PredictionResults({ result, onNewAssessment }) {
                 <RiskHeatmap location={location} score={prediction.score} />
             </Card>
 
+            <AdminOnly>
             <Card>
                 <SectionLabel icon="grid-outline">Environmental Parameters</SectionLabel>
+                <AdminBadge />
                 <View style={styles.paramGrid}>
                     {features.names.slice(0, 10).map((name, i) => (
                         <View key={name} style={styles.param}>
@@ -121,6 +124,7 @@ export default function PredictionResults({ result, onNewAssessment }) {
                     ))}
                 </View>
             </Card>
+            </AdminOnly>
 
             {forecast ? (
                 <ForecastSection

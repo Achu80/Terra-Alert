@@ -101,6 +101,7 @@ function Note({ icon, text }) {
  * weather: { loading, days, error } - real rainfall-forecast-driven risk from /api/forecast/predict
  */
 export default function ForecastSection({ forecast, weather }) {
+    const { thresholds } = useSettings();
     const [tab, setTab] = useState('7days');
 
     const weatherDays = fromWeather(weather?.days ?? []);
@@ -145,7 +146,14 @@ export default function ForecastSection({ forecast, weather }) {
                     )}
                     {tab === '7days' ? <ForecastCards days={days} /> : null}
                     {tab === '30days' ? <ThirtyDaySummary days={days} /> : null}
-                    <TrendChart title={`${days.length}-Day Risk Trend`} points={days} />
+                    <TrendChart
+                        title={`${days.length}-Day Risk Trend`}
+                        points={days.map((d) => ({ ...d, detail: d.rain != null ? `Forecast rain ${d.rain.toFixed(1)} mm` : 'Projected risk' }))}
+                        height={230}
+                        bands={thresholds}
+                        yAxisLabel="Risk score"
+                        xAxisLabel="Date"
+                    />
                 </View>
             )}
         </Card>
