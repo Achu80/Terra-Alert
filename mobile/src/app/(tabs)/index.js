@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Card, SectionLabel } from '@/components/Card';
+import FadeInView, { Stagger } from '@/components/FadeInView';
 import LocationMap from '@/components/home/LocationMap';
 import PredictionLoading from '@/components/home/PredictionLoading';
 import PredictionResults from '@/components/home/PredictionResults';
@@ -21,7 +22,7 @@ const OUTSIDE_HP_MESSAGE = `Please select a location within ${HP_STATE_NAME}.`;
  */
 export default function HomeScreen() {
     const { location, setLocation, ready } = useSelectedLocation();
-    const { prediction, setPrediction } = usePrediction();
+    const { prediction, setPrediction, startNewAssessment } = usePrediction();
 
     const [pickerOpen, setPickerOpen] = useState(false);
     const [resolvingPin, setResolvingPin] = useState(false);
@@ -74,20 +75,24 @@ export default function HomeScreen() {
     };
 
     return (
-        <Screen title="Landslide Risk Prediction" subtitle="Satellite data and machine learning for Himachal Pradesh">
+        <Screen title="Terra-Alert" subtitle="Satellite data and machine learning for Himachal Pradesh">
             {step === 'loading' ? (
-                <PredictionLoading locationName={location?.name} />
+                <FadeInView key="loading" style={styles.fill}>
+                    <PredictionLoading locationName={location?.name} />
+                </FadeInView>
             ) : (
+                // key={step}: each step gets a fresh scroll view (starts at the top) and replays its entrance animation
                 <ScrollView
+                    key={step}
                     scrollEnabled={!mapTouched}
                     contentContainerStyle={styles.content}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                 >
                     {step === 'results' ? (
-                        <PredictionResults result={prediction} onNewAssessment={() => setPrediction(null)} />
+                        <PredictionResults result={prediction} onNewAssessment={startNewAssessment} />
                     ) : (
-                        <>
+                        <Stagger>
                             <Card>
                                 <SectionLabel icon="location-outline">Select Location</SectionLabel>
                                 <View>
@@ -134,7 +139,7 @@ export default function HomeScreen() {
                                     </Pressable>
                                 </Card>
                             ) : null}
-                        </>
+                        </Stagger>
                     )}
                 </ScrollView>
             )}
@@ -150,6 +155,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+    fill: { flex: 1 },
     content: { gap: 16, paddingBottom: 32 },
     pressed: { opacity: 0.7 },
     hint: { color: colors.textMuted, fontSize: 12, marginTop: 8 },

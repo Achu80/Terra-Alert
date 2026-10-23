@@ -11,6 +11,8 @@ export default function SettingsLayout() {
                 headerTitleStyle: { fontWeight: '600' },
                 headerShadowVisible: false,
                 contentStyle: { backgroundColor: colors.background },
+                // Detail pages slide in from the right, like a phone's own Settings app
+                animation: 'slide_from_right',
             }}
         >
             <Stack.Screen name="index" options={{ headerShown: false }} />

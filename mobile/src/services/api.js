@@ -78,6 +78,20 @@ export const settingsAPI = {
 export const adminAPI = {
     // Resolves to true/false; throws on network errors or when too many wrong PINs were tried
     verify: (pin) => post('/admin/verify', { pin }).then((r) => r.valid === true),
+    // Choose the landslide model everyone uses: resolves to { active, models }
+    setModel: (version, pin) =>
+        fetchAPI('/admin/model', {
+            method: 'POST',
+            body: JSON.stringify({ version }),
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Pin': pin ?? '' },
+        }),
+    // SMS alert setup: { sms: { package_installed, configured, enabled } }
+    status: (pin) => fetchAPI('/admin/status', { headers: { 'Content-Type': 'application/json', 'X-Admin-Pin': pin ?? '' } }),
+};
+
+export const modelsAPI = {
+    // { active: 'v2', models: [{ version, label, description, rain_source, veg_source, metrics, trained_at, active }] }
+    list: () => fetchAPI('/models'),
 };
 
 export const healthCheck = () => fetchAPI('/health');

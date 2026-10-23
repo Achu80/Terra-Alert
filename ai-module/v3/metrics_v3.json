@@ -1,0 +1,192 @@
+{
+  "generated_at": "2026-10-23T05:03:06",
+  "rows": {
+    "landslide": 552,
+    "temporal_control": 552,
+    "spatial_control": 506
+  },
+  "spatial_cv": {
+    "v2": {
+      "all": {
+        "roc_auc": 0.489,
+        "pr_auc": 0.327,
+        "accuracy": 0.475,
+        "precision": 0.331,
+        "recall": 0.52,
+        "brier": 0.406,
+        "n": 1610
+      },
+      "vs_spatial_control": {
+        "roc_auc": 0.541,
+        "pr_auc": 0.547,
+        "accuracy": 0.525,
+        "precision": 0.547,
+        "recall": 0.52,
+        "brier": 0.362,
+        "n": 1058
+      },
+      "vs_temporal_control": {
+        "roc_auc": 0.442,
+        "pr_auc": 0.45,
+        "accuracy": 0.449,
+        "precision": 0.456,
+        "recall": 0.52,
+        "brier": 0.424,
+        "n": 1104
+      }
+    },
+    "v3": {
+      "all": {
+        "roc_auc": 0.59,
+        "pr_auc": 0.413,
+        "accuracy": 0.619,
+        "precision": 0.42,
+        "recall": 0.292,
+        "brier": 0.249,
+        "n": 1610
+      },
+      "vs_spatial_control": {
+        "roc_auc": 0.54,
+        "pr_auc": 0.552,
+        "accuracy": 0.502,
+        "precision": 0.542,
+        "recall": 0.292,
+        "brier": 0.319,
+        "n": 1058
+      },
+      "vs_temporal_control": {
+        "roc_auc": 0.635,
+        "pr_auc": 0.621,
+        "accuracy": 0.568,
+        "precision": 0.652,
+        "recall": 0.292,
+        "brier": 0.284,
+        "n": 1104
+      }
+    }
+  },
+  "himachal_holdout": {
+    "v2": {
+      "all": {
+        "roc_auc": 0.48,
+        "pr_auc": 0.313,
+        "accuracy": 0.474,
+        "precision": 0.325,
+        "recall": 0.497,
+        "brier": 0.392,
+        "n": 447
+      },
+      "vs_spatial_control": {
+        "roc_auc": 0.56,
+        "pr_auc": 0.569,
+        "accuracy": 0.531,
+        "precision": 0.555,
+        "recall": 0.497,
+        "brier": 0.333,
+        "n": 294
+      },
+      "vs_temporal_control": {
+        "roc_auc": 0.407,
+        "pr_auc": 0.421,
+        "accuracy": 0.431,
+        "precision": 0.439,
+        "recall": 0.497,
+        "brier": 0.423,
+        "n": 306
+      }
+    },
+    "v3": {
+      "all": {
+        "roc_auc": 0.611,
+        "pr_auc": 0.429,
+        "accuracy": 0.644,
+        "precision": 0.474,
+        "recall": 0.353,
+        "brier": 0.249,
+        "n": 447
+      },
+      "vs_spatial_control": {
+        "roc_auc": 0.559,
+        "pr_auc": 0.565,
+        "accuracy": 0.541,
+        "precision": 0.6,
+        "recall": 0.353,
+        "brier": 0.315,
+        "n": 294
+      },
+      "vs_temporal_control": {
+        "roc_auc": 0.658,
+        "pr_auc": 0.64,
+        "accuracy": 0.598,
+        "precision": 0.692,
+        "recall": 0.353,
+        "brier": 0.278,
+        "n": 306
+      }
+    }
+  },
+  "plains_rows": {
+    "count": 142,
+    "landslides_among_them": 46,
+    "v3_mean_score_controls": 28.9,
+    "v3_mean_score_landslides": 29.6
+  },
+  "shap_mean_abs": {
+    "v2": {
+      "ndwi": 2.156,
+      "elevation": 1.622,
+      "rainfall_ratio_7d_14d": 0.704,
+      "ndvi": 0.701,
+      "slope_elevation_product": 0.682,
+      "rainfall_ratio_14d_30d": 0.621,
+      "rainfall_ratio_3d_7d": 0.576,
+      "rainfall_3d": 0.555,
+      "rainfall_30d": 0.524,
+      "aspect": 0.456,
+      "rainfall_14d": 0.212,
+      "rainfall_acceleration": 0.153,
+      "rainfall_7d": 0.149,
+      "slope": 0.137,
+      "soil_type": 0.133,
+      "steep_low_elevation": 0.066,
+      "low_veg_steep": 0.005,
+      "north_facing": 0.001,
+      "high_short_term_rain": 0.0,
+      "sustained_heavy_rain": 0.0
+    },
+    "v3": {
+      "rainfall_3d": 0.358,
+      "ndvi": 0.297,
+      "rainfall_ratio_14d_30d": 0.289,
+      "rainfall_ratio_3d_7d": 0.259,
+      "ndwi": 0.254,
+      "rainfall_30d": 0.238,
+      "slope": 0.223,
+      "rainfall_ratio_7d_14d": 0.195,
+      "aspect": 0.192,
+      "slope_elevation_product": 0.185,
+      "rainfall_7d": 0.161,
+      "rainfall_acceleration": 0.15,
+      "rainfall_14d": 0.144,
+      "elevation": 0.101,
+      "soil_type": 0.036,
+      "steep_low_elevation": 0.02,
+      "low_veg_steep": 0.017,
+      "high_short_term_rain": 0.0,
+      "sustained_heavy_rain": 0.0,
+      "north_facing": 0.0
+    }
+  },
+  "median_score_by_kind": {
+    "v2": {
+      "landslide": 56.2,
+      "spatial_control": 45.8,
+      "temporal_control": 73.2
+    },
+    "v3": {
+      "landslide": 34.4,
+      "spatial_control": 29.1,
+      "temporal_control": 20.8
+    }
+  }
+}

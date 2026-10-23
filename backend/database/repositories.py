@@ -3,7 +3,7 @@ Database repositories for TerraAlert
 Handles all database operations for districts, alerts, history, and settings
 """
 from typing import List, Dict, Optional, Any
-from datetime import datetime
+from datetime import datetime, timedelta
 from database.supabase_client import get_supabase, is_supabase_available
 import json
 
@@ -403,6 +403,28 @@ class AlertRepository:
         result = self.supabase.table('alerts').insert(alert).execute()
         return result.data[0]
     
+    def record_alert_once(self, district_id: str, level: str, score: float,
+                          trigger: str, within_hours: int = 24) -> Optional[Dict]:
+        """Create an alert unless the same place + trigger was already recorded recently.
+        Never raises - a failed alert log must not break a prediction."""
+        if not self.supabase:
+            return None
+        try:
+            since = (datetime.utcnow() - timedelta(hours=within_hours)).isoformat()
+            existing = self.supabase.table('alerts')\
+                .select('id')\
+                .eq('district_id', district_id)\
+                .eq('trigger', trigger)\
+                .gte('created_at', since)\
+                .limit(1)\
+                .execute()
+            if existing.data:
+                return None
+            return self.create_alert(district_id, level, score, trigger)
+        except Exception as e:
+            print(f"⚠️  Could not record alert: {e}")
+            return None
+
     def get_recent_alerts(self, limit: int = 10, level: Optional[str] = None) -> List[Dict]:
         """Get recent alerts"""
         if not self.supabase:

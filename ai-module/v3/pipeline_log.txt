@@ -1,0 +1,59 @@
+﻿[10/23/2026 04:03:51] waiting for the dataset build to finish...
+[10/23/2026 05:01:06] build finished; second pass for any failed rows
+py : shard None: 1610 rows already fetched overall, 0 to go -> landslides_v3_part_rest.csv
+At D:\VS-Code projects\Terra-Alert\ai-module\v3\run_after_build.ps1:15 char:1
++ py -3.11 -W ignore ai-module\v3\build_dataset_v3.py 2>&1 | Out-File $ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (shard None: 161...3_part_rest.csv:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+shard None done
+✓ GEE initialized successfully
+[10/23/2026 05:01:22] comparing v2 and v3
+rows: 1610 | {'landslide': 552, 'temporal_control': 552, 'spatial_control': 506}
+py : Traceback (most recent call last):
+At D:\VS-Code projects\Terra-Alert\ai-module\v3\run_after_build.ps1:19 char:1
++ py -3.11 -W ignore evaluate_v2_vs_v3.py 2>&1 | Out-File "..\..\$log"  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "D:\VS-Code projects\Terra-Alert\ai-module\v3\evaluate_v2_vs_v3.py", line 183, in <module>
+    main()
+  File "D:\VS-Code projects\Terra-Alert\ai-module\v3\evaluate_v2_vs_v3.py", line 157, in main
+    'spatial_cv': {'v2': split_metrics(df, p_v2), 'v3': split_metrics(df, p_v3_cv)},
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\VS-Code projects\Terra-Alert\ai-module\v3\evaluate_v2_vs_v3.py", line 57, in split_metrics
+    out = {'all': metrics(df.label, p)}
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "D:\VS-Code projects\Terra-Alert\ai-module\v3\evaluate_v2_vs_v3.py", line 45, in metrics
+    'roc_auc': round(float(roc_auc_score(y, p)), 3) if len(set(y)) > 1 else None,
+                           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Anshul\AppData\Local\Programs\Python\Python311\Lib\site-packages\sklearn\utils\_param_validation.py", 
+line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Anshul\AppData\Local\Programs\Python\Python311\Lib\site-packages\sklearn\metrics\_ranking.py", line 
+741, in roc_auc_score
+    return _average_binary_score(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Anshul\AppData\Local\Programs\Python\Python311\Lib\site-packages\sklearn\metrics\_base.py", line 74, 
+in _average_binary_score
+    raise ValueError("{0} format is not supported".format(y_type))
+ValueError: unknown format is not supported
+[10/23/2026 05:01:39] training and installing v3
+py : Traceback (most recent call last):
+At D:\VS-Code projects\Terra-Alert\ai-module\v3\run_after_build.ps1:21 char:1
++ py -3.11 -W ignore train_xgboost_v3.py 2>&1 | Out-File "..\..\$log" - ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "D:\VS-Code projects\Terra-Alert\ai-module\v3\train_xgboost_v3.py", line 72, in <module>
+    main()
+  File "D:\VS-Code projects\Terra-Alert\ai-module\v3\train_xgboost_v3.py", line 36, in main
+    with open(os.path.join(HERE, 'metrics_v3.json'), encoding='utf-8') as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'D:\\VS-Code 
+projects\\Terra-Alert\\ai-module\\v3\\metrics_v3.json'
+[10/23/2026 05:01:47] ALL DONE - see ai-module\v3\REPORT.md; restart the backend to load v3

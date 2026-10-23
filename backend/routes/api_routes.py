@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from services.gee_service import GEEService
-from services.model_service import ModelService
+from services.model_registry import registry
 from utils.data_processor import DataProcessor
 from routes.admin_routes import is_admin_request
 from database.repositories import (
@@ -20,11 +20,7 @@ api_bp = Blueprint('api', __name__)
 gee_project_id = os.getenv('GEE_PROJECT_ID')
 gee_service = GEEService(project_id=gee_project_id)
 data_processor = DataProcessor()
-model_service = ModelService()
-
-# Load ML models on startup
-print("Loading ML models...")
-model_service.load_models()
+# Models are loaded once by services/model_registry.py; every request uses registry.active()
 
 # Initialize repositories
 district_repo = DistrictRepository()
@@ -32,6 +28,14 @@ history_repo = RiskHistoryRepository()
 alert_repo = AlertRepository()
 settings_repo = SettingsRepository()
 stats_repo = StatsRepository()
+
+
+@api_bp.route('/models', methods=['GET'])
+def list_models():
+    """Available landslide models and which one is active (switching is admin-only: POST /api/admin/model)."""
+    models = registry.list()
+    active = next((m['version'] for m in models if m['active']), None)
+    return jsonify({'active': active, 'models': models})
 
 
 @api_bp.route('/health')
@@ -92,7 +96,9 @@ def get_himachal_districts():
         start_time = time.time()
         end_date = datetime.now()
         start_date = end_date - timedelta(days=30)
-        
+        # One model for the whole request (an admin could switch models while this runs)
+        active_model = registry.active()
+
         def fetch_district_data(district):
             """Fetch data for a single district"""
             try:
@@ -102,7 +108,8 @@ def get_himachal_districts():
                     district['lon'],
                     start_date.strftime('%Y-%m-%d'),
                     end_date.strftime('%Y-%m-%d'),
-                    buffer=5000  # 5km buffer for district center
+                    buffer=5000,  # 5km buffer for district center
+                    **active_model.feature_options
                 )
                 
                 if gee_data:
@@ -110,8 +117,8 @@ def get_himachal_districts():
                     processed_data = data_processor.prepare_model_input(gee_data)
                     
                     # Get prediction
-                    prediction = model_service.predict(processed_data['features'])
-                    
+                    prediction = active_model.predict(processed_data['features'])
+
                     # Build district data
                     return {
                         'id': district['id'],
@@ -341,13 +348,17 @@ def predict():
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days_back)
         
+        # The active model decides which rain data to fetch (each model uses what it was trained on)
+        active_model = registry.active()
+
         # Step 1: Fetch ALL features from GEE
-        print(f"Fetching GEE data for location: {lat}, {lon}")
+        print(f"Fetching GEE data for location: {lat}, {lon} (model {active_model.version})")
         gee_data = gee_service.get_all_features(
             lat, lon,
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d'),
-            buffer
+            buffer,
+            **active_model.feature_options
         )
         
         if not gee_data:
@@ -360,8 +371,8 @@ def predict():
             return jsonify({'error': 'Failed to process GEE data'}), 500
         
         # Step 3: Make prediction with ML model
-        prediction = model_service.predict(processed_data['features'])
-        
+        prediction = active_model.predict(processed_data['features'])
+
         # Step 3.5: Save prediction to Supabase (risk_history table)
         try:
             if history_repo.supabase:  # Only if Supabase is available
@@ -417,9 +428,19 @@ def predict():
                     score=float(prediction['score']),
                     level=prediction['level'],
                     features=features_with_location,
-                    model_scores={'xgboost': float(prediction['score'])}
+                    model_scores={'xgboost': float(prediction['score']), 'model_version': active_model.version}
                 )
                 print(f"💾 Saved prediction to Supabase: {location_name} - Score: {prediction['score']:.1f}")
+
+                # Alert log (shown to admins in the app): Moderate and above
+                level = str(prediction['level']).upper()
+                if level in ('MODERATE', 'HIGH', 'CRITICAL'):
+                    alert_repo.record_alert_once(
+                        district_id=f"loc_{lat:.4f}_{lon:.4f}",
+                        level=level,
+                        score=float(prediction['score']),
+                        trigger=f"Assessment: {location_name}"
+                    )
         except Exception as save_error:
             print(f"⚠️  Failed to save to Supabase: {save_error}")
             # Continue even if save fails
@@ -456,6 +477,13 @@ def predict():
                 'end': end_date.strftime('%Y-%m-%d')
             },
             'prediction': convert_to_native(prediction),
+            # Which model answered and how fresh its rain data was (shown to admins in the app)
+            'model': {
+                'version': active_model.version,
+                'label': active_model.label,
+                'rain_source_used': gee_data.get('rain_source_used'),
+                'rain_data_age_days': gee_data.get('rain_data_age_days'),
+            },
             'features': {
                 'values': convert_to_native(processed_data['features']),
                 'names': processed_data['feature_names']

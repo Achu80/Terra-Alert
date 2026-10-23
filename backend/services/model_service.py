@@ -9,31 +9,58 @@ import pandas as pd
 
 
 class ModelService:
-    """Service for landslide prediction using XGBoost model"""
-    
-    def __init__(self):
+    """Service for landslide prediction using one XGBoost model.
+
+    Several instances can exist side by side (see services/model_registry.py), one per model version.
+    `meta` describes the model: label, rain_source ('chirps' or 'imerg' - the rain data it was trained on),
+    plains_rule (whether the low/flat override applies) and test metrics.
+    """
+
+    def __init__(self, version='v2', model_dir=None, meta=None):
+        self.version = version
+        self.meta = meta or {}
         self.model = None
         self.scaler = None
         self.model_loaded = False
-        self.model_dir = os.path.join(os.path.dirname(__file__), '..', 'ml', 'models')
-    
+        self.model_dir = model_dir or os.path.join(os.path.dirname(__file__), '..', 'ml', 'models')
+
+    @property
+    def rain_source(self):
+        return self.meta.get('rain_source', 'chirps')
+
+    @property
+    def veg_source(self):
+        return self.meta.get('veg_source', 'sentinel2')
+
+    @property
+    def feature_options(self):
+        """Data recipe this model was trained on - pass to GEEService.get_all_features(**options)."""
+        return {'rain_source': self.rain_source, 'veg_source': self.veg_source}
+
+    @property
+    def label(self):
+        return self.meta.get('label', self.version)
+
     def load_models(self):
         """Load trained XGBoost model and scaler from disk"""
         try:
             # Load XGBoost model from JSON (version-independent format)
             model_json_path = os.path.join(self.model_dir, 'xgboost_model.json')
             model_pkl_path = os.path.join(self.model_dir, 'xgboost_model.pkl')
-            
+            # Versioned folders (e.g. ml/models/v3/) use the plain name model.pkl
+            versioned_pkl_path = os.path.join(self.model_dir, 'model.pkl')
+
             # Try JSON format first (preferred)
             if os.path.exists(model_json_path):
                 self.model = xgb.XGBClassifier()
                 self.model.load_model(model_json_path)
-                print("✓ XGBoost model loaded from JSON (version-independent)")
+                print(f"✓ [{self.version}] XGBoost model loaded from JSON (version-independent)")
                 self.model_loaded = True
             # Fallback to pickle format
-            elif os.path.exists(model_pkl_path):
-                self.model = joblib.load(model_pkl_path)
-                print("✓ XGBoost model loaded from pickle")
+            elif os.path.exists(model_pkl_path) or os.path.exists(versioned_pkl_path):
+                path = model_pkl_path if os.path.exists(model_pkl_path) else versioned_pkl_path
+                self.model = joblib.load(path)
+                print(f"✓ [{self.version}] XGBoost model loaded from pickle")
                 self.model_loaded = True
             else:
                 print(f"⚠ Model not found at: {model_json_path} or {model_pkl_path}")
@@ -101,8 +128,8 @@ class ModelService:
           elevation = features[0]  # First feature
           slope = features[1]      # Second feature
         
-        # Plains area override
-          if elevation < 800 and slope < 15:
+        # Plains area override (only for models that need it - see meta['plains_rule'])
+          if self.meta.get('plains_rule', True) and elevation < 800 and slope < 15:
             print(f"⛰️ Plains override: elevation={elevation}m, slope={slope}°")
             return {
                 'score': 5.0,
@@ -114,6 +141,7 @@ class ModelService:
                     'landslide': 0.05
                 },
                 'model_type': 'Rule-Based (Plains)',
+                'model_version': self.version,
                 'note': 'Low-risk plains area - outside mountainous prediction zone'
             }
         
@@ -161,7 +189,8 @@ class ModelService:
                 'no_landslide': round(float(proba[0]), 3),
                 'landslide': round(float(proba[1]), 3)
             },
-            'model_type': 'XGBoost'
+            'model_type': 'XGBoost',
+            'model_version': self.version
         }
         
         except Exception as e:
@@ -198,6 +227,7 @@ class ModelService:
                 'landslide': round(risk_score / 100, 3)
             },
             'model_type': 'Mock',
+            'model_version': self.version,
             'warning': 'Using mock prediction - XGBoost model not loaded'
         }
     
