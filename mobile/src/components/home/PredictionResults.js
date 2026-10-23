@@ -1,12 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import AdminOnly, { AdminBadge } from '@/components/admin/AdminOnly';
+import { AdminBadge } from '@/components/admin/AdminOnly';
 import { Card, SectionLabel } from '@/components/Card';
+import { Stagger } from '@/components/FadeInView';
 import ForecastSection from '@/components/home/ForecastSection';
 import RiskHeatmap from '@/components/home/RiskHeatmap';
+import { useAdmin } from '@/context/AdminContext';
+import { useAlerts } from '@/context/AlertContext';
 import { useSettings } from '@/context/SettingsContext';
-import { forecastAPI } from '@/services/api';
 import { colors, RISK_COLORS } from '@/theme/colors';
 import { formatConfidence, getRiskColor, getRiskLevel, withAlpha } from '@/utils/risk';
 
@@ -35,28 +36,14 @@ const prettyName = (name) => name.replace(/_/g, ' ');
 export default function PredictionResults({ result, onNewAssessment }) {
     const { prediction, features, forecast, location } = result;
     const { thresholds } = useSettings();
+    const { isAdmin } = useAdmin();
     const level = getRiskLevel(prediction.score, thresholds);
     const color = getRiskColor(level);
     const values = features.values;
 
-    // Real rainfall-forecast-based risk, loaded in the background after the results appear.
-    // While weather.key differs from weatherKey, the request for this location is still running.
-    const weatherKey = `${location.lat},${location.lon}`;
-    const [weather, setWeather] = useState({ key: null, days: [], error: null });
-    useEffect(() => {
-        let cancelled = false;
-        forecastAPI
-            .predict(location.lat, location.lon)
-            .then((r) => {
-                if (!cancelled) setWeather({ key: weatherKey, days: r.forecast ?? [], error: null });
-            })
-            .catch((e) => {
-                if (!cancelled) setWeather({ key: weatherKey, days: [], error: e.message });
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [weatherKey, location.lat, location.lon]);
+    // Real rainfall-forecast-based risk for the saved location (the place being assessed).
+    // Fetched once by AlertContext and shared with the alert pop-up.
+    const { forecast: weather } = useAlerts();
 
     // Indexes follow the backend FEATURE_ORDER (0 elevation, 1 slope, 3 ndvi, 9 rainfall_30d)
     const metrics = [
@@ -68,6 +55,8 @@ export default function PredictionResults({ result, onNewAssessment }) {
 
     return (
         <View style={styles.wrap}>
+            {/* Sections cascade in one after another */}
+            <Stagger step={60}>
             <View style={styles.header}>
                 <View style={styles.headerText}>
                     <Text style={styles.title}>Risk Assessment</Text>
@@ -76,11 +65,30 @@ export default function PredictionResults({ result, onNewAssessment }) {
                         {location.region ? `, ${location.region}` : ''}
                     </Text>
                 </View>
-                <Pressable onPress={onNewAssessment} style={({ pressed }) => [styles.newButton, pressed && styles.pressed]}>
-                    <Ionicons name="arrow-back" size={16} color={colors.text} />
-                    <Text style={styles.newButtonText}>New</Text>
+                <Pressable
+                    onPress={onNewAssessment}
+                    accessibilityRole="button"
+                    accessibilityLabel="Start a new analysis"
+                    style={({ pressed }) => [styles.newButton, pressed && styles.pressed]}
+                >
+                    <Ionicons name="add" size={18} color={colors.primary} />
+                    <Text style={styles.newButtonText}>New analysis</Text>
                 </Pressable>
             </View>
+
+            {/* Admin: which model answered and how fresh its rain data was */}
+            {isAdmin && result.model ? (
+                <View style={styles.modelLine}>
+                    <Ionicons name="hardware-chip-outline" size={14} color={colors.textMuted} />
+                    <Text style={styles.modelText}>
+                        Model {result.model.version} · rain: {result.model.rain_source_used ?? 'unknown'}
+                        {result.model.rain_data_age_days != null ? `, ${result.model.rain_data_age_days} day(s) old` : ''}
+                    </Text>
+                    {result.model.rain_source_used === 'open-meteo' || (result.model.rain_data_age_days ?? 0) > 3 ? (
+                        <Ionicons name="warning" size={14} color={RISK_COLORS.Moderate} />
+                    ) : null}
+                </View>
+            ) : null}
 
             {result.warning ? (
                 <View style={styles.warning}>
@@ -111,27 +119,39 @@ export default function PredictionResults({ result, onNewAssessment }) {
                 <RiskHeatmap location={location} score={prediction.score} />
             </Card>
 
-            <AdminOnly>
-            <Card>
-                <SectionLabel icon="grid-outline">Environmental Parameters</SectionLabel>
-                <AdminBadge />
-                <View style={styles.paramGrid}>
-                    {features.names.slice(0, 10).map((name, i) => (
-                        <View key={name} style={styles.param}>
-                            <Text style={styles.paramName}>{prettyName(name)}</Text>
-                            <Text style={styles.paramValue}>{formatParam(values[i])}</Text>
-                        </View>
-                    ))}
-                </View>
-            </Card>
-            </AdminOnly>
+            {/* Admin only: the raw model inputs. A plain condition (not <AdminOnly>) so nothing is left in the layout for users */}
+            {isAdmin ? (
+                <Card>
+                    <SectionLabel icon="grid-outline">Environmental Parameters</SectionLabel>
+                    <AdminBadge />
+                    <View style={styles.paramGrid}>
+                        {features.names.slice(0, 10).map((name, i) => (
+                            <View key={name} style={styles.param}>
+                                <Text style={styles.paramName}>{prettyName(name)}</Text>
+                                <Text style={styles.paramValue}>{formatParam(values[i])}</Text>
+                            </View>
+                        ))}
+                    </View>
+                </Card>
+            ) : null}
 
             {forecast ? (
                 <ForecastSection
                     forecast={forecast}
-                    weather={{ loading: weather.key !== weatherKey, days: weather.days, error: weather.error }}
+                    weather={weather}
                 />
             ) : null}
+
+            <Pressable
+                onPress={onNewAssessment}
+                accessibilityRole="button"
+                style={({ pressed }) => [styles.newWide, pressed && styles.pressed]}
+            >
+                <Ionicons name="refresh" size={18} color={colors.background} />
+                <Text style={styles.newWideText}>Start a new analysis</Text>
+            </Pressable>
+            <Text style={styles.newHint}>This also starts a fresh conversation with the assistant.</Text>
+            </Stagger>
         </View>
     );
 }
@@ -145,13 +165,29 @@ const styles = StyleSheet.create({
     newButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 4,
         paddingHorizontal: 12,
         paddingVertical: 8,
-        borderRadius: 10,
-        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: withAlpha(colors.primary, 0.5),
+        backgroundColor: withAlpha(colors.primary, 0.1),
     },
-    newButtonText: { color: colors.text, fontWeight: '600', fontSize: 13 },
+    newButtonText: { color: colors.primary, fontWeight: '700', fontSize: 13 },
+    newWide: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        minHeight: 52,
+        borderRadius: 16,
+        backgroundColor: colors.primary,
+        marginTop: 4,
+    },
+    newWideText: { color: colors.background, fontWeight: '700', fontSize: 15 },
+    modelLine: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    modelText: { color: colors.textMuted, fontSize: 12, flexShrink: 1 },
+    newHint: { color: colors.textMuted, fontSize: 12, textAlign: 'center', marginTop: -6 },
     pressed: { opacity: 0.7 },
     warning: {
         flexDirection: 'row',

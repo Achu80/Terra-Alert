@@ -1,9 +1,21 @@
 import ee
+import time
+import requests
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
+# Rain recipes. Each model is trained on one of these and must be fed the same one live:
+#   'chirps' - CHIRPS daily (v2). Accurate monthly totals but published ~3 weeks late.
+#   'imerg'  - NASA GPM IMERG half-hourly (v3). About 1 day late. Falls back to Open-Meteo if stale.
+IMERG_COLLECTIONS = ['NASA/GPM_L3/IMERG_V08', 'NASA/GPM_L3/IMERG_V07']  # V08 replaces V07 from ~late 2026
+IMERG_MAX_AGE_DAYS = 3
+RAIN_WINDOWS = (3, 7, 14, 30)
+_LATEST_CACHE_SECONDS = 3600
+
 
 class GEEService:
+    # (collection name -> (checked_at, latest_image_datetime)) shared by all instances
+    _latest_cache = {}
     def __init__(self, project_id=None):
         """Initialize Google Earth Engine"""
         try:
@@ -16,7 +28,8 @@ class GEEService:
             print(f"Error initializing GEE: {e}")
             print("Run 'earthengine authenticate' and 'earthengine set_project YOUR_PROJECT_ID'")
     
-    def get_all_features(self, lat: float, lon: float, start_date: str, end_date: str, buffer: int = 1000) -> Optional[Dict]:
+    def get_all_features(self, lat: float, lon: float, start_date: str, end_date: str, buffer: int = 1000,
+                         rain_source: str = 'chirps', veg_source: str = 'sentinel2') -> Optional[Dict]:
         """
         Fetch ALL features required for YOUR XGBoost landslide prediction model
         
@@ -49,13 +62,21 @@ class GEEService:
             # Initialize features dict
             features = {}
             
-            # 1. RAINFALL DATA (CHIRPS) - 3d, 7d, 14d, 30d
-            print("Fetching rainfall data...")
-            rainfall_features = self._get_rainfall_features(region, start_date, end_date)
+            # 1. RAINFALL DATA - 3d, 7d, 14d, 30d, from the rain source the active model was trained on
+            print(f"Fetching rainfall data ({rain_source})...")
+            if rain_source == 'imerg':
+                rainfall_features = self._get_rainfall_imerg(region, lat, lon, end_date)
+            else:
+                rainfall_features = self._get_rainfall_features(region, start_date, end_date)
+                rainfall_features['rain_source_used'] = 'chirps'
+                rainfall_features['rain_data_age_days'] = self._data_age_days('UCSB-CHG/CHIRPS/DAILY', end_date)
             features['rainfall_3d'] = rainfall_features.get('rainfall_3d', 0)
             features['rainfall_7d'] = rainfall_features.get('rainfall_7d', 0)
             features['rainfall_14d'] = rainfall_features.get('rainfall_14d', 0)
             features['rainfall_30d'] = rainfall_features.get('rainfall_30d', 0)
+            # Metadata (not model inputs): which rain source was used and how old its newest data is
+            features['rain_source_used'] = rainfall_features.get('rain_source_used')
+            features['rain_data_age_days'] = rainfall_features.get('rain_data_age_days')
             
             # 2. TERRAIN DATA (SRTM) - elevation, slope, aspect
             print("Fetching terrain data...")
@@ -65,8 +86,11 @@ class GEEService:
             features['aspect'] = terrain_features.get('aspect_mean', 0)
             
             # 3. VEGETATION INDICES (Sentinel-2) - ndvi, ndwi
-            print("Fetching vegetation data...")
-            vegetation_features = self._get_vegetation_features(region, start_date, end_date)
+            print(f"Fetching vegetation data ({veg_source})...")
+            if veg_source == 'modis_sr':
+                vegetation_features = self._get_vegetation_modis_sr(region, start_date, end_date)
+            else:
+                vegetation_features = self._get_vegetation_features(region, start_date, end_date)
             features['ndvi'] = vegetation_features.get('ndvi', 0)
             features['ndwi'] = vegetation_features.get('ndwi', 0)
             
@@ -150,6 +174,88 @@ class GEEService:
                 'rainfall_30d': 0
             }
     
+    # ------------------------------------------------------------------
+    # IMERG rain (v3) + freshness helpers
+    # ------------------------------------------------------------------
+    def _latest_image_time(self, collection_name: str) -> Optional[datetime]:
+        """Newest image time in a collection (cached for an hour); None if the collection is unavailable."""
+        cached = GEEService._latest_cache.get(collection_name)
+        if cached and time.time() - cached[0] < _LATEST_CACHE_SECONDS:
+            return cached[1]
+        try:
+            ms = ee.ImageCollection(collection_name).limit(1, 'system:time_start', False) \
+                .first().get('system:time_start').getInfo()
+            latest = datetime.utcfromtimestamp(ms / 1000) if ms else None
+        except Exception:
+            latest = None
+        GEEService._latest_cache[collection_name] = (time.time(), latest)
+        return latest
+
+    def _data_age_days(self, collection_name: str, end_date: str) -> Optional[int]:
+        """How many days the newest data is behind the end of the requested window."""
+        latest = self._latest_image_time(collection_name)
+        if latest is None:
+            return None
+        end = datetime.strptime(end_date, '%Y-%m-%d')
+        return max(0, (end - latest).days)
+
+    def _get_rainfall_imerg(self, region, lat: float, lon: float, end_date: str) -> Dict:
+        """Rain totals (mm) for the 3/7/14/30 days before end_date from NASA GPM IMERG.
+        IMERG is half-hourly in mm/hr, so each image contributes mm/hr x 0.5 h.
+        Falls back to Open-Meteo when IMERG is missing or more than IMERG_MAX_AGE_DAYS behind."""
+        for name in IMERG_COLLECTIONS:
+            age = self._data_age_days(name, end_date)
+            if age is None:
+                continue
+            if age > IMERG_MAX_AGE_DAYS:
+                print(f"⚠ {name} is {age} days behind - using Open-Meteo rain instead")
+                break
+            try:
+                end = datetime.strptime(end_date, '%Y-%m-%d')
+                col = ee.ImageCollection(name).select('precipitation')
+                bands = [
+                    col.filterDate((end - timedelta(days=d)).strftime('%Y-%m-%d'), end_date)
+                       .sum().multiply(0.5).rename(f'rainfall_{d}d')
+                    for d in RAIN_WINDOWS
+                ]
+                values = ee.Image.cat(bands).reduceRegion(
+                    reducer=ee.Reducer.mean(), geometry=region, scale=10000
+                ).getInfo()
+                result = {f'rainfall_{d}d': float(values.get(f'rainfall_{d}d') or 0) for d in RAIN_WINDOWS}
+                result['rain_source_used'] = 'imerg_' + name.rsplit('_', 1)[-1].lower()
+                result['rain_data_age_days'] = age
+                return result
+            except Exception as e:
+                print(f"Error fetching IMERG rain from {name}: {e}")
+        return self._get_rainfall_open_meteo(lat, lon, end_date)
+
+    def _get_rainfall_open_meteo(self, lat: float, lon: float, end_date: str) -> Dict:
+        """Backup rain source: Open-Meteo daily precipitation (free, no key). Windows end before end_date."""
+        try:
+            end = datetime.strptime(end_date, '%Y-%m-%d')
+            start = end - timedelta(days=max(RAIN_WINDOWS))
+            recent = (datetime.utcnow() - end).days < 80
+            url = 'https://api.open-meteo.com/v1/forecast' if recent else 'https://archive-api.open-meteo.com/v1/archive'
+            params = {
+                'latitude': lat, 'longitude': lon, 'daily': 'precipitation_sum', 'timezone': 'UTC',
+                'start_date': start.strftime('%Y-%m-%d'), 'end_date': (end - timedelta(days=1)).strftime('%Y-%m-%d'),
+            }
+            daily = requests.get(url, params=params, timeout=15).json()['daily']
+            by_day = dict(zip(daily['time'], daily['precipitation_sum']))
+            result = {}
+            for d in RAIN_WINDOWS:
+                days = [(end - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(1, d + 1)]
+                result[f'rainfall_{d}d'] = float(sum(by_day.get(day) or 0 for day in days))
+            result['rain_source_used'] = 'open-meteo'
+            result['rain_data_age_days'] = 0
+            return result
+        except Exception as e:
+            print(f"Error fetching Open-Meteo rain: {e}")
+            result = {f'rainfall_{d}d': 0 for d in RAIN_WINDOWS}
+            result['rain_source_used'] = 'unavailable'
+            result['rain_data_age_days'] = None
+            return result
+
     def _get_terrain_features(self, region) -> Dict:
         """Get terrain features from SRTM DEM"""
         try:
@@ -281,6 +387,27 @@ class GEEService:
         except:
             return {'ndvi': 0, 'ndwi': 0}
     
+    def _get_vegetation_modis_sr(self, region, start_date: str, end_date: str) -> Dict:
+        """NDVI and NDWI from MODIS 8-day surface reflectance (MOD09A1, 500 m), available 2000-today.
+        Used by models trained on historical events (before Sentinel-2 existed), so training and live
+        vegetation come from the same sensor. NDVI = (NIR-red)/(NIR+red), NDWI = (green-NIR)/(green+NIR)."""
+        try:
+            end = datetime.strptime(end_date, '%Y-%m-%d')
+            for days_back in (30, 60):  # composites arrive ~2 weeks late, so widen the window if needed
+                start = (end - timedelta(days=days_back)).strftime('%Y-%m-%d')
+                col = ee.ImageCollection('MODIS/061/MOD09A1').filterBounds(region).filterDate(start, end_date)
+                if col.size().getInfo() == 0:
+                    continue
+                image = col.median()
+                values = image.normalizedDifference(['sur_refl_b02', 'sur_refl_b01']).rename('ndvi') \
+                    .addBands(image.normalizedDifference(['sur_refl_b04', 'sur_refl_b02']).rename('ndwi')) \
+                    .reduceRegion(reducer=ee.Reducer.mean(), geometry=region, scale=500).getInfo()
+                return {'ndvi': values.get('ndvi') or 0, 'ndwi': values.get('ndwi') or 0}
+            return {'ndvi': 0, 'ndwi': 0}
+        except Exception as e:
+            print(f"Error fetching MODIS vegetation: {e}")
+            return {'ndvi': 0, 'ndwi': 0}
+
     def _get_population_features(self, region) -> Dict:
         """Get population density from WorldPop"""
         try:

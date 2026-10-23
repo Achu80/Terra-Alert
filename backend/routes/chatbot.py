@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from datetime import datetime, timedelta
-from routes.forecast_routes import fetch_7day_forecast, gee_service, model_service, data_processor
+from routes.forecast_routes import forecast_rain_windows, gee_service, data_processor
+from services.model_registry import registry
 
 chatbot_bp = Blueprint('chatbot', __name__)
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -112,13 +113,15 @@ def get_landslide_forecast(lat: float, lon: float) -> list:
         lat: Latitude of the location.
         lon: Longitude of the location.
     """
+    active_model = registry.active()
     end_date = datetime.now()
     start_date = end_date - timedelta(days=30)
     gee_data = gee_service.get_all_features(
         lat, lon,
         start_date.strftime('%Y-%m-%d'),
         end_date.strftime('%Y-%m-%d'),
-        1000
+        1000,
+        **active_model.feature_options
     )
     if not gee_data:
         gee_data = {
@@ -128,26 +131,16 @@ def get_landslide_forecast(lat: float, lon: float) -> list:
             'rainfall_14d': 0, 'rainfall_30d': 0
         }
 
-    daily_forecast = fetch_7day_forecast(lat, lon)
+    daily_forecast = forecast_rain_windows(lat, lon, gee_data)
 
     results = []
-    rain_history = []
-    cumulative_rain = 0
 
-    for i, (date, rain_mm) in enumerate(daily_forecast):
-        rain_history.append(rain_mm)
-        cumulative_rain += rain_mm
-
-        gee_data['rainfall_3d'] = sum(rain_history[-3:])
-        gee_data['rainfall_7d'] = sum(rain_history)
-        gee_data['rainfall_14d'] = gee_data.get('rainfall_14d', cumulative_rain)
-        gee_data['rainfall_30d'] = gee_data.get('rainfall_30d', cumulative_rain)
-
-        processed = data_processor.prepare_model_input(gee_data)
+    for i, (date, rain_mm, windows) in enumerate(daily_forecast):
+        processed = data_processor.prepare_model_input({**gee_data, **windows})
         if not processed:
             continue
 
-        prediction = model_service.predict(processed['features'])
+        prediction = active_model.predict(processed['features'])
         results.append({
             'date': date,
             'day': i + 1,
@@ -173,7 +166,8 @@ def get_terrain_parameters(lat: float, lon: float) -> dict:
         lat, lon,
         start_date.strftime('%Y-%m-%d'),
         end_date.strftime('%Y-%m-%d'),
-        1000
+        1000,
+        **registry.active().feature_options
     )
     return gee_data or {'error': 'Terrain data unavailable for this location'}
 

@@ -98,7 +98,7 @@ export default function SettingsScreen() {
                             icon="hardware-chip"
                             iconColor={RISK_COLORS.Low}
                             title="Prediction model"
-                            value="XGBoost v2"
+                            value="Choose model"
                             onPress={() => router.push('/settings/model')}
                         />
                         <SettingsRow

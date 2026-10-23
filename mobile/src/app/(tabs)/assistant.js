@@ -5,7 +5,7 @@ import { usePrediction } from '@/context/PredictionContext';
 
 // Mobile version of the web AssistantPage
 export default function AssistantScreen() {
-    const { prediction } = usePrediction();
+    const { prediction, chatKey } = usePrediction();
 
     return (
         <Screen
@@ -14,7 +14,8 @@ export default function AssistantScreen() {
         >
             {/* Pushes the input row above the on-screen keyboard */}
             <KeyboardAvoidingView style={styles.fill} behavior="padding">
-                <Chatbot prediction={prediction} />
+                {/* New key for every new analysis -> React mounts a fresh chat (new messages, new backend session) */}
+                <Chatbot key={chatKey} prediction={prediction} />
             </KeyboardAvoidingView>
         </Screen>
     );

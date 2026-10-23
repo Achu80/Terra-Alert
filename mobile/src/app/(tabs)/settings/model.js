@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AdminScreenGate } from '@/components/admin/AdminOnly';
+import ModelSelector from '@/components/settings/ModelSelector';
 import { SettingsRow, SettingsSection } from '@/components/settings/SettingsList';
 import { colors, RISK_COLORS } from '@/theme/colors';
 import { withAlpha } from '@/utils/risk';
@@ -31,13 +32,8 @@ const FEATURE_GROUPS = [
 function ModelContent() {
     return (
         <ScrollView contentContainerStyle={styles.content}>
-            <View style={styles.hero}>
-                <View style={styles.heroIcon}>
-                    <Ionicons name="hardware-chip" size={28} color={RISK_COLORS.Low} />
-                </View>
-                <Text style={styles.heroTitle}>XGBoost v2</Text>
-                <Text style={styles.heroSubtitle}>Gradient-boosted decision trees · 20 inputs</Text>
-            </View>
+            <Text style={styles.groupHeading}>CHOOSE THE MODEL</Text>
+            <ModelSelector />
 
             <SettingsSection title="HOW IT WORKS">
                 <SettingsRow icon="analytics" iconColor={colors.primary} title="Output" subtitle="Probability of a landslide × 100 = risk score (0–100)" />

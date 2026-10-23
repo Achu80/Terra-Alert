@@ -1,33 +1,57 @@
 from flask import Blueprint, jsonify, request
-from services.gee_service import GEEService
-from services.model_service import ModelService
+from services.gee_service import GEEService, RAIN_WINDOWS
+from services.model_registry import registry
 from utils.data_processor import DataProcessor
 import requests
 from datetime import datetime, timedelta
 import os
 from services.alert_service import AlertService
+from database.repositories import AlertRepository
 alert_service = AlertService()
+alert_repo = AlertRepository()
 forecast_bp = Blueprint('forecast', __name__)
 
 gee_service = GEEService(project_id=os.getenv('GEE_PROJECT_ID'))
-model_service = ModelService()
-model_service.load_models()
 data_processor = DataProcessor()
 
-OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+FORECAST_DAYS = 7
 
-def fetch_7day_forecast(lat, lon):
-    url = f"http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric"
-    response = requests.get(url)
-    data = response.json()
-    
-    daily_rain = {}
-    for item in data['list'][:56]:
-        date = item['dt_txt'].split()[0]
-        rain = item.get('rain', {}).get('3h', 0)
-        daily_rain[date] = daily_rain.get(date, 0) + rain
-    
-    return list(daily_rain.items())[:7]  # [(date, mm), ...]
+def fetch_daily_rain(lat, lon):
+    """Daily rain (mm) from Open-Meteo (free, no key, true 7-day forecast).
+    Returns (past, forecast): the last 30 observed days and today + the next 6 days, each [(date, mm), ...] oldest first."""
+    past_days = max(RAIN_WINDOWS)
+    params = {
+        'latitude': lat, 'longitude': lon, 'daily': 'precipitation_sum', 'timezone': 'auto',
+        'past_days': past_days, 'forecast_days': FORECAST_DAYS,
+    }
+    daily = requests.get('https://api.open-meteo.com/v1/forecast', params=params, timeout=15).json()['daily']
+    days = [(date, float(mm or 0)) for date, mm in zip(daily['time'], daily['precipitation_sum'])]
+    return days[:past_days], days[past_days:]
+
+
+def forecast_rain_windows(lat, lon, observed):
+    """Rain windows (3/7/14/30 day totals) for each forecast day, so every day gets its own model input.
+
+    `observed` holds today's windows from the model's own rain source (GEE), covering the days before today.
+    For forecast day k each window slides k+1 days forward: the oldest days drop out (their size taken from
+    Open-Meteo's past rain) and the forecast days up to and including day k come in.
+    Returns [(date, rain_mm, {'rainfall_3d': ..., ...}), ...].
+    """
+    past, forecast = fetch_daily_rain(lat, lon)
+    days = []
+    for k, (date, rain_mm) in enumerate(forecast):
+        windows = {}
+        for d in RAIN_WINDOWS:
+            incoming = sum(mm for _, mm in forecast[max(0, k + 1 - d):k + 1])
+            if k + 1 >= d:
+                # The whole window is forecast days
+                windows[f'rainfall_{d}d'] = incoming
+            else:
+                dropped = sum(mm for _, mm in past[-d:][:k + 1])
+                kept = max(0.0, float(observed.get(f'rainfall_{d}d') or 0) - dropped)
+                windows[f'rainfall_{d}d'] = kept + incoming
+        days.append((date, rain_mm, windows))
+    return days
 
 @forecast_bp.route('/predict', methods=['POST'])
 def predict_7day():
@@ -41,6 +65,9 @@ def predict_7day():
         if not all([lat, lon]):
             return jsonify({'error': 'Missing lat/lon'}), 400
 
+        # One model for the whole request, fed the rain data it was trained on
+        active_model = registry.active()
+
         # Step 1: Get terrain features from GEE (static)
         end_date = datetime.now()
         start_date = end_date - timedelta(days=30)
@@ -48,7 +75,8 @@ def predict_7day():
             lat, lon,
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d'),
-            1000
+            1000,
+            **active_model.feature_options
         )
         if not gee_data:
             print("⚠ GEE unavailable, using mock terrain data")
@@ -59,29 +87,18 @@ def predict_7day():
                 'rainfall_14d': 0, 'rainfall_30d': 0
             }
 
-        # Step 2: Get 7-day rainfall forecast
-        daily_forecast = fetch_7day_forecast(lat, lon)
+        # Step 2: Rain windows for each of the next 7 days (observed rain rolled forward with the forecast)
+        daily_forecast = forecast_rain_windows(lat, lon, gee_data)
 
         # Step 3: Predict for each day
         results = []
-        cumulative_rain = 0
-        rain_history = []
 
-        for i, (date, rain_mm) in enumerate(daily_forecast):
-            rain_history.append(rain_mm)
-            cumulative_rain += rain_mm
-
-            # Override rainfall in gee_data with forecast values
-            gee_data['rainfall_3d'] = sum(rain_history[-3:])
-            gee_data['rainfall_7d'] = sum(rain_history)
-            gee_data['rainfall_14d'] = gee_data.get('rainfall_14d', cumulative_rain)
-            gee_data['rainfall_30d'] = gee_data.get('rainfall_30d', cumulative_rain)
-
-            processed = data_processor.prepare_model_input(gee_data)
+        for i, (date, rain_mm, windows) in enumerate(daily_forecast):
+            processed = data_processor.prepare_model_input({**gee_data, **windows})
             if not processed:
                 continue
 
-            prediction = model_service.predict(processed['features'])
+            prediction = active_model.predict(processed['features'])
             results.append({
                 'date': date,
                 'day': i + 1,
@@ -90,6 +107,16 @@ def predict_7day():
                 'risk_level': prediction['level'],
                 'confidence': float(prediction['confidence'])
             })
+
+            # Alert log for the app (separate from SMS below): forecast days at Moderate and above
+            day_level = str(prediction['level']).upper()
+            if day_level in ('MODERATE', 'HIGH', 'CRITICAL'):
+                alert_repo.record_alert_once(
+                    district_id=f"loc_{float(lat):.4f}_{float(lon):.4f}",
+                    level=day_level,
+                    score=float(prediction['score']),
+                    trigger=f"Forecast for {date}"
+                )
 
             if notify and prediction['score'] >= 3:
                 alert_service.send_landslide_alert(

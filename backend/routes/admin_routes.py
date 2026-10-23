@@ -57,6 +57,41 @@ def is_admin_request():
     return ok
 
 
+@admin_bp.route('/status', methods=['GET'])
+def status():
+    """Admin-only overview of the SMS alert setup (no secrets are returned)."""
+    if not is_admin_request():
+        return jsonify({'error': 'Admin PIN required'}), 403
+
+    # Imported here to avoid an import cycle with the route modules
+    from services.alert_service import TWILIO_AVAILABLE
+    from routes.forecast_routes import alert_service
+
+    configured = all(os.getenv(k) for k in ('TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER', 'ALERT_PHONE_NUMBER'))
+    return jsonify({
+        'sms': {
+            'package_installed': TWILIO_AVAILABLE,
+            'configured': configured,
+            'enabled': bool(alert_service.enabled),
+        }
+    })
+
+
+@admin_bp.route('/model', methods=['POST'])
+def set_model():
+    """Admin-only: choose which landslide model everyone uses."""
+    if not is_admin_request():
+        return jsonify({'error': 'Admin PIN required'}), 403
+
+    from services.model_registry import registry
+    version = (request.get_json(silent=True) or {}).get('version')
+    try:
+        registry.set_active(version)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    return jsonify({'active': version, 'models': registry.list()})
+
+
 @admin_bp.route('/verify', methods=['POST'])
 def verify():
     ip = _client_ip()
