@@ -46,8 +46,8 @@ export const predictionAPI = {
 };
 
 export const forecastAPI = {
-    // Rainfall-forecast-driven risk for the next days. notify=false: viewing a forecast never sends SMS alerts
-    predict: (lat, lon) => post('/forecast/predict', { lat, lon, notify: false }),
+    // Rainfall-forecast-driven risk for the next `days` days (up to 30). notify=false: viewing a forecast never sends SMS alerts
+    predict: (lat, lon, days = 7) => post('/forecast/predict', { lat, lon, days, notify: false }),
 };
 
 export const statsAPI = {

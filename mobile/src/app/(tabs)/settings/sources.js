@@ -17,7 +17,7 @@ const SATELLITE = [
 
 const SERVICES = [
     { icon: 'globe', color: colors.primary, title: 'Google Earth Engine', subtitle: 'Processes the satellite data on demand' },
-    { icon: 'partly-sunny', color: '#fbbf24', title: 'OpenWeatherMap', subtitle: '7-day rainfall forecast' },
+    { icon: 'partly-sunny', color: '#fbbf24', title: 'Open-Meteo', subtitle: '16-day rainfall forecast + seasonal outlook to 30 days' },
     { icon: 'map', color: '#34d399', title: 'OpenStreetMap', subtitle: 'Maps, place search and hospital lookup' },
     { icon: 'sparkles', color: '#a78bfa', title: 'Google Gemini', subtitle: 'AI assistant' },
     { icon: 'server', color: '#3ecf8e', title: 'Supabase', subtitle: 'Stores every prediction' },

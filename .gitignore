@@ -154,3 +154,9 @@ docs/_build/
 *.local
 .vercel
 .netlify
+
+# Added by push-to-github.ps1
+.env.*
+!.env.example
+.venv/
+.expo/

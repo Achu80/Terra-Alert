@@ -2,7 +2,7 @@
  * Risk alerts (there is no separate Alerts tab).
  * An alert exists when a reading is Moderate, High or Critical:
  *   - the latest assessment on Home, or
- *   - any upcoming day in the rain forecast for the saved location.
+ *   - any of the next 7 days in the rain forecast for the saved location.
  * The pop-up banner shows while alerts exist; tapping it opens the alert sheet.
  *
  * Also owns the forecast for the saved location, so Home and the alerts share one request.
@@ -17,6 +17,10 @@ import { forecastAPI } from '@/services/api';
 import { getRiskLevel } from '@/utils/risk';
 
 const AlertContext = createContext(null);
+
+// One request covers every forecast tab (7/14/30 days); only the near days are firm enough to alert on
+const FORECAST_DAYS = 30;
+const ALERT_DAYS = 7;
 
 export function AlertProvider({ children }) {
     const { location } = useSelectedLocation();
@@ -34,7 +38,7 @@ export function AlertProvider({ children }) {
         if (requestKey == null) return;
         let cancelled = false;
         forecastAPI
-            .predict(lat, lon)
+            .predict(lat, lon, FORECAST_DAYS)
             .then((r) => {
                 if (!cancelled) setForecast({ key: requestKey, days: r.forecast ?? [], error: null });
             })
@@ -60,7 +64,7 @@ export function AlertProvider({ children }) {
             }
         }
         if (forecastReady && location) {
-            for (const day of forecast.days) {
+            for (const day of forecast.days.slice(0, ALERT_DAYS)) {
                 const score = Number(day.risk_score);
                 const level = getRiskLevel(score, thresholds);
                 if (isAlertLevel(level)) {

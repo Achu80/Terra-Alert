@@ -9,9 +9,9 @@ import { shortDate } from '@/utils/history';
 import { getRiskColor, getRiskLevel, withAlpha } from '@/utils/risk';
 
 const TABS = [
-    { id: '7days', label: '7 Days' },
-    { id: '14days', label: '14 Days' },
-    { id: '30days', label: '30 Days' },
+    { id: '7days', label: '7 Days', days: 7 },
+    { id: '14days', label: '14 Days', days: 14 },
+    { id: '30days', label: '30 Days', days: 30 },
 ];
 
 // '2026-10-24' -> 'Oct 24' (parsed as a local date, so the day doesn't shift with the time zone)
@@ -20,9 +20,21 @@ const labelOfIso = (iso) => {
     return shortDate(new Date(y, m - 1, d));
 };
 
-// Real forecast rows from /api/forecast/predict: { date, rainfall_mm, risk_score, confidence }
+// Real forecast rows from /api/forecast/predict: { date, rainfall_mm, rain_source, risk_score, confidence }
+// rain_source is 'forecast' (weather forecast, first 16 days) or 'seasonal' (seasonal outlook after that)
 const fromWeather = (rows) =>
-    rows.map((r) => ({ key: r.date, label: labelOfIso(r.date), score: r.risk_score, confidence: r.confidence, rain: r.rainfall_mm }));
+    rows.map((r) => ({
+        key: r.date,
+        label: labelOfIso(r.date),
+        score: r.risk_score,
+        confidence: r.confidence,
+        rain: r.rainfall_mm,
+        seasonal: r.rain_source === 'seasonal',
+        // Likely score range over the rain scenarios ([p10, p90]); null when only one forecast was available
+        range: r.risk_range ?? null,
+    }));
+
+const rangeText = (range) => (range && range[1] - range[0] >= 1 ? ` · likely ${range[0].toFixed(0)}-${range[1].toFixed(0)}` : '');
 
 // Projection rows from /api/predict: { date, day: 'Oct 24', score, confidence }
 const fromProjection = (rows) =>
@@ -57,6 +69,13 @@ function ForecastCards({ days }) {
             })}
         </ScrollView>
     );
+}
+
+function weatherNote(days) {
+    const firm = days.filter((d) => !d.seasonal).length;
+    const scenarios = days[0]?.range ? ' Each score is averaged over 31 possible rain scenarios.' : '';
+    if (firm === days.length) return `Based on the weather forecast for the next ${days.length} days (Open-Meteo).${scenarios}`;
+    return `Days 1-${firm} use the weather forecast; days ${firm + 1}-${days.length} use the seasonal rain outlook, which is much less certain (Open-Meteo).${scenarios}`;
 }
 
 function ThirtyDaySummary({ days }) {
@@ -104,8 +123,10 @@ export default function ForecastSection({ forecast, weather }) {
     const { thresholds } = useSettings();
     const [tab, setTab] = useState('7days');
 
-    const weatherDays = fromWeather(weather?.days ?? []);
-    const useWeather = tab === '7days' && weatherDays.length > 0;
+    // Every tab uses the real forecast (one 30-day request); the old projection is only a fallback if it failed
+    const tabDays = TABS.find((t) => t.id === tab).days;
+    const weatherDays = fromWeather((weather?.days ?? []).slice(0, tabDays));
+    const useWeather = weatherDays.length > 0;
     const days = useWeather ? weatherDays : fromProjection(forecast?.[tab] ?? []);
 
     return (
@@ -123,7 +144,7 @@ export default function ForecastSection({ forecast, weather }) {
                 })}
             </View>
 
-            {tab === '7days' && weather?.loading ? (
+            {weather?.loading ? (
                 <View style={styles.loading}>
                     <ActivityIndicator color={colors.primary} />
                     <Text style={styles.noteText}>Loading the rainfall forecast…</Text>
@@ -133,22 +154,28 @@ export default function ForecastSection({ forecast, weather }) {
             ) : (
                 <View style={styles.content}>
                     {useWeather ? (
-                        <Note icon="rainy-outline" text={`Based on the weather forecast for the next ${days.length} days (OpenWeatherMap).`} />
+                        <Note icon="rainy-outline" text={weatherNote(days)} />
                     ) : (
                         <Note
                             icon="information-circle-outline"
                             text={
-                                tab === '7days' && weather?.error
+                                weather?.error
                                     ? `Weather forecast unavailable (${weather.error}). Showing a projection from recent rainfall instead.`
                                     : 'Projection from the last 30 days of rainfall and the season - not a weather forecast.'
                             }
                         />
                     )}
-                    {tab === '7days' ? <ForecastCards days={days} /> : null}
+                    {tab !== '30days' ? <ForecastCards days={days} /> : null}
                     {tab === '30days' ? <ThirtyDaySummary days={days} /> : null}
                     <TrendChart
                         title={`${days.length}-Day Risk Trend`}
-                        points={days.map((d) => ({ ...d, detail: d.rain != null ? `Forecast rain ${d.rain.toFixed(1)} mm` : 'Projected risk' }))}
+                        points={days.map((d) => ({
+                            ...d,
+                            detail:
+                                d.rain == null
+                                    ? 'Projected risk'
+                                    : `${d.seasonal ? 'Seasonal outlook' : 'Forecast'} rain ${d.rain.toFixed(1)} mm${rangeText(d.range)}`,
+                        }))}
                         height={230}
                         bands={thresholds}
                         yAxisLabel="Risk score"

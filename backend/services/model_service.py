@@ -199,6 +199,22 @@ class ModelService:
             print(traceback.format_exc())
             return self._mock_prediction(features)
     
+    def predict_scores(self, rows: List[List[float]]) -> Optional[List[float]]:
+        """Risk scores (0-100) for many feature rows in one go, without debug output.
+        Used for ensemble forecasts (one row per rain scenario). None if the model is not loaded."""
+        if not self.model_loaded:
+            self.load_models()
+        if not self.model or not self.model_loaded or not rows:
+            return None
+        from utils.data_processor import DataProcessor
+        X = pd.DataFrame(rows, columns=DataProcessor.FEATURE_ORDER)
+        X_in = self.scaler.transform(X) if self.scaler else X.values
+        scores = self.model.predict_proba(X_in)[:, 1] * 100
+        if self.meta.get('plains_rule', True):
+            plains = (X['elevation'] < 800) & (X['slope'] < 15)
+            scores[plains.to_numpy()] = 5.0
+        return [float(s) for s in scores]
+
     def _mock_prediction(self, features: List[float]) -> Dict:
         """
         Generate mock prediction when model is not available

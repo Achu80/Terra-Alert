@@ -44,7 +44,7 @@ class DataProcessor:
         return engineered
 
     @staticmethod
-    def prepare_model_input(gee_data: Dict) -> Optional[Dict]:
+    def prepare_model_input(gee_data: Dict, verbose: bool = True) -> Optional[Dict]:
         if not gee_data:
             return None
 
@@ -52,9 +52,10 @@ class DataProcessor:
         engineered = DataProcessor._engineer_features(gee_data)
         all_data = {**gee_data, **engineered}
 
-        print(f"\n🔍 DEBUG - Engineered Features:")
-        for key, value in engineered.items():
-            print(f"  {key}: {value}")
+        if verbose:
+            print(f"\n🔍 DEBUG - Engineered Features:")
+            for key, value in engineered.items():
+                print(f"  {key}: {value}")
 
         feature_vector = []
         for feature_name in DataProcessor.FEATURE_ORDER:
@@ -63,9 +64,10 @@ class DataProcessor:
                 value = 0
             feature_vector.append(float(value))
 
-        print(f"\n🔍 DEBUG - Final Feature Vector ({len(feature_vector)} features):")
-        for i, (name, val) in enumerate(zip(DataProcessor.FEATURE_ORDER, feature_vector)):
-            print(f"  [{i}] {name}: {val}")
+        if verbose:
+            print(f"\n🔍 DEBUG - Final Feature Vector ({len(feature_vector)} features):")
+            for i, (name, val) in enumerate(zip(DataProcessor.FEATURE_ORDER, feature_vector)):
+                print(f"  [{i}] {name}: {val}")
 
         derived = DataProcessor.calculate_derived_features(gee_data)
 

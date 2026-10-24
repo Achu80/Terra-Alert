@@ -135,7 +135,7 @@ def get_landslide_forecast(lat: float, lon: float) -> list:
 
     results = []
 
-    for i, (date, rain_mm, windows) in enumerate(daily_forecast):
+    for i, (date, rain_mm, _source, windows) in enumerate(daily_forecast):
         processed = data_processor.prepare_model_input({**gee_data, **windows})
         if not processed:
             continue

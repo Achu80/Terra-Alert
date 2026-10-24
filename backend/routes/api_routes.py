@@ -108,7 +108,7 @@ def get_himachal_districts():
                     district['lon'],
                     start_date.strftime('%Y-%m-%d'),
                     end_date.strftime('%Y-%m-%d'),
-                    buffer=5000,  # 5km buffer for district center
+                    buffer=1000,  # same 1km area the models were trained on (and /predict uses)
                     **active_model.feature_options
                 )
                 
