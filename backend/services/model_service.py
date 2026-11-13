@@ -41,6 +41,24 @@ class ModelService:
     def label(self):
         return self.meta.get('label', self.version)
 
+    # Risk-index values that mark the start of MODERATE / HIGH / CRITICAL (see _get_risk_level)
+    LEVEL_STARTS = {'MODERATE': 40.0, 'HIGH': 60.0, 'CRITICAL': 80.0}
+
+    def to_risk_index(self, landslide_probability):
+        """Turn the model's raw output (0-1, works on one number or an array) into the app's 0-100 risk index.
+
+        Models with meta['risk_thresholds'] (e.g. v3) were trained on a 1:2 landslide:safe mix, so their raw
+        output is not a real-world chance. Their cut-offs were picked on purpose (ai-module/v3/calibrate_thresholds_v3.py)
+        and are stretched here so each cut-off lands exactly on 40 / 60 / 80 - the bands the whole app already uses.
+        Models without cut-offs (v2) keep the old behaviour: raw output x 100.
+        """
+        cut = self.meta.get('risk_thresholds')
+        if not cut:
+            return np.asarray(landslide_probability) * 100
+        raw = [0.0, cut['MODERATE'], cut['HIGH'], cut['CRITICAL'], 1.0]
+        index = [0.0, self.LEVEL_STARTS['MODERATE'], self.LEVEL_STARTS['HIGH'], self.LEVEL_STARTS['CRITICAL'], 100.0]
+        return np.interp(landslide_probability, raw, index)  # straight lines between those points
+
     def load_models(self):
         """Load trained XGBoost model and scaler from disk"""
         try:
@@ -168,8 +186,8 @@ class ModelService:
           proba = self.model.predict_proba(X_scaled)[0]
           landslide_probability = float(proba[1])
         
-        # Convert to 0-100 scale
-          risk_score = landslide_probability * 100
+        # Convert to the app's 0-100 risk index (a risk scale, not a % chance - see to_risk_index)
+          risk_score = float(self.to_risk_index(landslide_probability))
         
           print(f"✓ Prediction complete: Risk Score = {risk_score:.1f}")
           print(f"  Probabilities: No Landslide={proba[0]:.3f}, Landslide={proba[1]:.3f}")
@@ -177,8 +195,11 @@ class ModelService:
         # Determine risk level
           risk_level = self._get_risk_level(risk_score)
         
-        # Get prediction (0 or 1)
-          prediction_class = self.model.predict(X_scaled)[0]
+        # 1 = "raise an alert": MODERATE or above, i.e. the chosen cut-off, not the arbitrary 0.5
+          if self.meta.get('risk_thresholds'):
+              prediction_class = int(risk_score >= self.LEVEL_STARTS['MODERATE'])
+          else:
+              prediction_class = int(self.model.predict(X_scaled)[0])  # v2: unchanged
         
           return {
             'score': round(risk_score, 1),
@@ -209,7 +230,7 @@ class ModelService:
         from utils.data_processor import DataProcessor
         X = pd.DataFrame(rows, columns=DataProcessor.FEATURE_ORDER)
         X_in = self.scaler.transform(X) if self.scaler else X.values
-        scores = self.model.predict_proba(X_in)[:, 1] * 100
+        scores = self.to_risk_index(self.model.predict_proba(X_in)[:, 1])
         if self.meta.get('plains_rule', True):
             plains = (X['elevation'] < 800) & (X['slope'] < 15)
             scores[plains.to_numpy()] = 5.0

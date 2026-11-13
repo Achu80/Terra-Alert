@@ -21,6 +21,14 @@ from v3_common import HERE, ROOT, feature_matrix, load_dataset, new_model
 BACKEND_V3 = os.path.join(ROOT, 'backend', 'ml', 'models', 'v3')
 
 
+def _saved_thresholds():
+    path = os.path.join(HERE, 'risk_thresholds_v3.json')
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding='utf-8') as f:
+        return json.load(f)['thresholds']
+
+
 def main():
     df = load_dataset()
     X, y = feature_matrix(df, 'v3'), df.label.to_numpy()
@@ -36,7 +44,6 @@ def main():
     with open(os.path.join(HERE, 'metrics_v3.json'), encoding='utf-8') as f:
         ev = json.load(f)
     cv, hp = ev['spatial_cv']['v3']['all'], ev['himachal_holdout']['v3']['all']
-    plains = ev['plains_rows']
 
     meta = {
         'version': 'v3',
@@ -45,8 +52,11 @@ def main():
                        'controls; NASA IMERG rain and MODIS vegetation for training and live use.',
         'rain_source': 'imerg',
         'veg_source': 'modis_sr',
-        # Keep the plains override only if v3 itself scores low/flat control points above Low
-        'plains_rule': bool(plains['v3_mean_score_controls'] is not None and plains['v3_mean_score_controls'] >= 40),
+        # Always on: only 27 of 1,610 training rows are from plains (Haryana/Delhi/UP), so v3 never learned flat land
+        # and could flag Delhi or Lucknow from monsoon rain alone. (The old auto-check looked at those same 27 rows.)
+        'plains_rule': True,
+        # Risk-level cut-offs chosen by calibrate_thresholds_v3.py (run it after retraining to refresh them)
+        'risk_thresholds': _saved_thresholds(),
         'trained_at': datetime.now().isoformat(timespec='seconds'),
         'training_rows': ev['rows'],
         'metrics': {
