@@ -21,8 +21,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score, precision_score,
-                             recall_score, roc_auc_score, roc_curve)
+from sklearn.metrics import (accuracy_score, balanced_accuracy_score, confusion_matrix, f1_score,
+                             precision_score, recall_score, roc_auc_score, roc_curve)
 
 _V3 = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # v3/ holds v3_common.py
 sys.path.insert(0, _V3)
@@ -52,6 +52,8 @@ def main():
     tn, fp, fn, tp = confusion_matrix(y, preds).ravel()
     table = pd.DataFrame([{
         'accuracy': accuracy_score(y, preds),
+        # average of "landslides caught" and "safe places cleared": fair when there are 2 safe rows per landslide
+        'balanced_accuracy': balanced_accuracy_score(y, preds),
         'precision': precision_score(y, preds, zero_division=0),
         'recall': recall_score(y, preds, zero_division=0),
         'f1': f1_score(y, preds, zero_division=0),
