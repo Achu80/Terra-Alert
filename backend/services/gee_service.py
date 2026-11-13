@@ -10,7 +10,7 @@ from typing import Dict, Optional
 #   'chirps' - CHIRPS daily (v2). Accurate monthly totals but published ~3 weeks late.
 #   'imerg'  - NASA GPM IMERG half-hourly (v3). About 1 day late. Falls back to Open-Meteo if stale.
 # V07 first: it is what v3/v4 were trained on. V08 (not in Earth Engine yet as of 2026-11) is only a backup
-# until ai-module/v3/compare_rain_sources_v3.py shows it matches V07 - otherwise the model would silently get
+# until ai-module/v3/evaluate/compare_rain_sources_v3.py shows it matches V07 - otherwise the model would silently get
 # rain on a scale it never learned the day NASA publishes V08.
 IMERG_COLLECTIONS = ['NASA/GPM_L3/IMERG_V07', 'NASA/GPM_L3/IMERG_V08']
 IMERG_MAX_AGE_DAYS = 3
@@ -196,7 +196,7 @@ class GEEService:
     @staticmethod
     def _log_rain_source(lat, lon, end_date, requested, features):
         """Append which rain source a live fetch really used, so we can count fallbacks later
-        (summary: py -3.11 ai-module/v3/compare_rain_sources_v3.py --log-only). Never breaks a prediction."""
+        (summary: py -3.11 ai-module/v3/evaluate/compare_rain_sources_v3.py --log-only). Never breaks a prediction."""
         try:
             os.makedirs(os.path.dirname(RAIN_SOURCE_LOG), exist_ok=True)
             entry = {

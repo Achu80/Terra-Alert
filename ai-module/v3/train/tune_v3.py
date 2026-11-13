@@ -17,12 +17,13 @@ Also tried (each kept only if the inner loop prefers it):
     monotone_rain    more rain can never lower the risk (physics rule)
     ignore_unstable  hold the 5 broken inputs constant so the trees cannot use them (see v3_common.UNSTABLE)
 
-Writes ai-module/v3/best_params_v3.json and tune_results_v3.json
-Run: py -3.11 ai-module/v3/tune_v3.py        (~5-15 min)
+Writes ai-module/v3/results/best_params_v3.json and tune_results_v3.json
+Run: py -3.11 ai-module/v3/train/tune_v3.py        (~5-15 min)
 """
 import json
 import os
 import random
+import sys
 
 import numpy as np
 import pandas as pd
@@ -31,11 +32,12 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import StandardScaler
 
-from v3_common import BEST_JSON, HERE, feature_matrix, load_dataset, new_model, v3_inputs, v3_model
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # v3/ holds v3_common.py
+from v3_common import BEST_JSON, DATA_V3, RESULTS_DIR, feature_matrix, load_dataset, new_model, v3_inputs, v3_model
 
 N_CONFIGS = 40          # random settings tried in each inner search
 OUTER_SEEDS = [0, 1, 2]  # repeat the honest test with 3 different area splits, to see how stable it is
-RESULTS_JSON = os.path.join(HERE, 'tune_results_v3.json')
+RESULTS_JSON = os.path.join(RESULTS_DIR, 'tune_results_v3.json')
 
 SPACE = {
     'max_depth': [2, 3, 4, 5],                 # how many questions each tree may ask in a row
@@ -110,7 +112,7 @@ def main():
     df = load_dataset()
     X, y = feature_matrix(df, 'v3'), df.label.to_numpy()
     groups_fair = df['group']
-    old = pd.read_csv(os.path.join(HERE, 'landslides_v3_dataset.csv')).drop_duplicates('row_id').set_index('row_id')
+    old = pd.read_csv(os.path.join(DATA_V3, 'landslides_v3_dataset.csv')).drop_duplicates('row_id').set_index('row_id')
     groups_old = df.row_id.map(old['group']).to_numpy()   # the original 0.5 degree cells
 
     print('A. Original v3 settings (200 trees, depth 6)')

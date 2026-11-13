@@ -10,10 +10,11 @@ Checks:
 
 For graphs, confusion matrices and a paper-style report, run research_evaluation_v3.py instead.
 
-Run:  py -3.11 -m pytest ai-module/v3/test_model_evaluation.py -v -s
+Run:  py -3.11 -m pytest ai-module/v3/evaluate/test_model_evaluation.py -v -s
 """
 import json
 import os
+import sys
 
 import joblib
 import numpy as np
@@ -22,11 +23,12 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_a
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import StandardScaler
 
-from v3_common import FEATURES, HERE, feature_matrix, load_best, load_dataset, v3_inputs, v3_model
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # v3/ holds v3_common.py
+from v3_common import FEATURES, MODELS_DIR, RESULTS_DIR, feature_matrix, load_best, load_dataset, v3_inputs, v3_model
 
-MODEL_PATH = os.path.join(HERE, 'xgboost_model_v3.pkl')
-SCALER_PATH = os.path.join(HERE, 'scaler_v3.pkl')
-THRESHOLDS_PATH = os.path.join(HERE, 'risk_thresholds_v3.json')
+MODEL_PATH = os.path.join(MODELS_DIR, 'xgboost_model_v3.pkl')
+SCALER_PATH = os.path.join(MODELS_DIR, 'scaler_v3.pkl')
+THRESHOLDS_PATH = os.path.join(RESULTS_DIR, 'risk_thresholds_v3.json')
 
 MIN_CV_ROC_AUC = 0.58    # must clearly beat random guessing (0.5); tuned v3 scores ~0.61
 MAX_OVERFIT_GAP = 0.15   # training AUC minus unseen-area AUC; tuned v3 ~0.07 (the untuned model was 0.43)

@@ -48,7 +48,7 @@ class ModelService:
         """Turn the model's raw output (0-1, works on one number or an array) into the app's 0-100 risk index.
 
         Models with meta['risk_thresholds'] (e.g. v3) were trained on a 1:2 landslide:safe mix, so their raw
-        output is not a real-world chance. Their cut-offs were picked on purpose (ai-module/v3/calibrate_thresholds_v3.py)
+        output is not a real-world chance. Their cut-offs were picked on purpose (ai-module/v3/train/calibrate_thresholds_v3.py)
         and are stretched here so each cut-off lands exactly on 40 / 60 / 80 - the bands the whole app already uses.
         Models without cut-offs (v2) keep the old behaviour: raw output x 100.
         """

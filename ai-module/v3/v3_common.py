@@ -6,23 +6,29 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
+HERE = os.path.dirname(os.path.abspath(__file__))                 # ai-module/v3
+AI_DIR = os.path.dirname(HERE)                                     # ai-module
+ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))             # repository root
 sys.path.insert(0, os.path.join(ROOT, 'backend'))
 
 from utils.data_processor import DataProcessor  # noqa: E402  (the backend's own feature code)
 
-DATASET_CSV = os.path.join(HERE, 'landslides_v3_dataset.csv')
+DATA_RAW = os.path.join(AI_DIR, 'data', 'raw')                     # landslide event list, control inputs
+DATA_V3 = os.path.join(AI_DIR, 'data', 'v3')                       # v3 dataset shards and merged CSV
+RESULTS_DIR = os.path.join(HERE, 'results')                        # thresholds, metrics, charts, reports
+MODELS_DIR = os.path.join(HERE, 'models')                          # trained .pkl files
+
+DATASET_CSV = os.path.join(DATA_V3, 'landslides_v3_dataset.csv')
 FEATURES = DataProcessor.FEATURE_ORDER
 SEED = 42
 
-# Same settings as ai-module/train_xgboost_v2.py, so only the data differs; class weights for 1 slide : 2 controls
+# Same settings as ai-module/v2/train_xgboost_v2.py, so only the data differs; class weights for 1 slide : 2 controls
 XGB_PARAMS = dict(n_estimators=200, max_depth=6, learning_rate=0.1, random_state=SEED, eval_metric='logloss')
 
 
 def load_dataset():
     # The builder writes one file per shard (landslides_v3_part0.csv ...); merge them into one table
-    parts = [os.path.join(HERE, f) for f in sorted(os.listdir(HERE)) if f.startswith('landslides_v3_part') and f.endswith('.csv')]
+    parts = [os.path.join(DATA_V3, f) for f in sorted(os.listdir(DATA_V3)) if f.startswith('landslides_v3_part') and f.endswith('.csv')]
     df = pd.concat([pd.read_csv(p) for p in parts if os.path.getsize(p) > 0], ignore_index=True)
     # Merged part files can come back as text ("object") columns - force numbers for labels and measurements
     numeric = ['row_id', 'label', 'lat', 'lon', 'elevation', 'slope', 'aspect', 'ndvi', 'ndwi', 'soil_type',
@@ -82,7 +88,7 @@ def new_model(y):
 
 # ---------------------------------------------------------------------------------------------- tuned v3
 # The live app always sends the same 20 inputs. Tuning only changes HOW the model learns from them.
-BEST_JSON = os.path.join(HERE, 'best_params_v3.json')
+BEST_JSON = os.path.join(RESULTS_DIR, 'best_params_v3.json')
 
 # More rain must never LOWER the risk (physics). Without this rule the trees learn noise like
 # "40 mm is riskier than 60 mm" from a handful of rows.

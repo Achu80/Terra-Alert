@@ -99,7 +99,7 @@ This forces the model to learn from rain and terrain, not from "hills vs plains"
 
 **Why not "90% accuracy"?** The older v2 model reported 90%, but its "safe" examples were plains and glaciers, so it only learned "hills = danger". On a fair test it scored below a coin flip. With 2 safe rows for every landslide, a model that never warns would score 67% accuracy while catching nothing. That's why Terra Alert reports **recall and false alarms** instead.
 
-Full details: [ai-module/v3/V3_BEFORE_AFTER.pdf](ai-module/v3/V3_BEFORE_AFTER.pdf) · [ai-module/v3/MODEL_STATUS_v3.pdf](ai-module/v3/MODEL_STATUS_v3.pdf)
+Full details: [ai-module/v3/docs/V3_BEFORE_AFTER.pdf](ai-module/v3/docs/V3_BEFORE_AFTER.pdf) · [ai-module/v3/docs/MODEL_STATUS_v3.pdf](ai-module/v3/docs/MODEL_STATUS_v3.pdf)
 
 ## Project structure
 
@@ -119,10 +119,13 @@ Terra-Alert/
 ├── frontend/                    React + Vite web dashboard (port 5173)
 ├── mobile/                      Android app: Expo SDK 58 + Expo Router
 │
-├── ai-module/
-│   ├── v3/                      live model: dataset, tuning, training, cut-offs, reports
+├── ai-module/                   see ai-module/README.md
+│   ├── data/                    raw inputs and dataset CSVs (raw/, v2/, v3/)
+│   ├── v2/                      original model, kept for comparison
+│   ├── v3/                      live model: build/, train/, evaluate/, results/, models/
 │   ├── v4/                      steadier-forecast variant of v3
-│   └── v5/                      terrain experiment (not used by the app)
+│   ├── v5/                      terrain experiment (not used by the app)
+│   └── tools/                   forecast API helpers
 │
 └── docs/                        project documentation, SMS setup
 ```
@@ -168,7 +171,7 @@ A phone can't reach `localhost` on your PC, so use your PC's LAN IP (`ipconfig`)
 | Model safety tests | `cd backend && py -3.11 -m pytest tests/test_v3_model.py -q` | Cut-offs, plains rule, "more rain never lowers risk", low-confidence warnings, missing-data guards, v2 unchanged. Offline, ~3 s |
 | Full backend suite | `cd backend && py -3.11 -m pytest tests -q` | Above plus the end-to-end pipeline (needs Earth Engine) |
 | Mobile lint | `cd mobile && npx expo lint` | Code errors and React rules |
-| Rain source check | `py -3.11 ai-module/v3/compare_rain_sources_v3.py --log-only` | Which rain source live checks really used |
+| Rain source check | `py -3.11 ai-module/v3/evaluate/compare_rain_sources_v3.py --log-only` | Which rain source live checks really used |
 
 **Manual checklist before a release:**
 - [ ] Check Shimla in the monsoon: Moderate or higher, with a warning sentence naming the rain
@@ -184,8 +187,8 @@ Model files are **not in git** (they are large and binary), so a fresh clone mus
 
 ```bash
 py -3.11 -m pip install shap                    # once, needed by the evaluation step
-py -3.11 ai-module/v3/tune_v3.py                # ~15 min: picks settings on unseen areas
-py -3.11 ai-module/v3/train_xgboost_v3.py       # trains, installs, then picks the risk cut-offs
+py -3.11 ai-module/v3/train/tune_v3.py                # ~15 min: picks settings on unseen areas
+py -3.11 ai-module/v3/train/train_xgboost_v3.py       # trains, installs, then picks the risk cut-offs
 # restart the backend to load the new model
 ```
 
@@ -214,8 +217,8 @@ All routes are under `http://localhost:5000/api`.
 
 ## Further reading
 
-- [ai-module/v3/V3_BEFORE_AFTER.pdf](ai-module/v3/V3_BEFORE_AFTER.pdf): what changed in the model, with before/after numbers
-- [ai-module/v3/MODEL_STATUS_v3.pdf](ai-module/v3/MODEL_STATUS_v3.pdf): model status, data and plan
+- [ai-module/v3/docs/V3_BEFORE_AFTER.pdf](ai-module/v3/docs/V3_BEFORE_AFTER.pdf): what changed in the model, with before/after numbers
+- [ai-module/v3/docs/MODEL_STATUS_v3.pdf](ai-module/v3/docs/MODEL_STATUS_v3.pdf): model status, data and plan
 - [docs/PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md): full project documentation
 - [docs/TWILIO_SMS_SETUP.md](docs/TWILIO_SMS_SETUP.md): SMS alerts
 - [mobile/README.md](mobile/README.md) · [backend/README.md](backend/README.md)

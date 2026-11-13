@@ -9,10 +9,11 @@ Scores are OUT-OF-FOLD: each landslide and control is scored by a model that nev
 saw its ~100 km area during training. This is the honest version of v2's test split.
 
 Run from the repository root:
-    py -3.11 ai-module/v3/evaluate_v3_like_v2.py
+    py -3.11 ai-module/v3/evaluate/evaluate_v3_like_v2.py
 """
 import json
 import os
+import sys
 
 import joblib
 import matplotlib
@@ -23,11 +24,14 @@ import pandas as pd
 from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score, precision_score,
                              recall_score, roc_auc_score, roc_curve)
 
+_V3 = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # v3/ holds v3_common.py
+sys.path.insert(0, _V3)
+sys.path.insert(0, os.path.join(_V3, 'train'))                     # calibrate_thresholds_v3.py lives here
 from calibrate_thresholds_v3 import out_of_fold_scores
-from v3_common import FEATURES, HERE, feature_matrix, load_best, load_dataset
+from v3_common import FEATURES, MODELS_DIR, RESULTS_DIR, feature_matrix, load_best, load_dataset
 
-MODEL_PATH = os.path.join(HERE, 'xgboost_model_v3.pkl')
-THRESHOLDS_PATH = os.path.join(HERE, 'risk_thresholds_v3.json')
+MODEL_PATH = os.path.join(MODELS_DIR, 'xgboost_model_v3.pkl')
+THRESHOLDS_PATH = os.path.join(RESULTS_DIR, 'risk_thresholds_v3.json')
 
 
 def main():
@@ -56,7 +60,7 @@ def main():
         'true_positives': int(tp), 'false_negatives': int(fn),
         'false_positives': int(fp), 'true_negatives': int(tn),
     }])
-    table.to_csv(os.path.join(HERE, 'accuracy_table_v3.csv'), index=False)
+    table.to_csv(os.path.join(RESULTS_DIR, 'accuracy_table_v3.csv'), index=False)
     print('\nAccuracy table (out-of-fold, at the MODERATE alert level):')
     print(table.T.to_string(header=False))
 
@@ -70,7 +74,7 @@ def main():
     plt.title('ROC Curve (V3 - out-of-fold)')
     plt.legend(loc='lower right')
     plt.tight_layout()
-    plt.savefig(os.path.join(HERE, 'roc_curve_v3.png'), dpi=300)
+    plt.savefig(os.path.join(RESULTS_DIR, 'roc_curve_v3.png'), dpi=300)
     plt.close()
     print('Saved: roc_curve_v3.png')
 
@@ -90,7 +94,7 @@ def main():
             plt.text(j, i, f'{cm[i, j]}', ha='center', va='center',
                      color='white' if cm[i, j] > cm.max() / 2 else 'black', fontsize=14)
     plt.tight_layout()
-    plt.savefig(os.path.join(HERE, 'confusion_matrix_v3.png'), dpi=300)
+    plt.savefig(os.path.join(RESULTS_DIR, 'confusion_matrix_v3.png'), dpi=300)
     plt.close()
     print('Saved: confusion_matrix_v3.png')
 
@@ -98,14 +102,14 @@ def main():
     model = joblib.load(MODEL_PATH)
     importance = pd.DataFrame({'feature': FEATURES, 'importance': model.feature_importances_})
     importance = importance.sort_values('importance', ascending=False)
-    importance.to_csv(os.path.join(HERE, 'feature_importance_v3.csv'), index=False)
+    importance.to_csv(os.path.join(RESULTS_DIR, 'feature_importance_v3.csv'), index=False)
     top = importance.head(15).iloc[::-1]
     plt.figure(figsize=(8, 6))
     plt.barh(top['feature'], top['importance'], color='#2a78d6')
     plt.xlabel('Importance')
     plt.title('Top 15 Features (V3)')
     plt.tight_layout()
-    plt.savefig(os.path.join(HERE, 'feature_importance_v3.png'), dpi=300)
+    plt.savefig(os.path.join(RESULTS_DIR, 'feature_importance_v3.png'), dpi=300)
     plt.close()
     print('Saved: feature_importance_v3.png, feature_importance_v3.csv')
 
