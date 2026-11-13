@@ -5,7 +5,7 @@
 $ErrorActionPreference = 'Continue'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 Set-Location $root
-$log = Join-Path $root 'ai-module\v3\pipeline_log.txt'
+$log = Join-Path $root 'ai-module\v3\logs\pipeline_log.txt'
 "[$(Get-Date)] waiting for the dataset build to finish..." | Out-File $log -Encoding utf8
 
 while (Get-CimInstance Win32_Process -Filter "Name like 'python%'" | Where-Object { $_.CommandLine -match 'build_dataset_v3' }) {
@@ -26,10 +26,8 @@ function Step($title, $script) {
 }
 
 $env:PYTHONIOENCODING = 'utf-8'   # emoji in print() crashed every step on the Windows console code page
-Step 'build finished; second pass for any failed rows' 'ai-module\v3\build_dataset_v3.py'
-Push-Location ai-module\v3
-Step 'comparing v2 and v3' 'evaluate_v2_vs_v3.py'
-Step 'tuning v3 settings (nested spatial CV)' 'tune_v3.py'
-Step 'training and installing v3 (+ picking cut-offs)' 'train_xgboost_v3.py'
-Pop-Location
-"[$(Get-Date)] ALL DONE - see ai-module\v3\REPORT.md; restart the backend to load v3" | Out-File $log -Append -Encoding utf8
+Step 'build finished; second pass for any failed rows' 'ai-module\v3\build\build_dataset_v3.py'
+Step 'comparing v2 and v3' 'ai-module\v3\evaluate\evaluate_v2_vs_v3.py'
+Step 'tuning v3 settings (nested spatial CV)' 'ai-module\v3\train\tune_v3.py'
+Step 'training and installing v3 (+ picking cut-offs)' 'ai-module\v3\train\train_xgboost_v3.py'
+"[$(Get-Date)] ALL DONE - see ai-module\v3\results\REPORT.md; restart the backend to load v3" | Out-File $log -Append -Encoding utf8

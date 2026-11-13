@@ -23,7 +23,7 @@ DEFAULT_VERSION = 'v2'
 # v2 was built before meta.json existed, so its description lives here
 V2_META = {
     'label': 'v2 (original)',
-    'description': 'Original XGBoost model (ai-module/train_xgboost_v2.py), trained with CHIRPS rainfall.',
+    'description': 'Original XGBoost model (ai-module/v2/train_xgboost_v2.py), trained with CHIRPS rainfall.',
     'rain_source': 'chirps',
     'veg_source': 'sentinel2',
     'plains_rule': True,

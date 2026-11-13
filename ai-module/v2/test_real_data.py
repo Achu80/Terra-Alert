@@ -1,15 +1,19 @@
+import os
+V2_DIR = os.path.dirname(os.path.abspath(__file__))   # ai-module/v2
+AI_DIR = os.path.dirname(V2_DIR)                       # ai-module
+
 import pickle
 import pandas as pd
 
 # Load model and scaler
-with open('xgboost_model.pkl', 'rb') as f:
+with open(os.path.join(V2_DIR, 'models', 'xgboost_model.pkl'), 'rb') as f:
     model = pickle.load(f)
 
-with open('scaler.pkl', 'rb') as f:
+with open(os.path.join(V2_DIR, 'models', 'scaler.pkl'), 'rb') as f:
     scaler = pickle.load(f)
 
 # Load actual data
-df = pd.read_csv('landslides_combined.csv')
+df = pd.read_csv(os.path.join(AI_DIR, 'data', 'v2', 'landslides_combined.csv'))
 
 # Get one actual landslide point
 landslide_sample = df[df['label']==1].iloc[0]

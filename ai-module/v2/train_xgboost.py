@@ -1,3 +1,7 @@
+import os
+V2_DIR = os.path.dirname(os.path.abspath(__file__))   # ai-module/v2
+AI_DIR = os.path.dirname(V2_DIR)                       # ai-module
+
 import pandas as pd
 import numpy as np
 import pickle
@@ -7,7 +11,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import xgboost as xgb
 
 # Load data
-df = pd.read_csv('landslides_combined.csv')
+df = pd.read_csv(os.path.join(AI_DIR, 'data', 'v2', 'landslides_combined.csv'))
 
 print("Dataset loaded:", df.shape)
 
@@ -96,11 +100,11 @@ print("\nTop 10 Feature Importance:")
 print(feature_importance.head(10))
 
 # Save model in XGBoost native format (version-independent)
-model.save_model('xgboost_model.json')
+model.save_model(os.path.join(V2_DIR, 'models', 'xgboost_model.json'))
 print("\n✓ Model saved as xgboost_model.json (XGBoost native format)")
 
 # Save scaler as pickle (still needed for backward compatibility)
-with open('scaler.pkl', 'wb') as f:
+with open(os.path.join(V2_DIR, 'models', 'scaler.pkl'), 'wb') as f:
     pickle.dump(scaler, f)
 print("✓ Scaler saved as scaler.pkl")
 
@@ -113,11 +117,11 @@ scaler_params = {
     'n_features': int(scaler.n_features_in_),
     'n_samples_seen': int(scaler.n_samples_seen_)
 }
-with open('scaler_params.json', 'w') as f:
+with open(os.path.join(V2_DIR, 'models', 'scaler_params.json'), 'w') as f:
     json.dump(scaler_params, f, indent=2)
 print("✓ Scaler parameters saved as scaler_params.json (version-independent)")
 
 # Also save as old format for backward compatibility
-with open('xgboost_model.pkl', 'wb') as f:
+with open(os.path.join(V2_DIR, 'models', 'xgboost_model.pkl'), 'wb') as f:
     pickle.dump(model, f)
 print("✓ Model also saved as xgboost_model.pkl (backward compatibility)")

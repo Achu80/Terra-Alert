@@ -1,11 +1,15 @@
+import os
+V2_DIR = os.path.dirname(os.path.abspath(__file__))   # ai-module/v2
+AI_DIR = os.path.dirname(V2_DIR)                       # ai-module
+
 import pickle
 import numpy as np
 
 # Load model and scaler
-with open('xgboost_model.pkl', 'rb') as f:
+with open(os.path.join(V2_DIR, 'models', 'xgboost_model.pkl'), 'rb') as f:
     model = pickle.load(f)
 
-with open('scaler.pkl', 'rb') as f:
+with open(os.path.join(V2_DIR, 'models', 'scaler.pkl'), 'rb') as f:
     scaler = pickle.load(f)
 
 # Feature order: elevation, slope, aspect, ndvi, ndwi, soil_type, 

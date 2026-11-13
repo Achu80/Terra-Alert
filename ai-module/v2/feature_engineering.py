@@ -1,3 +1,7 @@
+import os
+V2_DIR = os.path.dirname(os.path.abspath(__file__))   # ai-module/v2
+AI_DIR = os.path.dirname(V2_DIR)                       # ai-module
+
 import pandas as pd
 import numpy as np
 
@@ -59,7 +63,7 @@ def engineer_features(df):
 # Test it
 if __name__ == "__main__":
     # Load your dataset
-    df = pd.read_csv('landslides_combined.csv')
+    df = pd.read_csv(os.path.join(AI_DIR, 'data', 'v2', 'landslides_combined.csv'))
     
     print(f"Original features: {len(df.columns)}")
     print(f"Original shape: {df.shape}")
@@ -77,5 +81,5 @@ if __name__ == "__main__":
         print(f"   - {feat}")
     
     # Save
-    df_engineered.to_csv('landslides_combined_engineered.csv', index=False)
+    df_engineered.to_csv(os.path.join(AI_DIR, 'data', 'v2', 'landslides_combined_engineered.csv'), index=False)
     print(f"\n💾 Saved to: landslides_combined_engineered.csv")

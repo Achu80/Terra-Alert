@@ -10,10 +10,11 @@ Grade v2 and v3 on the same rows, in ways that expose shortcuts. Writes metrics_
   v2 is the original model, unchanged, given its own recipe (CHIRPS rain, Sentinel-2/MODIS vegetation).
   Note: v2 was trained on these same 555 landslide points, which favours v2 on the landslide rows.
 
-Run: py -3.11 ai-module/v3/evaluate_v2_vs_v3.py
+Run: py -3.11 ai-module/v3/evaluate/evaluate_v2_vs_v3.py
 """
 import json
 import os
+import sys
 from datetime import datetime
 
 import joblib
@@ -24,10 +25,11 @@ from sklearn.metrics import accuracy_score, average_precision_score, brier_score
 from sklearn.model_selection import GroupKFold
 from sklearn.preprocessing import StandardScaler
 
-from v3_common import FEATURES, HERE, ROOT, feature_matrix, load_dataset, new_model, plains_mask
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # v3/ holds v3_common.py
+from v3_common import AI_DIR, FEATURES, RESULTS_DIR, feature_matrix, load_dataset, new_model, plains_mask
 
-V2_MODEL = os.path.join(ROOT, 'ai-module', 'xgboost_model_v2.pkl')
-V2_SCALER = os.path.join(ROOT, 'ai-module', 'scaler_v2.pkl')
+V2_MODEL = os.path.join(AI_DIR, 'v2', 'models', 'xgboost_model_v2.pkl')
+V2_SCALER = os.path.join(AI_DIR, 'v2', 'models', 'scaler_v2.pkl')
 
 
 def v2_scores(X2):
@@ -74,7 +76,7 @@ def shap_importance(model, scaler, X):
 
 
 def write_report(r):
-    """Plain-language comparison for the team (ai-module/v3/REPORT.md)."""
+    """Plain-language comparison for the team (ai-module/v3/results/REPORT.md)."""
     def table(section):
         lines = ['| Test | Model | ROC-AUC | Accuracy | Precision | Recall | Brier (lower=better) |', '|---|---|---|---|---|---|---|']
         names = {'all': 'All test rows', 'vs_spatial_control': 'Landslide vs nearby same-day place',
@@ -89,7 +91,7 @@ def write_report(r):
     med = r['median_score_by_kind']
     text = f"""# Landslide model v3 vs v2
 
-Generated {r['generated_at']} by `ai-module/v3/evaluate_v2_vs_v3.py`. Rows: {r['rows']}.
+Generated {r['generated_at']} by `ai-module/v3/evaluate/evaluate_v2_vs_v3.py`. Rows: {r['rows']}.
 
 **How to read this:** ROC-AUC 0.5 = guessing, 1.0 = perfect. "Nearby same-day place" tests whether a model
 can tell *where* a landslide happens without relying on altitude/region shortcuts; "same place, other year"
@@ -121,7 +123,7 @@ A good model scores landslides high and both kinds of safe rows low.
 Switch to v3 only if it beats v2 on the "unseen areas" and "Himachal held out" tables, especially the
 "same place, other year" rows. Switching is done in the app: admin mode -> Settings -> Prediction model.
 """
-    with open(os.path.join(HERE, 'REPORT.md'), 'w', encoding='utf-8') as f:
+    with open(os.path.join(RESULTS_DIR, 'REPORT.md'), 'w', encoding='utf-8') as f:
         f.write(text)
     print('REPORT.md written')
 
@@ -171,7 +173,7 @@ def main():
             for name, p in (('v2', p_v2), ('v3', p_v3_cv))
         },
     }
-    with open(os.path.join(HERE, 'metrics_v3.json'), 'w', encoding='utf-8') as f:
+    with open(os.path.join(RESULTS_DIR, 'metrics_v3.json'), 'w', encoding='utf-8') as f:
         json.dump(results, f, indent=2)
     write_report(results)
     print(json.dumps({k: results[k] for k in ('spatial_cv', 'himachal_holdout', 'median_score_by_kind', 'plains_rows')}, indent=1))

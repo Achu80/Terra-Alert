@@ -1,12 +1,16 @@
 """
 Save scaler parameters as JSON (version-independent)
 """
+import os
+V2_DIR = os.path.dirname(os.path.abspath(__file__))   # ai-module/v2
+AI_DIR = os.path.dirname(V2_DIR)                       # ai-module
+
 import pickle
 import json
 import numpy as np
 
 # Load the scaler
-with open('scaler.pkl', 'rb') as f:
+with open(os.path.join(V2_DIR, 'models', 'scaler.pkl'), 'rb') as f:
     scaler = pickle.load(f)
 
 # Extract parameters
@@ -19,7 +23,7 @@ scaler_params = {
 }
 
 # Save as JSON
-with open('scaler_params.json', 'w') as f:
+with open(os.path.join(V2_DIR, 'models', 'scaler_params.json'), 'w') as f:
     json.dump(scaler_params, f, indent=2)
 
 print("✓ Scaler parameters saved to scaler_params.json")

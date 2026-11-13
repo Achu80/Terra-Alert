@@ -4,22 +4,24 @@ Train the final v3 model on all rows and install it (v2 and v4 are never touched
 Order:  tune_v3.py (picks settings, optional)  ->  this script  ->  calibrate_thresholds_v3.py (run automatically)
 
 Writes:
-  ai-module/v3/xgboost_model_v3.pkl, scaler_v3.pkl
+  ai-module/v3/models/xgboost_model_v3.pkl, scaler_v3.pkl
   backend/ml/models/v3/model.pkl, scaler.pkl, meta.json   (picked up by backend/services/model_registry.py)
 Restart the backend afterwards to load it.
 
-Run: py -3.11 ai-module/v3/train_xgboost_v3.py
+Run: py -3.11 ai-module/v3/train/train_xgboost_v3.py
 """
 import json
 import os
 import shutil
+import sys
 from datetime import datetime
 
 import joblib
 from sklearn.preprocessing import StandardScaler
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # v3/ holds v3_common.py
 import calibrate_thresholds_v3
-from v3_common import HERE, ROOT, UNSTABLE, feature_matrix, load_best, load_dataset, v3_inputs, v3_model
+from v3_common import MODELS_DIR, RESULTS_DIR, ROOT, UNSTABLE, feature_matrix, load_best, load_dataset, v3_inputs, v3_model
 
 BACKEND_V3 = os.path.join(ROOT, 'backend', 'ml', 'models', 'v3')
 
@@ -29,7 +31,7 @@ RANGE_CHECKED = ['elevation', 'slope', 'ndvi', 'ndwi', 'rainfall_3d', 'rainfall_
 
 def _metrics():
     """Honest scores for meta.json: from tune_v3.py when it ran, else from evaluate_v2_vs_v3.py."""
-    tuned = os.path.join(HERE, 'tune_results_v3.json')
+    tuned = os.path.join(RESULTS_DIR, 'tune_results_v3.json')
     if os.path.exists(tuned):
         with open(tuned, encoding='utf-8') as f:
             r = json.load(f)
@@ -46,7 +48,7 @@ def _metrics():
             'overfit_gap': r['final_check']['overfit_gap'],
             'original_v3_roc_auc_same_test': o['roc_auc']['mean'],
         }
-    with open(os.path.join(HERE, 'metrics_v3.json'), encoding='utf-8') as f:
+    with open(os.path.join(RESULTS_DIR, 'metrics_v3.json'), encoding='utf-8') as f:
         ev = json.load(f)
     cv = ev['spatial_cv']['v3']['all']
     return {'spatial_cv_roc_auc': cv['roc_auc'], 'spatial_cv_accuracy': cv['accuracy']}
@@ -61,8 +63,8 @@ def main():
     scaler = StandardScaler().fit(X_train)
     model = v3_model(y, best).fit(scaler.transform(X_train), y)
 
-    model_path = os.path.join(HERE, 'xgboost_model_v3.pkl')
-    scaler_path = os.path.join(HERE, 'scaler_v3.pkl')
+    model_path = os.path.join(MODELS_DIR, 'xgboost_model_v3.pkl')
+    scaler_path = os.path.join(MODELS_DIR, 'scaler_v3.pkl')
     joblib.dump(model, model_path)
     joblib.dump(scaler, scaler_path)
 

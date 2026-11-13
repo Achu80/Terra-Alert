@@ -13,22 +13,24 @@ The scores we use are "out-of-fold": each row is scored by a model that never sa
 (5-fold spatial CV, same as evaluate_v2_vs_v3.py). Scoring rows the model trained on would look far too good.
 
 Writes:
-  ai-module/v3/risk_thresholds_v3.json          (read again by train_xgboost_v3.py on retrain)
+  ai-module/v3/results/risk_thresholds_v3.json          (read again by train_xgboost_v3.py on retrain)
   backend/ml/models/v3/meta.json                (adds risk_thresholds, turns plains_rule on)
 
-Run: py -3.11 ai-module/v3/calibrate_thresholds_v3.py
+Run: py -3.11 ai-module/v3/train/calibrate_thresholds_v3.py
 """
 import json
 import os
+import sys
 
 import numpy as np
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import StandardScaler
 
-from v3_common import HERE, ROOT, feature_matrix, load_best, load_dataset, v3_inputs, v3_model
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # v3/ holds v3_common.py
+from v3_common import RESULTS_DIR, ROOT, feature_matrix, load_best, load_dataset, v3_inputs, v3_model
 
 TARGET_RECALL = {'MODERATE': 0.70, 'HIGH': 0.40, 'CRITICAL': 0.15}
-THRESHOLDS_JSON = os.path.join(HERE, 'risk_thresholds_v3.json')
+THRESHOLDS_JSON = os.path.join(RESULTS_DIR, 'risk_thresholds_v3.json')
 BACKEND_META = os.path.join(ROOT, 'backend', 'ml', 'models', 'v3', 'meta.json')
 
 

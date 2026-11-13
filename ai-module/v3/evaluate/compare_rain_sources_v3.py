@@ -12,14 +12,15 @@ on a different scale, the model gets numbers it never learned from. This script 
                      archive), which is exactly what the live fallback uses. Compare it with V07 too.
   4. Impact        - re-score the history rows with each backup source's rain: how often does the risk level change?
 
-Writes ai-module/v3/rain_source_comparison_v3.json
+Writes ai-module/v3/results/rain_source_comparison_v3.json
 
-Run:  py -3.11 ai-module/v3/compare_rain_sources_v3.py            (all steps, ~10 min)
-      py -3.11 ai-module/v3/compare_rain_sources_v3.py --log-only (step 1 only, instant)
+Run:  py -3.11 ai-module/v3/evaluate/compare_rain_sources_v3.py            (all steps, ~10 min)
+      py -3.11 ai-module/v3/evaluate/compare_rain_sources_v3.py --log-only (step 1 only, instant)
 """
 import argparse
 import json
 import os
+import sys
 import time
 from datetime import datetime, timedelta
 
@@ -27,7 +28,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 
-from v3_common import HERE, ROOT, feature_matrix, load_dataset
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # v3/ holds v3_common.py
+from v3_common import RESULTS_DIR, ROOT, feature_matrix, load_dataset
 
 from dotenv import load_dotenv  # noqa: E402
 
@@ -37,7 +39,7 @@ from services.gee_service import GEEService, RAIN_SOURCE_LOG, RAIN_WINDOWS  # no
 from services.model_service import ModelService  # noqa: E402
 
 V3_DIR = os.path.join(ROOT, 'backend', 'ml', 'models', 'v3')
-OUT_JSON = os.path.join(HERE, 'rain_source_comparison_v3.json')
+OUT_JSON = os.path.join(RESULTS_DIR, 'rain_source_comparison_v3.json')
 WINDOWS = [f'rainfall_{d}d' for d in RAIN_WINDOWS]
 
 

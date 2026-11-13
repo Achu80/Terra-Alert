@@ -1,3 +1,7 @@
+import os
+V2_DIR = os.path.dirname(os.path.abspath(__file__))   # ai-module/v2
+AI_DIR = os.path.dirname(V2_DIR)                       # ai-module
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -9,7 +13,7 @@ import seaborn as sns
 import joblib
 
 # Load engineered dataset
-df = pd.read_csv('landslides_combined_engineered.csv')
+df = pd.read_csv(os.path.join(AI_DIR, 'data', 'v2', 'landslides_combined_engineered.csv'))
 
 print(f"Dataset loaded: {df.shape}")
 
@@ -101,7 +105,7 @@ plt.title('Confusion Matrix (V2 - Engineered Features)')
 plt.ylabel('Actual')
 plt.xlabel('Predicted')
 plt.tight_layout()
-plt.savefig('confusion_matrix_v2.png', dpi=300)
+plt.savefig(os.path.join(V2_DIR, 'charts', 'confusion_matrix_v2.png'), dpi=300)
 print("\n✅ Saved: confusion_matrix_v2.png")
 
 # 2. ROC Curve
@@ -117,7 +121,7 @@ plt.title('ROC Curve (V2 - Engineered Features)')
 plt.legend(loc="lower right")
 plt.grid(alpha=0.3)
 plt.tight_layout()
-plt.savefig('roc_curve_v2.png', dpi=300)
+plt.savefig(os.path.join(V2_DIR, 'charts', 'roc_curve_v2.png'), dpi=300)
 print("✅ Saved: roc_curve_v2.png")
 
 # 3. Feature Importance Plot (Top 15)
@@ -128,12 +132,12 @@ plt.title('Top 15 Feature Importances (V2)')
 plt.xlabel('Importance')
 plt.ylabel('Feature')
 plt.tight_layout()
-plt.savefig('feature_importance_v2.png', dpi=300)
+plt.savefig(os.path.join(V2_DIR, 'charts', 'feature_importance_v2.png'), dpi=300)
 print("✅ Saved: feature_importance_v2.png")
 
 # Save model and scaler
-joblib.dump(model, 'xgboost_model_v2.pkl')
-joblib.dump(scaler, 'scaler_v2.pkl')
+joblib.dump(model, os.path.join(V2_DIR, 'models', 'xgboost_model_v2.pkl'))
+joblib.dump(scaler, os.path.join(V2_DIR, 'models', 'scaler_v2.pkl'))
 print("\n💾 Saved: xgboost_model_v2.pkl, scaler_v2.pkl")
 
 print("\n" + "="*60)

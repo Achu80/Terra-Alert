@@ -335,7 +335,7 @@ FEATURE_ORDER = [
 - Non-landslide points: Constrained sampling
 - Total samples: ~10,000+ points
 
-**Training Script:** `ai-module/train_xgboost.py`
+**Training Script:** `ai-module/v2/train_xgboost.py`
 
 **Model Performance:**
 - Accuracy: ~92%

@@ -6,7 +6,7 @@ Produces everything a paper's "Evaluation" section needs, for three models side 
     v3 original   v3 before tuning (200 trees, depth 6)
     v3 tuned      the installed v3 (best_params_v3.json)
 
-Outputs (ai-module/v3/evaluation_report/):
+Outputs (ai-module/v3/results/evaluation_report/):
     figures/*.png              ROC, precision-recall, confusion matrices, threshold curves, calibration,
                                score distributions, feature importance, partial dependence, learning curves,
                                per-fold scores, per-region / per-season results
@@ -22,7 +22,7 @@ Evaluation protocol (why the numbers are honest):
     * Note: the tuned settings were chosen on all rows, so these out-of-fold figures are slightly optimistic.
       The strictly honest headline (nested CV) is in tune_results_v3.json and is reported next to them.
 
-Run:  py -3.11 ai-module/v3/research_evaluation_v3.py        (~3-5 min)
+Run:  py -3.11 ai-module/v3/evaluate/research_evaluation_v3.py        (~3-5 min)
 """
 import json
 import os
@@ -41,16 +41,17 @@ from sklearn.metrics import (average_precision_score, brier_score_loss, confusio
 from sklearn.model_selection import StratifiedGroupKFold  # noqa: E402
 from sklearn.preprocessing import StandardScaler  # noqa: E402
 
-from v3_common import (FEATURES, HERE, ROOT, feature_matrix, load_best, load_dataset,  # noqa: E402
-                       plains_mask, v3_inputs, v3_model)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # v3/ holds v3_common.py
+from v3_common import (AI_DIR, FEATURES, MODELS_DIR, RESULTS_DIR, ROOT, feature_matrix, load_best,  # noqa: E402
+                       load_dataset, plains_mask, v3_inputs, v3_model)
 
 # ============================================================================== settings
-OUT = os.path.join(HERE, 'evaluation_report')          # everything is written here
+OUT = os.path.join(RESULTS_DIR, 'evaluation_report')    # everything is written here
 FIG, TAB = os.path.join(OUT, 'figures'), os.path.join(OUT, 'tables')
 SEED = 0                                               # same fold split as calibrate_thresholds_v3.py
 N_BOOT = 1000                                          # bootstrap repeats for confidence intervals
-V2_MODEL = os.path.join(ROOT, 'ai-module', 'xgboost_model_v2.pkl')
-V2_SCALER = os.path.join(ROOT, 'ai-module', 'scaler_v2.pkl')
+V2_MODEL = os.path.join(AI_DIR, 'v2', 'models', 'xgboost_model_v2.pkl')
+V2_SCALER = os.path.join(AI_DIR, 'v2', 'models', 'scaler_v2.pkl')
 OLD_APP_ALERT = 0.40   # before Nov 2026 the app alerted at score >= 40, i.e. raw output >= 0.40 (v2 and old v3)
 
 # One fixed colour per model, used the same way in every figure (validated categorical slots 1-3)
@@ -401,7 +402,7 @@ def write_pdf(r, figs):
     ci = lambda name, k: f"{m[name]['ranking'][k]:.3f} [{m[name]['ci'][k][0]:.3f}, {m[name]['ci'][k][1]:.3f}]"
     pct = lambda name, op, k: f"{m[name][op][k]:.0%}"
     s = [Paragraph('TerraAlert v3: Model Evaluation Report', H1),
-         Paragraph(f"Generated {r['generated_at'][:10]} by ai-module/v3/research_evaluation_v3.py", CAP), Spacer(1, 8)]
+         Paragraph(f"Generated {r['generated_at'][:10]} by ai-module/v3/evaluate/research_evaluation_v3.py", CAP), Spacer(1, 8)]
 
     s += [Paragraph('Abstract', H2), Paragraph(
         f"We evaluate an XGBoost model that rates landslide risk from rainfall, terrain, vegetation and soil inputs. "
@@ -489,7 +490,7 @@ def write_pdf(r, figs):
 
     s += [Paragraph('5. Reproducibility', H2), Paragraph(
         f"Seed {SEED} for fold splits, bootstrap seed 42, {N_BOOT} resamples. Tuned settings: "
-        f"{json.dumps(r['settings'])}. Re-run: <i>py -3.11 ai-module/v3/research_evaluation_v3.py</i>. "
+        f"{json.dumps(r['settings'])}. Re-run: <i>py -3.11 ai-module/v3/evaluate/research_evaluation_v3.py</i>. "
         'All numbers are also in evaluation_report/metrics.json and tables/*.csv.', B)]
 
     pdf = os.path.join(OUT, 'EVALUATION_REPORT_v3.pdf')
@@ -516,7 +517,7 @@ def main():
     p_tuned, folds = out_of_fold(X, y, groups, best)
     p_orig, _ = out_of_fold(X, y, groups, None)
     P = {'v3 tuned': p_tuned, 'v3 original': p_orig, 'v2': v2_scores(X2)}
-    with open(os.path.join(HERE, 'risk_thresholds_v3.json'), encoding='utf-8') as f:
+    with open(os.path.join(RESULTS_DIR, 'risk_thresholds_v3.json'), encoding='utf-8') as f:
         level_cuts = json.load(f)['thresholds']
     alert_cut = {'v3 tuned': level_cuts['MODERATE'], 'v3 original': OLD_APP_ALERT, 'v2': OLD_APP_ALERT}
 
@@ -553,7 +554,7 @@ def main():
     groups_df = pd.DataFrame(group_rows)
 
     # ---- final installed model (for partial dependence)
-    model, scaler = joblib.load(os.path.join(HERE, 'xgboost_model_v3.pkl')), joblib.load(os.path.join(HERE, 'scaler_v3.pkl'))
+    model, scaler = joblib.load(os.path.join(MODELS_DIR, 'xgboost_model_v3.pkl')), joblib.load(os.path.join(MODELS_DIR, 'scaler_v3.pkl'))
 
     # ---- figures
     print('  drawing figures...')
@@ -581,7 +582,7 @@ def main():
     figs['grp'] = fig_groups(groups_df)
 
     # ---- nested-CV headline from tune_v3.py (the strict number)
-    with open(os.path.join(HERE, 'tune_results_v3.json'), encoding='utf-8') as f:
+    with open(os.path.join(RESULTS_DIR, 'tune_results_v3.json'), encoding='utf-8') as f:
         tr = json.load(f)
     nested = {'roc_auc': tr['tuned_fair_test']['roc_auc']['mean'], 'original_roc_auc': tr['original_fair_test']['roc_auc']['mean'],
               'overfit_gap_tuned': tr['final_check']['overfit_gap'], 'overfit_gap_original': tr['original_fair_test']['overfit']['overfit_gap']}

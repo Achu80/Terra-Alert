@@ -12,23 +12,26 @@ I wrote this script myself, except the GroupKFold cross-validation part
 (Step 4), where a friend helped me. The model and the helper functions in
 v3_common were built by my project team.
 
-Run:  python ai-module/v3/simple_evaluation.py
+Run:  python ai-module/v3/evaluate/simple_evaluation.py
 """
 
+import os
 import joblib
 from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.model_selection import GroupKFold
 from sklearn.preprocessing import StandardScaler
 
-from v3_common import HERE, feature_matrix, load_dataset, new_model
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # v3/ holds v3_common.py
+from v3_common import MODELS_DIR, feature_matrix, load_dataset, new_model
 
 # ---------- STEP 1: LOAD ----------
 df = load_dataset()
 X = feature_matrix(df, 'v3')
 y = df['label'].to_numpy()
 
-model = joblib.load(HERE + '/xgboost_model_v3.pkl')
-scaler = joblib.load(HERE + '/scaler_v3.pkl')
+model = joblib.load(MODELS_DIR + '/xgboost_model_v3.pkl')
+scaler = joblib.load(MODELS_DIR + '/scaler_v3.pkl')
 
 print('Rows:', X.shape[0], ' Features:', X.shape[1])
 

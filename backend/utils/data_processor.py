@@ -17,7 +17,7 @@ class DataProcessor:
     def _engineer_features(gee_data: Dict) -> Dict:
         """Calculate the 10 engineered features from base features.
 
-        These MUST match ai-module/feature_engineering.py exactly - the model was trained on
+        These MUST match ai-module/v2/feature_engineering.py exactly - the model was trained on
         features computed that way, and different formulas give meaningless predictions.
         """
         r3 = gee_data.get('rainfall_3d', 0) or 0

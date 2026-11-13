@@ -25,7 +25,7 @@ from utils.data_processor import DataProcessor  # noqa: E402
 MODELS = os.path.join(BACKEND, 'ml', 'models')
 V3_DIR = os.path.join(MODELS, 'v3')
 needs_v3 = pytest.mark.skipif(not os.path.exists(os.path.join(V3_DIR, 'model.pkl')),
-                              reason='v3 model files are not in git - train with ai-module/v3/train_xgboost_v3.py')
+                              reason='v3 model files are not in git - train with ai-module/v3/train/train_xgboost_v3.py')
 
 
 def features(**overrides):
