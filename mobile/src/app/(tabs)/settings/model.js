@@ -17,13 +17,14 @@ const FEATURE_GROUPS = [
         icon: 'git-merge',
         color: '#a78bfa',
         items: [
-            'Rainfall ratios (3d/7d, 7d/14d, 14d/30d)',
-            'Rainfall acceleration',
+            // v3 still receives these but ignores them: they blow up when recent rain is tiny
+            'Rainfall ratios (3d/7d, 7d/14d, 14d/30d) · ignored by v3',
+            'Rainfall acceleration · ignored by v3',
             'Heavy short-term rain flag',
             'Sustained heavy rain flag',
             'Slope × elevation',
             'Steep & low elevation flag',
-            'North-facing slope flag',
+            'North-facing slope flag · ignored by v3',
             'Bare & steep slope flag',
         ],
     },
@@ -36,8 +37,30 @@ function ModelContent() {
             <ModelSelector />
 
             <SettingsSection title="HOW IT WORKS">
-                <SettingsRow icon="analytics" iconColor={colors.primary} title="Output" subtitle="Probability of a landslide × 100 = risk score (0–100)" />
-                <SettingsRow icon="map" iconColor={colors.info} title="Trained on" subtitle="Recorded landslide and non-landslide points across North India" />
+                <SettingsRow
+                    icon="analytics"
+                    iconColor={colors.primary}
+                    title="Output"
+                    subtitle="A 0–100 risk score, not a % chance of a landslide. Cut-offs are set so Moderate or higher caught about 7 in 10 past landslides"
+                />
+                <SettingsRow
+                    icon="map"
+                    iconColor={colors.info}
+                    title="Trained on"
+                    subtitle="552 past landslides in Himachal, Uttarakhand and Kashmir (2007–2016), each compared with a nearby slope on the same day and the same spot in a normal year"
+                />
+                <SettingsRow
+                    icon="alert-circle"
+                    iconColor={RISK_COLORS.Moderate}
+                    title="Limits"
+                    subtitle="Many alerts will not end in a landslide, and about 3 in 10 landslides come without one. Treat it as a warning next to official advisories"
+                />
+                <SettingsRow
+                    icon="help-circle"
+                    iconColor={RISK_COLORS.Moderate}
+                    title="Low confidence badge"
+                    subtitle="Shown when inputs are outside what the model learned from, or rain came from a backup source"
+                />
                 <SettingsRow
                     icon="flag"
                     iconColor={RISK_COLORS.Moderate}

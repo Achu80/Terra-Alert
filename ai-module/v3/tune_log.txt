@@ -1,0 +1,27 @@
+A. Original v3 settings (200 trees, depth 6)
+   old test (0.5 deg areas):  ROC-AUC {'mean': 0.578, 'sd': 0.009}
+   fair test (1 deg areas):   ROC-AUC {'mean': 0.577, 'sd': 0.005}
+
+B. Nested tuning (fair test). This is the slow part...
+   split 0: ROC-AUC 0.607
+   split 1: ROC-AUC 0.608
+   split 2: ROC-AUC 0.612
+
+C. Final settings: same search on ALL rows (what gets installed)
+   chosen: {"params": {"max_depth": 4, "n_estimators": 100, "learning_rate": 0.02, "min_child_weight": 20, "subsample": 0.6, "colsample_bytree": 0.5, "reg_lambda": 10, "gamma": 0.5}, "monotone_rain": true, "ignore_unstable": true}
+
+============================================================================================
+(unseen areas, mean of 3 splits)             original v3        tuned v3
+roc_auc                                     0.577 ±0.005    0.609 ±0.003
+roc_auc_vs_nearby_same_day                  0.531 ±0.005    0.548 ±0.004
+roc_auc_vs_same_place_other_year            0.619 ±0.005    0.665 ±0.001
+false_alarm_at_70pct_recall                 0.605 ±0.007    0.542 ±0.001
+precision_at_70pct_recall                   0.377 ±0.003    0.403 ±0.001
+accuracy_at_70pct_recall                    0.500 ±0.004    0.541 ±0.001
+ROC-AUC on its own training rows                   1.000           0.679
+overfit gap (training - unseen)                    0.428           0.065
+Settings chosen per outer fold (stability check):
+  depth [3, 4, 4, 2, 2, 2, 4, 2, 4, 2, 2, 3, 3, 2, 4] | monotone 14 of 15 | ignore_unstable 14 of 15
+
+Tuned settings are better on unseen areas -> saved to D:\VS-Code projects\Terra-Alert\ai-module\v3\best_params_v3.json
+exit 0

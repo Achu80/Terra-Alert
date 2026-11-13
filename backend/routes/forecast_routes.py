@@ -186,7 +186,7 @@ def predict_7day():
                 processed = data_processor.prepare_model_input({**gee_data, **windows})
                 if not processed:
                     continue
-                prediction = active_model.predict(processed['features'])
+                prediction = active_model.predict(processed['features'], processed.get('raw_data'))
                 risk_range = None
 
             results.append({

@@ -8,7 +8,7 @@ import LeafletMap from '@/components/map/LeafletMap';
 import { predictionAPI } from '@/services/api';
 import { colors } from '@/theme/colors';
 import { HP_BOUNDS } from '@/constants/himachal';
-import { getRiskColor } from '@/utils/risk';
+import { getRiskColor, riskMessage } from '@/utils/risk';
 
 const LEVEL_COLORS = {
     CRITICAL: '#ef4444',
@@ -208,8 +208,14 @@ export default function MapScreen() {
                             </Text>
                             <Text style={styles.scoreMax}>/ 100 risk score</Text>
                         </View>
+                        {/* A warning sentence, not a "% confidence" that reads like a chance of a landslide */}
                         <Text style={styles.confidence}>
-                            {selectedDistrict.confidence == null ? 'Confidence unavailable' : `${Number(selectedDistrict.confidence) >= 1 ? Number(selectedDistrict.confidence).toFixed(0) : (Number(selectedDistrict.confidence) * 100).toFixed(0)}% model confidence`}
+                            {riskMessage({
+                                level: selectedDistrict.level,
+                                place: selectedDistrict.name,
+                                slope: Number(selectedDistrict.slope),
+                                rain30d: Number(selectedDistrict.rainfall_30d),
+                            })}
                         </Text>
                         <View style={styles.metrics}>
                             <Metric label="Elevation" value={`${formatNumber(selectedDistrict.elevation, 0)} m`} />
@@ -293,7 +299,7 @@ const styles = StyleSheet.create({
     scoreRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8, marginTop: 14 },
     score: { fontSize: 42, lineHeight: 48, fontWeight: '800', fontVariant: ['tabular-nums'] },
     scoreMax: { color: colors.textMuted, fontSize: 12 },
-    confidence: { color: colors.textMuted, fontSize: 11, marginBottom: 13 },
+    confidence: { color: colors.text, fontSize: 13, lineHeight: 18, marginBottom: 13 },
     metrics: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     metric: { width: '48%', minHeight: 58, padding: 9, borderRadius: 8, backgroundColor: '#ffffff08', borderWidth: 1, borderColor: colors.border },
     metricLabel: { color: colors.textMuted, fontSize: 10 },

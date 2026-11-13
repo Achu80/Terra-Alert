@@ -1,4 +1,6 @@
 import ee
+import json
+import os
 import time
 import requests
 from datetime import datetime, timedelta
@@ -7,8 +9,14 @@ from typing import Dict, Optional
 # Rain recipes. Each model is trained on one of these and must be fed the same one live:
 #   'chirps' - CHIRPS daily (v2). Accurate monthly totals but published ~3 weeks late.
 #   'imerg'  - NASA GPM IMERG half-hourly (v3). About 1 day late. Falls back to Open-Meteo if stale.
-IMERG_COLLECTIONS = ['NASA/GPM_L3/IMERG_V08', 'NASA/GPM_L3/IMERG_V07']  # V08 replaces V07 from ~late 2026
+# V07 first: it is what v3/v4 were trained on. V08 (not in Earth Engine yet as of 2026-11) is only a backup
+# until ai-module/v3/compare_rain_sources_v3.py shows it matches V07 - otherwise the model would silently get
+# rain on a scale it never learned the day NASA publishes V08.
+IMERG_COLLECTIONS = ['NASA/GPM_L3/IMERG_V07', 'NASA/GPM_L3/IMERG_V08']
 IMERG_MAX_AGE_DAYS = 3
+
+# One line per live feature fetch: which rain source was really used (see _log_rain_source)
+RAIN_SOURCE_LOG = os.path.join(os.path.dirname(__file__), '..', 'logs', 'rain_source_log.jsonl')
 RAIN_WINDOWS = (3, 7, 14, 30)
 _LATEST_CACHE_SECONDS = 3600
 
@@ -77,10 +85,20 @@ class GEEService:
             # Metadata (not model inputs): which rain source was used and how old its newest data is
             features['rain_source_used'] = rainfall_features.get('rain_source_used')
             features['rain_data_age_days'] = rainfall_features.get('rain_data_age_days')
-            
+            self._log_rain_source(lat, lon, end_date, rain_source, features)
+
+            # No rain data is NOT the same as no rain: 0 mm would make every place look safe. Callers treat
+            # None as "data unavailable" (district shows UNKNOWN, /predict returns an error) instead.
+            if features['rain_source_used'] == 'unavailable':
+                print("❌ No rain source available - refusing to predict with 0 mm rain")
+                return None
+
             # 2. TERRAIN DATA (SRTM) - elevation, slope, aspect
             print("Fetching terrain data...")
             terrain_features = self._get_terrain_features(region)
+            if terrain_features is None:
+                # Same idea: elevation 0 / slope 0 would trigger the plains rule and show LOW risk
+                return None
             features['elevation'] = terrain_features.get('elevation_mean', 0)
             features['slope'] = terrain_features.get('slope_mean', 0)
             features['aspect'] = terrain_features.get('aspect_mean', 0)
@@ -98,7 +116,7 @@ class GEEService:
             print("Fetching soil data...")
             soil_features = self._get_soil_features(region)
             features['soil_type'] = soil_features.get('soil_type_class', 0)
-            
+
             print(f"✓ Fetched {len(features)} features successfully")
             print(f"🔍 DEBUG - GEE Features:")
             for key, value in features.items():
@@ -175,6 +193,25 @@ class GEEService:
             }
     
     # ------------------------------------------------------------------
+    @staticmethod
+    def _log_rain_source(lat, lon, end_date, requested, features):
+        """Append which rain source a live fetch really used, so we can count fallbacks later
+        (summary: py -3.11 ai-module/v3/compare_rain_sources_v3.py --log-only). Never breaks a prediction."""
+        try:
+            os.makedirs(os.path.dirname(RAIN_SOURCE_LOG), exist_ok=True)
+            entry = {
+                'time': datetime.utcnow().isoformat(timespec='seconds'),
+                'lat': round(lat, 4), 'lon': round(lon, 4), 'end_date': end_date,
+                'requested': requested,
+                'used': features.get('rain_source_used'),
+                'age_days': features.get('rain_data_age_days'),
+                **{f'rainfall_{d}d': round(float(features.get(f'rainfall_{d}d') or 0), 2) for d in RAIN_WINDOWS},
+            }
+            with open(RAIN_SOURCE_LOG, 'a', encoding='utf-8') as f:
+                f.write(json.dumps(entry) + '\n')
+        except Exception as e:
+            print(f"⚠ Could not write rain source log: {e}")
+
     # IMERG rain (v3) + freshness helpers
     # ------------------------------------------------------------------
     def _latest_image_time(self, collection_name: str) -> Optional[datetime]:
@@ -199,6 +236,22 @@ class GEEService:
         end = datetime.strptime(end_date, '%Y-%m-%d')
         return max(0, (end - latest).days)
 
+    @staticmethod
+    def imerg_totals(collection_name: str, region, end_date: str) -> Dict:
+        """Rain totals (mm) from one IMERG collection for the 3/7/14/30 days before end_date (no fallback).
+        IMERG is half-hourly in mm/hr, so each image contributes mm/hr x 0.5 h."""
+        end = datetime.strptime(end_date, '%Y-%m-%d')
+        col = ee.ImageCollection(collection_name).select('precipitation')
+        bands = [
+            col.filterDate((end - timedelta(days=d)).strftime('%Y-%m-%d'), end_date)
+               .sum().multiply(0.5).rename(f'rainfall_{d}d')
+            for d in RAIN_WINDOWS
+        ]
+        values = ee.Image.cat(bands).reduceRegion(
+            reducer=ee.Reducer.mean(), geometry=region, scale=10000
+        ).getInfo()
+        return {f'rainfall_{d}d': float(values.get(f'rainfall_{d}d') or 0) for d in RAIN_WINDOWS}
+
     def _get_rainfall_imerg(self, region, lat: float, lon: float, end_date: str) -> Dict:
         """Rain totals (mm) for the 3/7/14/30 days before end_date from NASA GPM IMERG.
         IMERG is half-hourly in mm/hr, so each image contributes mm/hr x 0.5 h.
@@ -208,20 +261,10 @@ class GEEService:
             if age is None:
                 continue
             if age > IMERG_MAX_AGE_DAYS:
-                print(f"⚠ {name} is {age} days behind - using Open-Meteo rain instead")
-                break
+                print(f"⚠ {name} is {age} days behind - trying the next rain source")
+                continue
             try:
-                end = datetime.strptime(end_date, '%Y-%m-%d')
-                col = ee.ImageCollection(name).select('precipitation')
-                bands = [
-                    col.filterDate((end - timedelta(days=d)).strftime('%Y-%m-%d'), end_date)
-                       .sum().multiply(0.5).rename(f'rainfall_{d}d')
-                    for d in RAIN_WINDOWS
-                ]
-                values = ee.Image.cat(bands).reduceRegion(
-                    reducer=ee.Reducer.mean(), geometry=region, scale=10000
-                ).getInfo()
-                result = {f'rainfall_{d}d': float(values.get(f'rainfall_{d}d') or 0) for d in RAIN_WINDOWS}
+                result = self.imerg_totals(name, region, end_date)
                 result['rain_source_used'] = 'imerg_' + name.rsplit('_', 1)[-1].lower()
                 result['rain_data_age_days'] = age
                 return result
@@ -308,13 +351,7 @@ class GEEService:
             }
         except Exception as e:
             print(f"Error fetching terrain: {e}")
-            return {
-                'elevation_mean': 0,
-                'slope_mean': 0,
-                'slope_max': 0,
-                'aspect_mean': 0,
-                'curvature_mean': 0
-            }
+            return None  # caller stops: zeros here would look like flat sea-level land (LOW risk)
     
     def _get_vegetation_features(self, region, start_date: str, end_date: str) -> Dict:
         """Get vegetation indices from Sentinel-2"""

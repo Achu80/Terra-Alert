@@ -22,23 +22,24 @@ import json
 import os
 
 import numpy as np
-from sklearn.model_selection import GroupKFold
+from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import StandardScaler
 
-from v3_common import HERE, ROOT, feature_matrix, load_dataset, new_model
+from v3_common import HERE, ROOT, feature_matrix, load_best, load_dataset, v3_inputs, v3_model
 
 TARGET_RECALL = {'MODERATE': 0.70, 'HIGH': 0.40, 'CRITICAL': 0.15}
 THRESHOLDS_JSON = os.path.join(HERE, 'risk_thresholds_v3.json')
 BACKEND_META = os.path.join(ROOT, 'backend', 'ml', 'models', 'v3', 'meta.json')
 
 
-def out_of_fold_scores(X, y, groups):
-    """Every row scored by a model trained only on the OTHER 4 folds (other areas)."""
+def out_of_fold_scores(X, y, groups, best=None):
+    """Every row scored by a model trained only on the OTHER 4 folds (other ~100 km areas).
+    Uses the same settings as the installed model (best_params_v3.json from tune_v3.py, if present)."""
     p = np.zeros(len(y))
-    for train_idx, test_idx in GroupKFold(n_splits=5).split(X, y, groups=groups):
-        scaler = StandardScaler().fit(X.iloc[train_idx])
-        model = new_model(y[train_idx]).fit(scaler.transform(X.iloc[train_idx]), y[train_idx])
-        p[test_idx] = model.predict_proba(scaler.transform(X.iloc[test_idx]))[:, 1]
+    for tr, te in StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=0).split(X, y, groups):
+        scaler = StandardScaler().fit(v3_inputs(X.iloc[tr], best))
+        model = v3_model(y[tr], best).fit(scaler.transform(v3_inputs(X.iloc[tr], best)), y[tr])
+        p[te] = model.predict_proba(scaler.transform(X.iloc[te]))[:, 1]
     return p
 
 
@@ -65,7 +66,9 @@ def describe(y, p, cut):
 def main():
     df = load_dataset()
     X, y = feature_matrix(df, 'v3'), df.label.to_numpy()
-    p = out_of_fold_scores(X, y, df['group'])
+    best = load_best()
+    print('settings:', 'tuned (best_params_v3.json)' if best else 'original (200 trees, depth 6)')
+    p = out_of_fold_scores(X, y, df['group'], best)
 
     print(f'{len(y)} rows, {int(y.sum())} landslides\n')
     print('Old default cut-off 0.5:', describe(y, p, 0.5), '\n')

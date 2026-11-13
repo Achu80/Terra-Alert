@@ -1,34 +1,41 @@
 """
-Evaluate the TerraAlert V3 landslide model.
+Pass/fail checks for the installed TerraAlert v3 landslide model (the tuned one).
 
 Checks:
-  1. The saved model and scaler load and give sensible predictions.
-  2. Metrics on the training data (accuracy, precision, recall, ROC-AUC).
-  3. 5-fold spatial cross-validation (test areas are never seen in training).
-  4. Overfitting check: training score vs cross-validation score.
+  1. The data has the right shape and the saved model + scaler give valid 0-1 outputs.
+  2. Metrics on the training data (accuracy, precision, recall, ROC-AUC) at the app's alert level.
+  3. 5-fold spatial cross-validation with the SAME settings as the installed model (unseen ~100 km areas).
+  4. No overfitting: training score and unseen-area score stay close.
+  5. The alert level still catches about 70% of landslides on unseen areas.
+
+For graphs, confusion matrices and a paper-style report, run research_evaluation_v3.py instead.
 
 Run:  py -3.11 -m pytest ai-module/v3/test_model_evaluation.py -v -s
 """
+import json
 import os
 
 import joblib
 import numpy as np
 import pytest
 from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score
-from sklearn.model_selection import GroupKFold
+from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import StandardScaler
 
-from v3_common import FEATURES, HERE, feature_matrix, load_dataset, new_model
+from v3_common import FEATURES, HERE, feature_matrix, load_best, load_dataset, v3_inputs, v3_model
 
 MODEL_PATH = os.path.join(HERE, 'xgboost_model_v3.pkl')
 SCALER_PATH = os.path.join(HERE, 'scaler_v3.pkl')
+THRESHOLDS_PATH = os.path.join(HERE, 'risk_thresholds_v3.json')
 
-MIN_CV_ROC_AUC = 0.55   # must beat random guessing (0.5) with some margin
-MAX_OVERFIT_GAP = 0.50  # training AUC minus CV AUC; today it is about 0.41
+MIN_CV_ROC_AUC = 0.58    # must clearly beat random guessing (0.5); tuned v3 scores ~0.61
+MAX_OVERFIT_GAP = 0.15   # training AUC minus unseen-area AUC; tuned v3 ~0.07 (the untuned model was 0.43)
+TARGET_RECALL = 0.70     # the MODERATE level was chosen to catch 70% of landslides
 
 
-def score_report(y_true, probs):
-    preds = (probs >= 0.5).astype(int)
+def score_report(y_true, probs, cutoff):
+    """Grade the model when it raises an alert for every output >= cutoff."""
+    preds = (probs >= cutoff).astype(int)
     return {
         'accuracy': accuracy_score(y_true, preds),
         'precision': precision_score(y_true, preds, zero_division=0),
@@ -47,31 +54,39 @@ def data():
 
 @pytest.fixture(scope='module')
 def saved_model():
-    model = joblib.load(MODEL_PATH)
-    scaler = joblib.load(SCALER_PATH)
-    return model, scaler
+    return joblib.load(MODEL_PATH), joblib.load(SCALER_PATH)
 
 
 @pytest.fixture(scope='module')
-def train_scores(data, saved_model):
+def alert_cutoff():
+    """The model output where the app's MODERATE level (first alert level) starts."""
+    with open(THRESHOLDS_PATH, encoding='utf-8') as f:
+        return json.load(f)['thresholds']['MODERATE']
+
+
+@pytest.fixture(scope='module')
+def train_scores(data, saved_model, alert_cutoff):
     df, X, y = data
     model, scaler = saved_model
     probs = model.predict_proba(scaler.transform(X))[:, 1]
-    return score_report(y, probs)
+    return score_report(y, probs, alert_cutoff)
 
 
 @pytest.fixture(scope='module')
-def cv_scores(data):
+def cv_results(data, alert_cutoff):
+    """Out-of-fold scores: every row scored by a model that never saw its ~100 km block."""
     df, X, y = data
+    best = load_best()                       # the tuned settings the installed model uses
+    probs = np.zeros(len(y))
     fold_aucs = []
-    for train_idx, test_idx in GroupKFold(n_splits=5).split(X, y, groups=df['group']):
-        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
-        y_train, y_test = y[train_idx], y[test_idx]
+    folds = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=0)
+    for train_idx, test_idx in folds.split(X, y, groups=df['group']):
+        X_train, X_test = v3_inputs(X.iloc[train_idx], best), X.iloc[test_idx]
         scaler = StandardScaler().fit(X_train)
-        model = new_model(y_train).fit(scaler.transform(X_train), y_train)
-        probs = model.predict_proba(scaler.transform(X_test))[:, 1]
-        fold_aucs.append(roc_auc_score(y_test, probs))
-    return np.array(fold_aucs)
+        model = v3_model(y[train_idx], best).fit(scaler.transform(X_train), y[train_idx])
+        probs[test_idx] = model.predict_proba(scaler.transform(X_test))[:, 1]
+        fold_aucs.append(roc_auc_score(y[test_idx], probs[test_idx]))
+    return np.array(fold_aucs), score_report(y, probs, alert_cutoff)
 
 
 def test_dataset_shape(data):
@@ -90,20 +105,29 @@ def test_predictions_are_probabilities(data, saved_model):
 
 
 def test_training_metrics(train_scores):
-    print('\nTraining-data metrics:')
+    print('\nTraining-data metrics at the alert level:')
     for name, value in train_scores.items():
         print(f'  {name:9s} {value:.3f}')
     assert train_scores['roc_auc'] > 0.5
 
 
-def test_cross_validation(cv_scores):
-    print(f'\n5-fold spatial CV ROC-AUC per fold: {np.round(cv_scores, 3)}')
-    print(f'Mean: {cv_scores.mean():.3f}  (+/- {cv_scores.std():.3f})')
-    assert len(cv_scores) == 5
-    assert cv_scores.mean() > MIN_CV_ROC_AUC
+def test_cross_validation(cv_results):
+    fold_aucs, _ = cv_results
+    print(f'\n5-fold spatial CV ROC-AUC per fold: {np.round(fold_aucs, 3)}')
+    print(f'Mean: {fold_aucs.mean():.3f}  (+/- {fold_aucs.std():.3f})')
+    assert len(fold_aucs) == 5
+    assert fold_aucs.mean() > MIN_CV_ROC_AUC
 
 
-def test_overfitting(train_scores, cv_scores):
-    gap = train_scores['roc_auc'] - cv_scores.mean()
-    print(f'\nTraining ROC-AUC {train_scores["roc_auc"]:.3f} vs CV ROC-AUC {cv_scores.mean():.3f} -> gap {gap:.3f}')
+def test_overfitting(train_scores, cv_results):
+    fold_aucs, _ = cv_results
+    gap = train_scores['roc_auc'] - fold_aucs.mean()
+    print(f'\nTraining ROC-AUC {train_scores["roc_auc"]:.3f} vs CV ROC-AUC {fold_aucs.mean():.3f} -> gap {gap:.3f}')
     assert gap < MAX_OVERFIT_GAP
+
+
+def test_alert_level_catches_target_share(cv_results):
+    _, unseen = cv_results
+    print(f'\nUnseen areas at the alert level: recall {unseen["recall"]:.0%}, precision {unseen["precision"]:.0%}, '
+          f'accuracy {unseen["accuracy"]:.0%}')
+    assert unseen['recall'] == pytest.approx(TARGET_RECALL, abs=0.02)

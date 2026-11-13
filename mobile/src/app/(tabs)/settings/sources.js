@@ -5,11 +5,13 @@ import { SettingsRow, SettingsSection } from '@/components/settings/SettingsList
 import { statsAPI } from '@/services/api';
 import { colors, RISK_COLORS } from '@/theme/colors';
 
-// Real datasets used by backend/services/gee_service.py (Google Earth Engine collection IDs)
+// Real datasets used by backend/services/gee_service.py (Google Earth Engine collection IDs).
+// Each model is fed the data it was trained on: v3 / v4 use IMERG + MODIS, v2 uses CHIRPS + Sentinel-2.
 const SATELLITE = [
-    { icon: 'rainy', color: colors.info, title: 'CHIRPS Daily', subtitle: 'Rainfall - 3, 7, 14 and 30-day totals', value: 'UCSB-CHG' },
-    { icon: 'leaf', color: RISK_COLORS.Low, title: 'Sentinel-2 SR', subtitle: 'Vegetation (NDVI) and moisture (NDWI)', value: 'ESA' },
-    { icon: 'leaf-outline', color: '#4ade80', title: 'MODIS MOD13A2', subtitle: 'Vegetation backup when Sentinel-2 is cloudy', value: 'NASA' },
+    { icon: 'rainy', color: colors.info, title: 'NASA GPM IMERG V07', subtitle: 'Rainfall for v3 / v4 - 3, 7, 14 and 30-day totals', value: 'NASA' },
+    { icon: 'leaf', color: RISK_COLORS.Low, title: 'MODIS MOD09A1', subtitle: 'Vegetation (NDVI) and moisture (NDWI) for v3 / v4', value: 'NASA' },
+    { icon: 'rainy-outline', color: '#60a5fa', title: 'CHIRPS Daily', subtitle: 'Rainfall for v2', value: 'UCSB-CHG' },
+    { icon: 'leaf-outline', color: '#4ade80', title: 'Sentinel-2 SR + MODIS MOD13A2', subtitle: 'Vegetation for v2 (MODIS when cloudy)', value: 'ESA / NASA' },
     { icon: 'triangle', color: RISK_COLORS.High, title: 'SRTM 30 m', subtitle: 'Elevation, slope and aspect', value: 'USGS' },
     { icon: 'layers', color: '#a16207', title: 'OpenLandMap', subtitle: 'Soil texture class (USDA)', value: 'Soil' },
     { icon: 'people', color: '#f472b6', title: 'WorldPop 100 m', subtitle: 'Population density', value: 'WorldPop' },
@@ -17,7 +19,7 @@ const SATELLITE = [
 
 const SERVICES = [
     { icon: 'globe', color: colors.primary, title: 'Google Earth Engine', subtitle: 'Processes the satellite data on demand' },
-    { icon: 'partly-sunny', color: '#fbbf24', title: 'Open-Meteo', subtitle: '16-day rainfall forecast + seasonal outlook to 30 days' },
+    { icon: 'partly-sunny', color: '#fbbf24', title: 'Open-Meteo', subtitle: '16-day rainfall forecast, seasonal outlook to 30 days, and backup rain when IMERG is late (shown as low confidence)' },
     { icon: 'map', color: '#34d399', title: 'OpenStreetMap', subtitle: 'Maps, place search and hospital lookup' },
     { icon: 'sparkles', color: '#a78bfa', title: 'Google Gemini', subtitle: 'AI assistant' },
     { icon: 'server', color: '#3ecf8e', title: 'Supabase', subtitle: 'Stores every prediction' },

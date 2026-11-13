@@ -9,7 +9,15 @@ import { useAdmin } from '@/context/AdminContext';
 import { useAlerts } from '@/context/AlertContext';
 import { useSettings } from '@/context/SettingsContext';
 import { colors, RISK_COLORS } from '@/theme/colors';
-import { formatConfidence, getRiskColor, getRiskLevel, withAlpha } from '@/utils/risk';
+import {
+    describeWarnings,
+    formatConfidence,
+    getRiskColor,
+    getRiskLevel,
+    RISK_DISCLAIMER,
+    riskMessage,
+    withAlpha,
+} from '@/utils/risk';
 
 function MetricCard({ label, value, unit, color, icon }) {
     return (
@@ -53,6 +61,18 @@ export default function PredictionResults({ result, onNewAssessment }) {
         { label: 'Vegetation (NDVI)', value: values[3]?.toFixed(2), color: RISK_COLORS.Low, icon: 'leaf-outline' },
     ];
 
+    // A warning sentence instead of a bare number (indexes: 1 slope, 6 rainfall_3d, 9 rainfall_30d)
+    const message = riskMessage({
+        level,
+        place: location.name,
+        slope: values[1],
+        rain3d: values[6],
+        rain30d: values[9],
+        plains: prediction.model_type === 'Rule-Based (Plains)',
+    });
+    // Backend flags scores it should not fully trust (unusual inputs, backup rain source)
+    const doubts = prediction.low_confidence ? describeWarnings(prediction.warnings) : [];
+
     return (
         <View style={styles.wrap}>
             {/* Sections cascade in one after another */}
@@ -83,6 +103,7 @@ export default function PredictionResults({ result, onNewAssessment }) {
                     <Text style={styles.modelText}>
                         Model {result.model.version} · rain: {result.model.rain_source_used ?? 'unknown'}
                         {result.model.rain_data_age_days != null ? `, ${result.model.rain_data_age_days} day(s) old` : ''}
+                        {prediction.confidence != null ? ` · raw output ${formatConfidence(prediction.confidence)}` : ''}
                     </Text>
                     {result.model.rain_source_used === 'open-meteo' || (result.model.rain_data_age_days ?? 0) > 3 ? (
                         <Ionicons name="warning" size={14} color={RISK_COLORS.Moderate} />
@@ -98,13 +119,29 @@ export default function PredictionResults({ result, onNewAssessment }) {
             ) : null}
 
             <Card style={{ backgroundColor: withAlpha(color, 0.1), borderColor: withAlpha(color, 0.3) }}>
-                <SectionLabel>Risk Score</SectionLabel>
+                <SectionLabel>Landslide Risk</SectionLabel>
                 <View style={styles.scoreBox}>
                     <Text style={[styles.score, { color }]}>{prediction.score}</Text>
+                    <Text style={styles.scoreScale}>risk score out of 100</Text>
                     <View style={[styles.levelPill, { backgroundColor: withAlpha(color, 0.2) }]}>
                         <Text style={[styles.levelText, { color }]}>{level} RISK</Text>
                     </View>
-                    <Text style={styles.confidence}>Confidence: {formatConfidence(prediction.confidence)}</Text>
+                    {doubts.length ? (
+                        <View style={styles.doubtPill} accessibilityLabel="Low confidence score">
+                            <Ionicons name="help-circle-outline" size={14} color={RISK_COLORS.Moderate} />
+                            <Text style={styles.doubtPillText}>Low confidence</Text>
+                        </View>
+                    ) : null}
+                    <Text style={styles.message}>{message}</Text>
+                    {doubts.map((d) => (
+                        <Text key={d} style={styles.doubtText}>
+                            {d}
+                        </Text>
+                    ))}
+                </View>
+                <View style={styles.disclaimer}>
+                    <Ionicons name="information-circle-outline" size={14} color={colors.textMuted} />
+                    <Text style={styles.disclaimerText}>{RISK_DISCLAIMER}</Text>
                 </View>
             </Card>
 
@@ -202,7 +239,31 @@ const styles = StyleSheet.create({
     score: { fontSize: 64, fontWeight: '800' },
     levelPill: { paddingHorizontal: 20, paddingVertical: 6, borderRadius: 999, marginTop: 4 },
     levelText: { fontSize: 16, fontWeight: '700' },
-    confidence: { color: colors.textMuted, fontSize: 13, marginTop: 12 },
+    scoreScale: { color: colors.textMuted, fontSize: 12, marginTop: -4 },
+    message: { color: colors.text, fontSize: 15, lineHeight: 21, textAlign: 'center', marginTop: 14, paddingHorizontal: 4 },
+    doubtPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        marginTop: 8,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 999,
+        borderWidth: 1,
+        borderColor: withAlpha(RISK_COLORS.Moderate, 0.5),
+        backgroundColor: withAlpha(RISK_COLORS.Moderate, 0.12),
+    },
+    doubtPillText: { color: RISK_COLORS.Moderate, fontSize: 12, fontWeight: '700' },
+    doubtText: { color: RISK_COLORS.Moderate, fontSize: 12, lineHeight: 17, textAlign: 'center', marginTop: 6 },
+    disclaimer: {
+        flexDirection: 'row',
+        gap: 6,
+        marginTop: 12,
+        paddingTop: 10,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: colors.border,
+    },
+    disclaimerText: { color: colors.textMuted, fontSize: 11, lineHeight: 16, flex: 1 },
     metricGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
     metric: { flexGrow: 1, flexBasis: '45%', borderWidth: 1, borderRadius: 12, padding: 12 },
     metricHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },

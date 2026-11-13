@@ -23,10 +23,26 @@ const METRIC_LABELS = {
     himachal_holdout_roc_auc: 'ROC-AUC, Himachal held out',
     v2_spatial_cv_roc_auc: 'v2 on the same test: ROC-AUC, unseen areas',
     v2_himachal_holdout_roc_auc: 'v2 on the same test: ROC-AUC, Himachal',
+    // Tuned v3 (ai-module/v3/tune_v3.py) - all on ~100 km areas never seen in training
+    roc_auc: 'ROC-AUC, unseen areas',
+    roc_auc_vs_nearby_same_day: 'ROC-AUC vs nearby slope, same day',
+    roc_auc_vs_same_place_other_year: 'ROC-AUC vs same place, normal year',
+    recall_at_alert_level: 'Landslides caught at Moderate+',
+    precision_at_alert_level: 'Alerts that were real',
+    false_alarm_at_alert_level: 'Safe places wrongly alerted',
+    accuracy_at_alert_level: 'Accuracy at Moderate+',
+    overfit_gap: 'Overfitting gap (lower is better)',
+    original_v3_roc_auc_same_test: 'Untuned v3 on the same test: ROC-AUC',
 };
 
+// Shares are shown as %, scores (ROC-AUC, gaps) as decimals
+const PERCENT_KEYS = ['accuracy', 'recall', 'precision', 'false_alarm'];
 const formatMetric = (key, value) =>
-    value == null ? '–' : key.includes('accuracy') ? `${Math.round(value * 100)}%` : Number(value).toFixed(2);
+    value == null
+        ? '–'
+        : PERCENT_KEYS.some((k) => key.includes(k))
+          ? `${Math.round(value * 100)}%`
+          : Number(value).toFixed(2);
 
 /**
  * Admin: pick the landslide model every user's predictions use (backend: POST /api/admin/model).
@@ -97,7 +113,10 @@ export default function ModelSelector() {
                         <Ionicons name="rainy" size={14} color={colors.info} />
                         <Text style={styles.lineText}>Rain data: {RAIN_LABELS[m.rain_source] ?? m.rain_source}</Text>
                     </View>
-                    {Object.entries(m.metrics ?? {}).map(([key, value]) => (
+                    {/* Numbers only - text notes such as metrics.test (how it was tested) are not scores */}
+                    {Object.entries(m.metrics ?? {})
+                        .filter(([, value]) => typeof value === 'number')
+                        .map(([key, value]) => (
                         <View key={key} style={styles.metric}>
                             <Text style={styles.metricLabel}>{METRIC_LABELS[key] ?? key}</Text>
                             <Text style={styles.metricValue}>{formatMetric(key, value)}</Text>

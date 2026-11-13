@@ -6,34 +6,34 @@
     "CRITICAL": 0.15
   },
   "thresholds": {
-    "MODERATE": 0.2084,
-    "HIGH": 0.4029,
-    "CRITICAL": 0.6654
+    "MODERATE": 0.4681,
+    "HIGH": 0.5417,
+    "CRITICAL": 0.5972
   },
   "at_each_cutoff": {
     "MODERATE": {
-      "cutoff": 0.2084,
+      "cutoff": 0.4681,
       "recall": 0.701,
-      "precision": 0.398,
-      "false_alarm_rate": 0.553
+      "precision": 0.407,
+      "false_alarm_rate": 0.533
     },
     "HIGH": {
-      "cutoff": 0.4029,
+      "cutoff": 0.5417,
       "recall": 0.4,
-      "precision": 0.409,
-      "false_alarm_rate": 0.302
+      "precision": 0.45,
+      "false_alarm_rate": 0.255
     },
     "CRITICAL": {
-      "cutoff": 0.6654,
+      "cutoff": 0.5972,
       "recall": 0.15,
-      "precision": 0.461,
-      "false_alarm_rate": 0.092
+      "precision": 0.491,
+      "false_alarm_rate": 0.081
     }
   },
   "default_0_5": {
     "cutoff": 0.5,
-    "recall": 0.292,
-    "precision": 0.42,
-    "false_alarm_rate": 0.21
+    "recall": 0.58,
+    "precision": 0.428,
+    "false_alarm_rate": 0.404
   }
 }
