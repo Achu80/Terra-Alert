@@ -140,7 +140,7 @@ def get_landslide_forecast(lat: float, lon: float) -> list:
         if not processed:
             continue
 
-        prediction = active_model.predict(processed['features'])
+        prediction = active_model.predict(processed['features'], processed.get('raw_data'))
         results.append({
             'date': date,
             'day': i + 1,

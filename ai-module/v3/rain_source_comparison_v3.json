@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-11-13T13:02:39",
+  "live_log": null,
+  "history": {
+    "open_meteo_archive": {
+      "rainfall_3d": {
+        "n": 150,
+        "spearman": 0.689,
+        "total_ratio": 0.927,
+        "median_abs_diff_mm": 16.7
+      },
+      "rainfall_7d": {
+        "n": 150,
+        "spearman": 0.657,
+        "total_ratio": 1.075,
+        "median_abs_diff_mm": 31.2
+      },
+      "rainfall_14d": {
+        "n": 150,
+        "spearman": 0.671,
+        "total_ratio": 1.106,
+        "median_abs_diff_mm": 53.3
+      },
+      "rainfall_30d": {
+        "n": 150,
+        "spearman": 0.769,
+        "total_ratio": 1.083,
+        "median_abs_diff_mm": 64.9
+      }
+    }
+  },
+  "recent": {
+    "open_meteo_forecast_api": {
+      "rainfall_3d": {
+        "n": 56,
+        "spearman": 0.669,
+        "total_ratio": 0.506,
+        "median_abs_diff_mm": 0.9
+      },
+      "rainfall_7d": {
+        "n": 56,
+        "spearman": 0.734,
+        "total_ratio": 0.557,
+        "median_abs_diff_mm": 4.9
+      },
+      "rainfall_14d": {
+        "n": 56,
+        "spearman": 0.559,
+        "total_ratio": 0.45,
+        "median_abs_diff_mm": 27.1
+      },
+      "rainfall_30d": {
+        "n": 56,
+        "spearman": 0.414,
+        "total_ratio": 0.378,
+        "median_abs_diff_mm": 62.8
+      }
+    }
+  },
+  "impact": {
+    "open_meteo_archive": {
+      "n": 150,
+      "level_changed_pct": 55.3,
+      "alert_flipped_pct": 29.3,
+      "mean_index_shift": 4.5
+    }
+  }
+}

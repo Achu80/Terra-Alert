@@ -117,7 +117,23 @@ class ModelService:
             print(traceback.format_exc())
             self.model_loaded = False
     
-    def predict(self, features: List[float]) -> Dict:
+    def data_warnings(self, features: List[float], raw_data: Optional[Dict] = None) -> List[str]:
+        """Reasons not to fully trust a score. The model always returns a number; this says when that number is
+        a guess outside what it learned (meta['feature_ranges']) or built on different rain data than training."""
+        from utils.data_processor import DataProcessor
+        warnings = []
+        values = dict(zip(DataProcessor.FEATURE_ORDER, features))
+        for name, (lo, hi) in (self.meta.get('feature_ranges') or {}).items():
+            v = values.get(name)
+            if v is not None and (v < lo or v > hi):
+                warnings.append(f'outside_training_range:{name}={round(v, 2)} (trained on {lo}..{hi})')
+        expected = self.meta.get('expected_rain_source_used')
+        used = (raw_data or {}).get('rain_source_used')
+        if expected and used and used != expected:
+            warnings.append(f'rain_source_mismatch:{used} (trained on {expected})')
+        return warnings
+
+    def predict(self, features: List[float], raw_data: Optional[Dict] = None) -> Dict:
         """
     Make landslide prediction using XGBoost model
     
@@ -160,6 +176,8 @@ class ModelService:
                 },
                 'model_type': 'Rule-Based (Plains)',
                 'model_version': self.version,
+                'low_confidence': False,
+                'warnings': [],
                 'note': 'Low-risk plains area - outside mountainous prediction zone'
             }
         
@@ -201,6 +219,9 @@ class ModelService:
           else:
               prediction_class = int(self.model.predict(X_scaled)[0])  # v2: unchanged
         
+          warnings = self.data_warnings(features, raw_data)
+          if warnings:
+              print(f"⚠ Low confidence: {warnings}")
           return {
             'score': round(risk_score, 1),
             'level': risk_level,
@@ -211,7 +232,10 @@ class ModelService:
                 'landslide': round(float(proba[1]), 3)
             },
             'model_type': 'XGBoost',
-            'model_version': self.version
+            'model_version': self.version,
+            # New, additive fields: show a "low confidence" badge when warnings is not empty
+            'low_confidence': bool(warnings),
+            'warnings': warnings,
         }
         
         except Exception as e:

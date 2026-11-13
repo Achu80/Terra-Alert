@@ -168,7 +168,7 @@ def main():
                        'unstable rain-ratio inputs - steadier 7/14/30-day forecasts. IMERG rain, MODIS vegetation.',
         'rain_source': 'imerg',
         'veg_source': 'modis_sr',
-        'plains_rule': False,
+        'plains_rule': True,  # same data as v3: only 27 plains rows, so the model never learned flat land
         'trained_at': datetime.now().isoformat(timespec='seconds'),
         'training_rows': df.kind.value_counts().to_dict(),
         'metrics': {**metrics['v4'], 'v3_spatial_cv_roc_auc': metrics['v3']['spatial_cv_roc_auc'],

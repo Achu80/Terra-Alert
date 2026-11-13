@@ -117,7 +117,7 @@ def get_himachal_districts():
                     processed_data = data_processor.prepare_model_input(gee_data)
                     
                     # Get prediction
-                    prediction = active_model.predict(processed_data['features'])
+                    prediction = active_model.predict(processed_data['features'], gee_data)
 
                     # Build district data
                     return {
@@ -371,7 +371,7 @@ def predict():
             return jsonify({'error': 'Failed to process GEE data'}), 500
         
         # Step 3: Make prediction with ML model
-        prediction = active_model.predict(processed_data['features'])
+        prediction = active_model.predict(processed_data['features'], gee_data)
 
         # Step 3.5: Save prediction to Supabase (risk_history table)
         try:

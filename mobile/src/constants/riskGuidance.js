@@ -32,7 +32,7 @@ export const RISK_GUIDANCE = {
     },
     CRITICAL: {
         title: 'Act now',
-        summary: 'A landslide is likely. Move to safety and follow instructions from local authorities.',
+        summary: 'Landslide risk is very high. Move to safety and follow instructions from local authorities.',
         steps: [
             'Move away from slopes and out of any debris path immediately - go to stable, higher ground away from channels.',
             'Follow evacuation orders. Call 1077 (district) or 1070 (state) for disaster help.',

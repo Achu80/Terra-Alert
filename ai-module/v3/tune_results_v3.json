@@ -1,0 +1,328 @@
+{
+  "original_old_test": {
+    "roc_auc": {
+      "mean": 0.578,
+      "sd": 0.009
+    },
+    "roc_auc_vs_nearby_same_day": {
+      "mean": 0.536,
+      "sd": 0.006
+    },
+    "roc_auc_vs_same_place_other_year": {
+      "mean": 0.615,
+      "sd": 0.013
+    },
+    "false_alarm_at_70pct_recall": {
+      "mean": 0.585,
+      "sd": 0.022
+    },
+    "precision_at_70pct_recall": {
+      "mean": 0.385,
+      "sd": 0.009
+    },
+    "accuracy_at_70pct_recall": {
+      "mean": 0.513,
+      "sd": 0.014
+    }
+  },
+  "original_fair_test": {
+    "roc_auc": {
+      "mean": 0.577,
+      "sd": 0.005
+    },
+    "roc_auc_vs_nearby_same_day": {
+      "mean": 0.531,
+      "sd": 0.005
+    },
+    "roc_auc_vs_same_place_other_year": {
+      "mean": 0.619,
+      "sd": 0.005
+    },
+    "false_alarm_at_70pct_recall": {
+      "mean": 0.605,
+      "sd": 0.007
+    },
+    "precision_at_70pct_recall": {
+      "mean": 0.377,
+      "sd": 0.003
+    },
+    "accuracy_at_70pct_recall": {
+      "mean": 0.5,
+      "sd": 0.004
+    },
+    "overfit": {
+      "roc_auc": 0.572,
+      "roc_auc_vs_nearby_same_day": 0.526,
+      "roc_auc_vs_same_place_other_year": 0.614,
+      "false_alarm_at_70pct_recall": 0.61,
+      "precision_at_70pct_recall": 0.375,
+      "accuracy_at_70pct_recall": 0.497,
+      "roc_auc_on_training_rows": 1.0,
+      "overfit_gap": 0.428
+    }
+  },
+  "tuned_fair_test": {
+    "roc_auc": {
+      "mean": 0.609,
+      "sd": 0.003
+    },
+    "roc_auc_vs_nearby_same_day": {
+      "mean": 0.548,
+      "sd": 0.004
+    },
+    "roc_auc_vs_same_place_other_year": {
+      "mean": 0.665,
+      "sd": 0.001
+    },
+    "false_alarm_at_70pct_recall": {
+      "mean": 0.542,
+      "sd": 0.001
+    },
+    "precision_at_70pct_recall": {
+      "mean": 0.403,
+      "sd": 0.001
+    },
+    "accuracy_at_70pct_recall": {
+      "mean": 0.541,
+      "sd": 0.001
+    }
+  },
+  "final": {
+    "params": {
+      "max_depth": 4,
+      "n_estimators": 100,
+      "learning_rate": 0.02,
+      "min_child_weight": 20,
+      "subsample": 0.6,
+      "colsample_bytree": 0.5,
+      "reg_lambda": 10,
+      "gamma": 0.5
+    },
+    "monotone_rain": true,
+    "ignore_unstable": true
+  },
+  "final_check": {
+    "roc_auc": 0.615,
+    "roc_auc_vs_nearby_same_day": 0.542,
+    "roc_auc_vs_same_place_other_year": 0.681,
+    "false_alarm_at_70pct_recall": 0.539,
+    "precision_at_70pct_recall": 0.404,
+    "accuracy_at_70pct_recall": 0.543,
+    "roc_auc_on_training_rows": 0.679,
+    "overfit_gap": 0.065
+  },
+  "final_inner_auc": 0.615,
+  "chosen_per_fold": [
+    {
+      "params": {
+        "max_depth": 3,
+        "n_estimators": 200,
+        "learning_rate": 0.02,
+        "min_child_weight": 20,
+        "subsample": 1.0,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 10,
+        "gamma": 1
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 4,
+        "n_estimators": 100,
+        "learning_rate": 0.05,
+        "min_child_weight": 20,
+        "subsample": 0.8,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 10,
+        "gamma": 0.5
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 4,
+        "n_estimators": 300,
+        "learning_rate": 0.1,
+        "min_child_weight": 10,
+        "subsample": 1.0,
+        "colsample_bytree": 0.5,
+        "reg_lambda": 10,
+        "gamma": 1
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 2,
+        "n_estimators": 100,
+        "learning_rate": 0.1,
+        "min_child_weight": 5,
+        "subsample": 0.8,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 1,
+        "gamma": 0.5
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 2,
+        "n_estimators": 200,
+        "learning_rate": 0.02,
+        "min_child_weight": 20,
+        "subsample": 0.8,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 10,
+        "gamma": 0
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 2,
+        "n_estimators": 200,
+        "learning_rate": 0.02,
+        "min_child_weight": 20,
+        "subsample": 1.0,
+        "colsample_bytree": 0.5,
+        "reg_lambda": 3,
+        "gamma": 1
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 4,
+        "n_estimators": 300,
+        "learning_rate": 0.02,
+        "min_child_weight": 10,
+        "subsample": 0.6,
+        "colsample_bytree": 0.7,
+        "reg_lambda": 3,
+        "gamma": 0
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 2,
+        "n_estimators": 100,
+        "learning_rate": 0.05,
+        "min_child_weight": 10,
+        "subsample": 0.6,
+        "colsample_bytree": 0.7,
+        "reg_lambda": 1,
+        "gamma": 0.5
+      },
+      "monotone_rain": false,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 4,
+        "n_estimators": 300,
+        "learning_rate": 0.02,
+        "min_child_weight": 20,
+        "subsample": 0.6,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 1,
+        "gamma": 1
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 2,
+        "n_estimators": 100,
+        "learning_rate": 0.02,
+        "min_child_weight": 10,
+        "subsample": 0.6,
+        "colsample_bytree": 0.5,
+        "reg_lambda": 3,
+        "gamma": 1
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 2,
+        "n_estimators": 100,
+        "learning_rate": 0.05,
+        "min_child_weight": 10,
+        "subsample": 0.6,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 10,
+        "gamma": 0
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 3,
+        "n_estimators": 100,
+        "learning_rate": 0.1,
+        "min_child_weight": 3,
+        "subsample": 0.6,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 10,
+        "gamma": 0
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 3,
+        "n_estimators": 100,
+        "learning_rate": 0.02,
+        "min_child_weight": 10,
+        "subsample": 0.8,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 1,
+        "gamma": 0
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 2,
+        "n_estimators": 100,
+        "learning_rate": 0.1,
+        "min_child_weight": 3,
+        "subsample": 0.6,
+        "colsample_bytree": 0.7,
+        "reg_lambda": 3,
+        "gamma": 1
+      },
+      "monotone_rain": true,
+      "ignore_unstable": true
+    },
+    {
+      "params": {
+        "max_depth": 4,
+        "n_estimators": 300,
+        "learning_rate": 0.02,
+        "min_child_weight": 20,
+        "subsample": 0.6,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 1,
+        "gamma": 1
+      },
+      "monotone_rain": true,
+      "ignore_unstable": false
+    }
+  ],
+  "tuned_is_better": true
+}

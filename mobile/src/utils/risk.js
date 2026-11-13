@@ -37,3 +37,66 @@ export const withAlpha = (hex, alpha) =>
 
 // The model returns confidence as a percentage, older responses as a 0-1 fraction
 export const formatConfidence = (confidence) => `${(confidence >= 1 ? confidence : confidence * 100).toFixed(0)}%`;
+
+/*
+ * How results are worded to users.
+ * The score is a RISK WARNING, not a forecast that a landslide will happen: at MODERATE or higher the model
+ * catches about 7 in 10 past landslides, but most alerts do not end in one (ai-module/v3/V3_BEFORE_AFTER.pdf).
+ * So: "High landslide risk in Shimla today because of heavy rain. Stay alert." - never "A landslide will happen".
+ */
+export const RISK_DISCLAIMER =
+    'This is a risk warning based on recent rain and terrain, not a forecast that a landslide will happen. ' +
+    'Always follow official advisories (HPSDMA, IMD, district administration).';
+
+const LEVEL_WORDS = { LOW: 'Low', MODERATE: 'Moderate', HIGH: 'High', CRITICAL: 'Very high' };
+
+const ADVICE = {
+    LOW: 'No special action needed - keep an eye on the weather.',
+    MODERATE: 'Stay alert.',
+    HIGH: 'Be ready to move.',
+    CRITICAL: 'Move away from slopes and follow official advisories.',
+};
+
+const joinList = (items) => (items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`);
+
+/** The main things pushing the risk up (or keeping it down), in plain words. Missing values are skipped. */
+export function riskReasons({ level, rain3d, rain30d, slope }) {
+    const reasons = [];
+    if (rain3d >= 50) reasons.push(`heavy rain (${rain3d.toFixed(0)} mm in 3 days)`);
+    else if (rain3d >= 20) reasons.push(`recent rain (${rain3d.toFixed(0)} mm in 3 days)`);
+    if (rain30d >= 300) reasons.push(`a very wet month (${rain30d.toFixed(0)} mm in 30 days)`);
+    if (slope >= 25) reasons.push(`steep slopes (${slope.toFixed(0)}°)`);
+    if (!reasons.length && level === 'LOW' && Number.isFinite(rain3d) && rain3d < 10) reasons.push('little recent rain');
+    return reasons;
+}
+
+/**
+ * One warning sentence for a place, e.g.
+ * "High landslide risk in Shimla today, mainly because of heavy rain (85 mm in 3 days). Be ready to move."
+ * plains: true when the backend's plains rule answered (flat, low ground is always Low).
+ */
+export function riskMessage({ level: rawLevel, place, rain3d, rain30d, slope, plains = false }) {
+    const where = place ? ` in ${place}` : '';
+    const level = String(rawLevel ?? '').toUpperCase();
+    // UNKNOWN / ERROR: the backend refused to guess because satellite data was missing
+    if (!LEVEL_WORDS[level]) return `Risk${where} could not be checked right now - satellite data is unavailable. Try again later.`;
+    if (plains) return `Low landslide risk${where}: flat, low-lying ground. ${ADVICE.LOW}`;
+    const reasons = riskReasons({ level, rain3d, rain30d, slope });
+    const because = reasons.length ? `, mainly because of ${joinList(reasons)}` : '';
+    return `${LEVEL_WORDS[level]} landslide risk${where} today${because}. ${ADVICE[level]}`;
+}
+
+/** Backend `warnings` codes (see backend/services/model_service.py data_warnings) -> plain sentences, no repeats. */
+export function describeWarnings(warnings = []) {
+    const out = new Set();
+    for (const w of warnings) {
+        if (w.startsWith('rain_source_mismatch')) {
+            out.add('Recent rain data came from a backup source, so this score is less reliable than usual.');
+        } else if (w.startsWith('outside_training_range:rainfall')) {
+            out.add('Rainfall here is beyond anything the model was trained on - treat the score as a rough guide.');
+        } else if (w.startsWith('outside_training_range')) {
+            out.add('Conditions here are unusual for the model (e.g. elevation or slope) - treat the score as a rough guide.');
+        }
+    }
+    return [...out];
+}
