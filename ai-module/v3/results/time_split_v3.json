@@ -1,0 +1,19 @@
+{
+  "split_year": 2014,
+  "train_rows": 1126,
+  "test_rows": 484,
+  "train_landslides": 385,
+  "test_landslides": 167,
+  "alert_cutoff": 0.4681,
+  "roc_auc": 0.5998035474791741,
+  "accuracy": 0.5495867768595041,
+  "balanced_accuracy": 0.5725646498800506,
+  "recall": 0.6467065868263473,
+  "precision": 0.4044943820224719,
+  "false_alarm_rate": 0.501577287066246,
+  "true_positives": 108,
+  "false_negatives": 59,
+  "false_positives": 159,
+  "true_negatives": 158,
+  "spatial_test_roc_auc_for_comparison": 0.6125320196706939
+}

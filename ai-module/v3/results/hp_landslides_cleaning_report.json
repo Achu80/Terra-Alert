@@ -1,0 +1,29 @@
+{
+  "input_rows": 6539,
+  "dropped_bad_coordinates": 0,
+  "dropped_outside_himachal_box": 10,
+  "dropped_no_real_year": 6047,
+  "rows_with_full_day": 8,
+  "dropped_duplicates": 23,
+  "output_rows": 459,
+  "years_range": [
+    1970,
+    2023
+  ],
+  "rows_per_year_last_10": {
+    "2013": 13,
+    "2014": 47,
+    "2015": 93,
+    "2016": 12,
+    "2017": 38,
+    "2018": 43,
+    "2019": 2,
+    "2020": 2,
+    "2021": 3,
+    "2023": 53
+  },
+  "before_2014": 166,
+  "2014_2016": 152,
+  "2017_on": 141,
+  "rows_2015": 93
+}
