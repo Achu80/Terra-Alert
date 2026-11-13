@@ -1,0 +1,39 @@
+{
+  "method": "Cut-offs on out-of-fold v3 scores (5-fold spatial CV) chosen by target recall",
+  "target_recall": {
+    "MODERATE": 0.7,
+    "HIGH": 0.4,
+    "CRITICAL": 0.15
+  },
+  "thresholds": {
+    "MODERATE": 0.2084,
+    "HIGH": 0.4029,
+    "CRITICAL": 0.6654
+  },
+  "at_each_cutoff": {
+    "MODERATE": {
+      "cutoff": 0.2084,
+      "recall": 0.701,
+      "precision": 0.398,
+      "false_alarm_rate": 0.553
+    },
+    "HIGH": {
+      "cutoff": 0.4029,
+      "recall": 0.4,
+      "precision": 0.409,
+      "false_alarm_rate": 0.302
+    },
+    "CRITICAL": {
+      "cutoff": 0.6654,
+      "recall": 0.15,
+      "precision": 0.461,
+      "false_alarm_rate": 0.092
+    }
+  },
+  "default_0_5": {
+    "cutoff": 0.5,
+    "recall": 0.292,
+    "precision": 0.42,
+    "false_alarm_rate": 0.21
+  }
+}
