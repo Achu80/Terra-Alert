@@ -15,4 +15,4 @@ google-genai==2.20.0
 
 # Optional dependencies
 # Uncomment to enable SMS alerts
-# twilio>=8.0.0
+ twilio>=8.0.0

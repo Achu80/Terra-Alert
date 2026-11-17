@@ -625,3 +625,74 @@ class StatsRepository:
         except Exception as e:
             print(f"Error in get_total_predictions: {e}")
             return 0
+
+class SubscriberRepository:
+    """Repository for SMS alert subscribers (phone numbers + the place they want alerts for)"""
+
+    def __init__(self):
+        try:
+            if is_supabase_available():
+                self.supabase = get_supabase()
+            else:
+                self.supabase = None
+        except Exception as e:
+            print(f"Warning: Could not initialize Supabase in SubscriberRepository: {e}")
+            self.supabase = None
+
+    @staticmethod
+    def _location_key(lat: float, lon: float) -> str:
+        return f"{float(lat):.2f},{float(lon):.2f}"
+
+    def add(self, phone: str, lat: float, lon: float, name: Optional[str] = None) -> Dict:
+        """Subscribe a phone to a place. Subscribing again just re-activates it."""
+        if not self.supabase:
+            raise ConnectionError("Supabase not available")
+        row = {
+            'phone': phone,
+            'lat': float(lat),
+            'lon': float(lon),
+            'location_key': self._location_key(lat, lon),
+            'location_name': name,
+            'active': True,
+        }
+        result = self.supabase.table('subscribers').upsert(row, on_conflict='phone,location_key').execute()
+        return result.data[0] if result.data else row
+
+    def unsubscribe(self, phone: str) -> None:
+        """Stop all alerts for a phone number"""
+        if not self.supabase:
+            raise ConnectionError("Supabase not available")
+        self.supabase.table('subscribers').update({'active': False}).eq('phone', phone).execute()
+
+    def find_near(self, lat: float, lon: float, radius_km: float = 10.0) -> Optional[List[str]]:
+        """Phone numbers of active subscribers within radius_km of (lat, lon), one entry per phone.
+        Returns None if the database is unavailable (so callers can tell that apart from 'nobody')."""
+        if not self.supabase:
+            return None
+        import math
+        lat, lon = float(lat), float(lon)
+        # Cheap box filter in the database first, exact distance below
+        dlat = radius_km / 111.0
+        dlon = radius_km / (111.0 * max(math.cos(math.radians(lat)), 0.01))
+        try:
+            rows = self.supabase.table('subscribers')\
+                .select('phone,lat,lon')\
+                .eq('active', True)\
+                .gte('lat', lat - dlat).lte('lat', lat + dlat)\
+                .gte('lon', lon - dlon).lte('lon', lon + dlon)\
+                .execute().data or []
+        except Exception as e:
+            print(f"Error in find_near: {e}")
+            return None
+
+        def km(a_lat, a_lon, b_lat, b_lon):
+            p = math.pi / 180
+            h = (math.sin((b_lat - a_lat) * p / 2) ** 2
+                 + math.cos(a_lat * p) * math.cos(b_lat * p) * math.sin((b_lon - a_lon) * p / 2) ** 2)
+            return 12742 * math.asin(math.sqrt(h))
+
+        phones = []
+        for r in rows:
+            if km(lat, lon, r['lat'], r['lon']) <= radius_km and r['phone'] not in phones:
+                phones.append(r['phone'])
+        return phones
