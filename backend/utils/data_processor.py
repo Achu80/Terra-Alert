@@ -85,11 +85,8 @@ class DataProcessor:
         rainfall_30d = gee_data.get('rainfall_30d', 0)
         derived['rainfall_intensity'] = rainfall_30d / 30 if rainfall_30d else 0
 
-        rainfall_3d = gee_data.get('rainfall_3d', 0)
-        if rainfall_30d > 0:
-            derived['rainfall_acceleration'] = (rainfall_3d / 3) / (rainfall_30d / 30)
-        else:
-            derived['rainfall_acceleration'] = 0
+        # rainfall_acceleration is NOT repeated here: the model's value (same formula as v2 training)
+        # is in _engineer_features. A second formula under the same name confused the output.
 
         slope = gee_data.get('slope', 0)
         if slope < 15:
