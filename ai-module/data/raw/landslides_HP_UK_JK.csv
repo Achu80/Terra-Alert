@@ -1,0 +1,715 @@
+event_id,date,latitude,longitude,type,trigger,location_accuracy,state,nearest_place,fatalities,source
+14439,1990-01-29,29.99311,78.33044,complex,other,1km,Uttarakhand,Rishikesh,,NASA GLC/COOLR
+35,2007-03-12,34.0935,74.9112,landslide,rain,50km,Jammu and Kashmir,Pampur,2,NASA GLC/COOLR
+37,2007-03-19,33.8778,74.3333,landslide,rain,25km,Jammu and Kashmir,Rajpur,2,NASA GLC/COOLR
+43,2007-03-23,33.9659,74.3313,landslide,downpour,50km,Jammu and Kashmir,Gulmarg,10,NASA GLC/COOLR
+73,2007-05-08,33.242,75.231,landslide,rain,50km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+111,2007-07-02,33.24431,75.22742,landslide,downpour,25km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+146,2007-07-30,30.733,78.439,landslide,downpour,50km,Uttarakhand,Uttarkashi,2,NASA GLC/COOLR
+149,2007-07-30,30.557,79.56,landslide,downpour,50km,Uttarakhand,Joshimath,,NASA GLC/COOLR
+150,2007-07-30,30.4,79.349,landslide,downpour,50km,Uttarakhand,Langsu,,NASA GLC/COOLR
+157,2007-08-06,33.2451,75.2257,landslide,rain,25km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+173,2007-08-11,30.0702,78.3027,landslide,rain,unknown,Uttarakhand,Rishikesh,,NASA GLC/COOLR
+177,2007-08-12,32.7334,77.5914,landslide,rain,unknown,Himachal Pradesh,Malung,11,NASA GLC/COOLR
+178,2007-08-12,32.0985,76.2665,landslide,rain,25km,Himachal Pradesh,Kangra,2,NASA GLC/COOLR
+234,2007-09-05,33.1662,75.3098,landslide,rain,50km,Jammu and Kashmir,Doda,,NASA GLC/COOLR
+237,2007-09-06,29.5833,80.2167,landslide,rain,25km,Uttarakhand,Pithoragarh,,NASA GLC/COOLR
+410,2008-01-06,33.1517,75.5464,landslide,rain,25km,Jammu and Kashmir,Doda,1,NASA GLC/COOLR
+416,2008-01-07,33.4341,75.1923,landslide,rain,25km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+419,2008-01-09,33.23738,75.24528,landslide,rain,25km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+428,2008-01-16,33.2537,75.2006,landslide,snowfall_snowmelt,50km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+443,2008-02-03,33.33281,75.2132,landslide,downpour,5km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+452,2008-02-13,33.2418,75.242,landslide,rain,10km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+481,2008-03-17,32.2862,77.1613,landslide,snowfall_snowmelt,25km,Himachal Pradesh,Chandra,25,NASA GLC/COOLR
+488,2008-03-30,34.219,77.2665,landslide,rain,50km,Jammu and Kashmir,Machakka,2,NASA GLC/COOLR
+492,2008-04-05,33.9337,74.9985,landslide,rain,50km,Jammu and Kashmir,Awantipura,,NASA GLC/COOLR
+516,2008-05-01,33.1463,75.7454,complex,unknown,25km,Jammu and Kashmir,Khandhot,12,NASA GLC/COOLR
+523,2008-05-05,33.9513,74.9845,landslide,downpour,50km,Jammu and Kashmir,Awantipura,,NASA GLC/COOLR
+568,2008-06-03,31.2077,77.193,landslide,rain,25km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+588,2008-06-15,32.5659,75.0944,landslide,rain,50km,Jammu and Kashmir,Chhanni,,NASA GLC/COOLR
+592,2008-06-18,32.3712,77.2466,landslide,rain,25km,Himachal Pradesh,Chandra,,NASA GLC/COOLR
+653,2008-07-18,29.33,80.1,landslide,rain,5km,Uttarakhand,Tanakpur,14,NASA GLC/COOLR
+697,2008-08-08,31.13,77.09,landslide,rain,25km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+715,2008-08-14,31,77.12,complex,monsoon,unknown,Himachal Pradesh,Gannja,,NASA GLC/COOLR
+717,2008-08-15,33,74.9277,landslide,downpour,25km,Jammu and Kashmir,Riasi,,NASA GLC/COOLR
+725,2008-08-17,31.1,77.16,landslide,rain,25km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+796,2008-09-19,30.56,77.3,landslide,downpour,10km,Himachal Pradesh,Nahan,6,NASA GLC/COOLR
+797,2008-09-19,31.1,77.1645,landslide,downpour,10km,Himachal Pradesh,Simla,38,NASA GLC/COOLR
+798,2008-09-19,31.587,78.315,landslide,downpour,50km,Himachal Pradesh,Oling,,NASA GLC/COOLR
+858,2008-10-22,33.6549,74.6326,landslide,downpour,50km,Jammu and Kashmir,Sokh Sarul,2,NASA GLC/COOLR
+940,2008-12-20,33.245,75.247,landslide,rain,25km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+942,2008-12-21,30.895,77.089,rock_fall,unknown,25km,Himachal Pradesh,Gannja,1,NASA GLC/COOLR
+1072,2009-08-08,29.5885,80.2098,landslide,downpour,10km,Uttarakhand,Pithoragarh,15,NASA GLC/COOLR
+1097,2009-08-17,29.4085,80.1327,landslide,continuous_rain,25km,Uttarakhand,Pithoragarh,0,NASA GLC/COOLR
+1130,2009-09-01,29.7036,78.5658,landslide,downpour,5km,Uttarakhand,Kotdwara,3,NASA GLC/COOLR
+1134,2009-09-03,32.351,77.2234,landslide,rain,10km,Himachal Pradesh,Chandra,,NASA GLC/COOLR
+1149,2009-09-10,31.5494,76.9001,landslide,downpour,5km,Himachal Pradesh,Sundarngar,,NASA GLC/COOLR
+1153,2009-09-10,31.8833,78.6167,landslide,downpour,5km,Himachal Pradesh,Khab,,NASA GLC/COOLR
+1154,2009-09-10,32.4035,77.5796,landslide,downpour,5km,Himachal Pradesh,Chandra,,NASA GLC/COOLR
+1157,2009-09-13,31.1032,77.1625,landslide,downpour,5km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+1384,2010-01-03,33.0289,74.9489,landslide,downpour,5km,Jammu and Kashmir,Riasi,0,NASA GLC/COOLR
+1475,2010-02-06,33.1595,75.8011,landslide,downpour,25km,Jammu and Kashmir,Shandero,,NASA GLC/COOLR
+1487,2010-02-08,34.0876,74.0225,landslide,downpour,10km,Jammu and Kashmir,Uri,1,NASA GLC/COOLR
+1498,2010-02-10,34.151,74.1213,landslide,rain,25km,Jammu and Kashmir,Jhelum,0,NASA GLC/COOLR
+1521,2010-02-23,30.38069,78.4705,landslide,downpour,25km,Uttarakhand,Chham,2,NASA GLC/COOLR
+1526,2010-02-27,33.0097,74.9402,landslide,downpour,5km,Jammu and Kashmir,Riasi,2,NASA GLC/COOLR
+1768,2010-04-20,34.38663,76.34159,landslide,downpour,unknown,Jammu and Kashmir,Goma,0,NASA GLC/COOLR
+1769,2010-04-20,34.38667,76.34149,landslide,downpour,unknown,Jammu and Kashmir,Goma,0,NASA GLC/COOLR
+1871,2010-05-17,34.3951,75.6233,landslide,downpour,50km,Jammu and Kashmir,Matayan,0,NASA GLC/COOLR
+1901,2010-05-25,34.09,74.0256,landslide,downpour,25km,Jammu and Kashmir,Uri,0,NASA GLC/COOLR
+1908,2010-05-27,34.5628,77.6001,landslide,rain,50km,Jammu and Kashmir,Sumur,0,NASA GLC/COOLR
+1946,2010-06-05,34.0901,74.0256,landslide,downpour,25km,Jammu and Kashmir,Uri,0,NASA GLC/COOLR
+1962,2010-06-09,31.09907,77.17236,landslide,downpour,unknown,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+2040,2010-07-06,30.638,78.3297,landslide,downpour,25km,Uttarakhand,Chham,0,NASA GLC/COOLR
+2041,2010-07-06,30.2485,78.8847,landslide,downpour,10km,Uttarakhand,Srinagar,0,NASA GLC/COOLR
+2046,2010-07-07,32.3733,77.2498,landslide,downpour,25km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+2047,2010-07-07,32.219,78.072,landslide,downpour,50km,Himachal Pradesh,Luling,0,NASA GLC/COOLR
+2048,2010-07-07,32.6598,76.853,landslide,downpour,25km,Himachal Pradesh,Gushai,0,NASA GLC/COOLR
+2049,2010-07-07,31.5041,77.9521,landslide,downpour,50km,Himachal Pradesh,Sarahan,0,NASA GLC/COOLR
+2050,2010-07-07,31.645,78.4354,landslide,downpour,25km,Himachal Pradesh,Rangbar Thachang,0,NASA GLC/COOLR
+2051,2010-07-07,31.1011,77.1793,landslide,downpour,5km,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+2056,2010-07-11,32.304,77.2106,landslide,downpour,10km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+2091,2010-07-17,30.6358,77.5435,landslide,downpour,50km,Himachal Pradesh,Nahan,0,NASA GLC/COOLR
+2103,2010-07-20,29.9862,78.6115,landslide,downpour,50km,Uttarakhand,Kandi,0,NASA GLC/COOLR
+2104,2010-07-20,29.36,80.126,landslide,downpour,50km,Uttarakhand,Pithoragarh,0,NASA GLC/COOLR
+2105,2010-07-20,29.3576,79.5519,landslide,downpour,10km,Uttarakhand,Nainital,1,NASA GLC/COOLR
+2120,2010-07-22,29.6095,79.6628,landslide,downpour,10km,Uttarakhand,Almora,1,NASA GLC/COOLR
+2118,2010-07-22,33.3893,75.203,landslide,downpour,10km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+2135,2010-07-25,32.2067,76.3641,landslide,downpour,10km,Himachal Pradesh,Dharmsala,0,NASA GLC/COOLR
+2136,2010-07-25,30.904,77.0969,landslide,downpour,25km,Himachal Pradesh,Gannja,0,NASA GLC/COOLR
+2137,2010-07-25,30.5589,77.2889,landslide,downpour,5km,Himachal Pradesh,Nahan,0,NASA GLC/COOLR
+2139,2010-07-25,31.1054,77.1727,landslide,downpour,5km,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+2138,2010-07-25,31.0931,77.1675,landslide,downpour,5km,Himachal Pradesh,Simla,2,NASA GLC/COOLR
+2161,2010-07-29,30.7467,78.4517,landslide,downpour,10km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+2162,2010-07-29,30.4054,79.3426,landslide,downpour,10km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+2183,2010-07-31,31.0655,77.1325,landslide,downpour,10km,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+2198,2010-08-04,32.7571,77.4138,landslide,downpour,10km,Himachal Pradesh,Malung,0,NASA GLC/COOLR
+2202,2010-08-05,30.4068,79.3351,landslide,downpour,25km,Uttarakhand,Langsu,5,NASA GLC/COOLR
+2208,2010-08-06,34.2116,77.3504,landslide,downpour,5km,Jammu and Kashmir,Machakka,182,NASA GLC/COOLR
+2206,2010-08-06,34.1416,77.4871,landslide,downpour,50km,Jammu and Kashmir,Leh,234,NASA GLC/COOLR
+2207,2010-08-06,34.1481,77.6538,landslide,downpour,5km,Jammu and Kashmir,Leh,11,NASA GLC/COOLR
+2209,2010-08-06,34.208,77.5101,landslide,downpour,5km,Jammu and Kashmir,Leh,0,NASA GLC/COOLR
+2210,2010-08-06,34.1619,77.5528,landslide,downpour,5km,Jammu and Kashmir,Leh,0,NASA GLC/COOLR
+2211,2010-08-06,34.3061,77.3265,landslide,downpour,5km,Jammu and Kashmir,Ladakh Range,0,NASA GLC/COOLR
+2212,2010-08-06,34.1482,77.5971,landslide,downpour,5km,Jammu and Kashmir,Leh,0,NASA GLC/COOLR
+2213,2010-08-06,34.1114,77.5874,mudslide,downpour,5km,Jammu and Kashmir,Leh,0,NASA GLC/COOLR
+2215,2010-08-06,32.371,77.2468,landslide,downpour,25km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+2227,2010-08-09,30.6463,79.5306,landslide,downpour,50km,Uttarakhand,Joshimath,0,NASA GLC/COOLR
+2228,2010-08-09,30.6785,78.3475,landslide,downpour,25km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+2229,2010-08-09,30.5151,78.3684,landslide,downpour,50km,Uttarakhand,Chham,0,NASA GLC/COOLR
+2226,2010-08-09,33.334,75.7627,landslide,downpour,5km,Jammu and Kashmir,Ariz,1,NASA GLC/COOLR
+2234,2010-08-11,31.958,77.1104,landslide,downpour,10km,Himachal Pradesh,Kulu,0,NASA GLC/COOLR
+2241,2010-08-13,30.802,78.61786,landslide,downpour,5km,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+2242,2010-08-13,30.8522,76.991,landslide,rain,5km,Himachal Pradesh,Kalka,0,NASA GLC/COOLR
+2246,2010-08-14,30.9012,77.0958,landslide,downpour,5km,Himachal Pradesh,Gannja,2,NASA GLC/COOLR
+2257,2010-08-16,30.7284,79.4971,landslide,downpour,25km,Uttarakhand,Saraswati,0,NASA GLC/COOLR
+2268,2010-08-18,30.0134,79.9261,complex,downpour,10km,Uttarakhand,Bageshwar,18,NASA GLC/COOLR
+2290,2010-08-20,30.6509,79.0264,landslide,downpour,5km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+2291,2010-08-20,30.966,78.4151,landslide,downpour,10km,Uttarakhand,Phetari,0,NASA GLC/COOLR
+2292,2010-08-20,30.8183,78.6186,landslide,downpour,5km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+2293,2010-08-20,30.7221,78.6437,landslide,downpour,50km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+2294,2010-08-20,30.3846,78.8371,landslide,downpour,unknown,Uttarakhand,Srinagar,0,NASA GLC/COOLR
+2305,2010-08-21,31.5304,77.7755,landslide,downpour,25km,Himachal Pradesh,Sarahan,0,NASA GLC/COOLR
+2309,2010-08-22,30.4238,79.6724,landslide,downpour,25km,Uttarakhand,Joshimath,0,NASA GLC/COOLR
+2340,2010-08-26,32.7029,75.9568,landslide,downpour,25km,Himachal Pradesh,Shaini,0,NASA GLC/COOLR
+2339,2010-08-26,30.365,78.0641,landslide,downpour,50km,Uttarakhand,Dehra Dun,0,NASA GLC/COOLR
+2378,2010-09-03,30.135,78.3896,landslide,downpour,5km,Uttarakhand,Rishikesh,0,NASA GLC/COOLR
+2379,2010-09-03,30.2851,78.9829,landslide,downpour,10km,Uttarakhand,Srinagar,0,NASA GLC/COOLR
+2380,2010-09-03,30.4008,79.0278,landslide,downpour,5km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+2389,2010-09-04,30.5004,79.3888,landslide,downpour,50km,Uttarakhand,Joshimath,0,NASA GLC/COOLR
+2390,2010-09-04,30.796,78.623,landslide,downpour,50km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+2391,2010-09-04,30.8987,78.3399,landslide,downpour,25km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+2397,2010-09-06,32.0987,77.1495,landslide,downpour,25km,Himachal Pradesh,Shirir,0,NASA GLC/COOLR
+2416,2010-09-12,30.7333,78.4403,landslide,downpour,5km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+2427,2010-09-14,32.3109,77.2195,landslide,downpour,10km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+2432,2010-09-15,31.4135,77.895,landslide,downpour,50km,Himachal Pradesh,Sarahan,0,NASA GLC/COOLR
+2440,2010-09-17,30.75402,79.4997,landslide,downpour,50km,Uttarakhand,Saraswati,,NASA GLC/COOLR
+2443,2010-09-18,29.6042,79.5343,landslide,downpour,50km,Uttarakhand,Almora,24,NASA GLC/COOLR
+2444,2010-09-18,29.29559,79.54043,landslide,downpour,50km,Uttarakhand,Haldwani,4,NASA GLC/COOLR
+2445,2010-09-18,30.1454,78.6007,landslide,downpour,10km,Uttarakhand,Alaknanda,0,NASA GLC/COOLR
+2455,2010-09-19,30.1035,78.4265,landslide,downpour,10km,Uttarakhand,Rishikesh,0,NASA GLC/COOLR
+2456,2010-09-19,30.7991,79.4356,landslide,downpour,25km,Uttarakhand,Saraswati,0,NASA GLC/COOLR
+2457,2010-09-19,31.563,77.9796,rock_fall,downpour,5km,Himachal Pradesh,Sarahan,1,NASA GLC/COOLR
+2458,2010-09-19,30.9015,78.7756,landslide,downpour,25km,Uttarakhand,Purali,0,NASA GLC/COOLR
+2459,2010-09-19,29.5477,79.3211,landslide,downpour,50km,Uttarakhand,Suni,0,NASA GLC/COOLR
+2460,2010-09-19,31.9843,77.1889,landslide,downpour,50km,Himachal Pradesh,Kulu,0,NASA GLC/COOLR
+2461,2010-09-19,31.4582,78.2114,landslide,downpour,5km,Himachal Pradesh,Oling,0,NASA GLC/COOLR
+2462,2010-09-19,30.9086,77.1103,landslide,downpour,5km,Himachal Pradesh,Gannja,0,NASA GLC/COOLR
+2463,2010-09-19,31.1191,77.5092,landslide,downpour,25km,Himachal Pradesh,Saura,0,NASA GLC/COOLR
+2464,2010-09-19,30.9544,77.5063,landslide,downpour,25km,Himachal Pradesh,Silori,0,NASA GLC/COOLR
+2465,2010-09-19,31.4161,77.4153,landslide,downpour,25km,Himachal Pradesh,Rampur,0,NASA GLC/COOLR
+2466,2010-09-19,30.8741,76.9576,landslide,downpour,5km,Himachal Pradesh,Kalka,0,NASA GLC/COOLR
+2467,2010-09-19,30.7198,77.1695,landslide,downpour,25km,Himachal Pradesh,Nahan,0,NASA GLC/COOLR
+2468,2010-09-19,30.9035,77.0965,landslide,downpour,25km,Himachal Pradesh,Gannja,0,NASA GLC/COOLR
+2469,2010-09-19,30.9009,77.4668,landslide,downpour,25km,Himachal Pradesh,Silori,0,NASA GLC/COOLR
+2470,2010-09-19,30.4326,78.0767,landslide,downpour,5km,Uttarakhand,Mussorie,0,NASA GLC/COOLR
+2471,2010-09-19,29.7911,80.058,landslide,downpour,50km,Uttarakhand,Nachani,0,NASA GLC/COOLR
+2453,2010-09-19,29.6131,79.494,landslide,downpour,50km,Uttarakhand,Almora,0,NASA GLC/COOLR
+2454,2010-09-19,30.9013,79.5322,landslide,downpour,10km,Uttarakhand,Saraswati,2,NASA GLC/COOLR
+2475,2010-09-20,31.1581,77.7155,landslide,downpour,10km,Himachal Pradesh,Saura,0,NASA GLC/COOLR
+2476,2010-09-20,29.33764,79.48354,landslide,downpour,10km,Uttarakhand,Nainital,0,NASA GLC/COOLR
+2478,2010-09-20,30.7332,78.4401,landslide,downpour,25km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+2479,2010-09-20,31.5699,78.2844,landslide,downpour,5km,Himachal Pradesh,Oling,0,NASA GLC/COOLR
+2480,2010-09-20,31.944,77.1179,landslide,downpour,5km,Himachal Pradesh,Kulu,0,NASA GLC/COOLR
+2477,2010-09-21,31.1838,76.9907,landslide,downpour,5km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+2488,2010-09-22,31.0215,77.1038,landslide,downpour,5km,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+2492,2010-09-23,33.32823,75.20419,landslide,downpour,25km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+2502,2010-09-25,33.241,75.2382,landslide,downpour,25km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+2538,2010-10-03,30.9141,76.818,landslide,continuous_rain,25km,Himachal Pradesh,Kalka,0,NASA GLC/COOLR
+2546,2010-10-04,30.9546,77.1792,landslide,downpour,25km,Himachal Pradesh,Gannja,0,NASA GLC/COOLR
+2594,2010-10-12,33.1847,75.8062,landslide,downpour,25km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+2596,2010-10-15,31.43714,78.23569,landslide,rain,5km,Himachal Pradesh,Oling,,NASA GLC/COOLR
+2645,2010-10-22,34.0887,74.0227,landslide,downpour,25km,Jammu and Kashmir,Uri,3,NASA GLC/COOLR
+2648,2010-10-22,33.0107,74.9397,landslide,downpour,5km,Jammu and Kashmir,Riasi,1,NASA GLC/COOLR
+3097,2011-02-07,33.35407,75.17241,landslide,downpour,25km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+3114,2011-02-13,33.1804,75.8101,landslide,snowfall_snowmelt,5km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+3115,2011-02-13,33.3037,75.1827,landslide,snowfall_snowmelt,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+3116,2011-02-13,33.33876,75.19211,landslide,rain,25km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+3117,2011-02-14,33.0165,74.9437,landslide,downpour,5km,Jammu and Kashmir,Riasi,0,NASA GLC/COOLR
+3113,2011-02-14,33.577,74.1872,landslide,downpour,25km,Jammu and Kashmir,Rajauri,0,NASA GLC/COOLR
+3127,2011-02-16,33.3308,75.1774,landslide,downpour,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+3128,2011-02-16,33.2609,75.244,landslide,downpour,25km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+3141,2011-02-23,30.4749,79.2293,landslide,downpour,50km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+3143,2011-02-24,33.3307,75.1772,landslide,downpour,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+3146,2011-02-25,32.18686,77.1766,rock_fall,continuous_rain,25km,Himachal Pradesh,Shirir,0,NASA GLC/COOLR
+3159,2011-03-01,33.2477,75.1919,landslide,downpour,50km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+3171,2011-03-04,33.2257,75.6695,landslide,downpour,25km,Jammu and Kashmir,Khandhot,1,NASA GLC/COOLR
+3174,2011-03-05,32.0996,77.1586,landslide,downpour,25km,Himachal Pradesh,Shirir,0,NASA GLC/COOLR
+3250,2011-03-19,33.3308,75.1773,landslide,downpour,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+3251,2011-03-19,33.33903,75.19169,landslide,downpour,25km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+3252,2011-03-19,33.2466,75.1611,landslide,downpour,50km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+3342,2011-04-06,34.2101,74.3445,landslide,downpour,25km,Jammu and Kashmir,Baramula,0,NASA GLC/COOLR
+3374,2011-04-17,34.1802,74.2718,landslide,downpour,10km,Jammu and Kashmir,Baramula,0,NASA GLC/COOLR
+3375,2011-04-17,33.2599,75.8886,landslide,downpour,unknown,Jammu and Kashmir,Shandero,1,NASA GLC/COOLR
+3376,2011-04-17,33.1488,75.5526,landslide,downpour,unknown,Jammu and Kashmir,Doda,5,NASA GLC/COOLR
+3373,2011-04-17,33.3645,75.1999,landslide,downpour,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+3380,2011-04-19,33.5808,74.9035,landslide,downpour,25km,Jammu and Kashmir,Shupiyan,0,NASA GLC/COOLR
+3558,2011-05-31,30.9206,78.3276,landslide,rain,25km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+3559,2011-05-31,30.4783,78.2741,landslide,rain,50km,Uttarakhand,Chham,1,NASA GLC/COOLR
+3577,2011-06-07,30.5319,79.3541,landslide,downpour,50km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+3578,2011-06-07,30.2414,78.908,landslide,downpour,5km,Uttarakhand,Srinagar,0,NASA GLC/COOLR
+3579,2011-06-08,33.1289,75.4325,landslide,downpour,25km,Jammu and Kashmir,Doda,4,NASA GLC/COOLR
+3581,2011-06-09,33.1617,75.3278,landslide,downpour,5km,Jammu and Kashmir,Doda,1,NASA GLC/COOLR
+3611,2011-06-14,32.3608,77.23083,landslide,downpour,5km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+3618,2011-06-17,31.5639,77.9798,landslide,downpour,5km,Himachal Pradesh,Sarahan,0,NASA GLC/COOLR
+3666,2011-06-29,32.4318,77.2147,landslide,continuous_rain,25km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+3667,2011-06-29,32.2282,77.1898,landslide,continuous_rain,25km,Himachal Pradesh,Shirir,0,NASA GLC/COOLR
+3668,2011-06-29,29.607,79.9298,landslide,downpour,unknown,Uttarakhand,Jigal,0,NASA GLC/COOLR
+3669,2011-06-29,30.7666,78.7963,landslide,downpour,50km,Uttarakhand,Bhatgaon,0,NASA GLC/COOLR
+3670,2011-06-29,30.67629,79.04192,landslide,downpour,25km,Uttarakhand,Gaundar,,NASA GLC/COOLR
+3671,2011-06-29,30.81507,78.22425,landslide,downpour,unknown,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+3673,2011-06-29,30.2416,78.8996,landslide,downpour,10km,Uttarakhand,Srinagar,0,NASA GLC/COOLR
+3674,2011-06-29,30.0667,79.0193,landslide,downpour,5km,Uttarakhand,Bandarkutgo,10,NASA GLC/COOLR
+3678,2011-06-30,30.15,78.7753,landslide,downpour,50km,Uttarakhand,Alaknanda,0,NASA GLC/COOLR
+3707,2011-07-03,34.1601,75.496,landslide,rain,25km,Jammu and Kashmir,Baziran,0,NASA GLC/COOLR
+3708,2011-07-03,34.1491,76.826,landslide,downpour,unknown,Jammu and Kashmir,Longzaling,0,NASA GLC/COOLR
+3737,2011-07-06,30.3214,78.0319,landslide,downpour,50km,Uttarakhand,Dehra Dun,0,NASA GLC/COOLR
+3745,2011-07-08,30.9209,77.0206,landslide,rain,unknown,Himachal Pradesh,Kalka,0,NASA GLC/COOLR
+3746,2011-07-08,30.6509,79.5192,landslide,downpour,10km,Uttarakhand,Saraswati,0,NASA GLC/COOLR
+3747,2011-07-08,32.3237,77.1935,landslide,rain,50km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+3749,2011-07-09,30.7412,79.4929,landslide,downpour,25km,Uttarakhand,Saraswati,0,NASA GLC/COOLR
+3750,2011-07-09,30.7652,78.5925,landslide,downpour,50km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+3751,2011-07-09,30.7331,79.0685,landslide,downpour,25km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+3752,2011-07-09,31.0188,78.4129,landslide,downpour,25km,Uttarakhand,Phetari,0,NASA GLC/COOLR
+3756,2011-07-10,31.7099,76.933,landslide,downpour,5km,Himachal Pradesh,Mandi,0,NASA GLC/COOLR
+3757,2011-07-10,30.7333,78.4399,landslide,downpour,10km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+3759,2011-07-11,30.506,79.1127,landslide,downpour,50km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+3763,2011-07-12,31.10588,77.17798,landslide,downpour,1km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+3777,2011-07-15,32.3491,77.2181,landslide,downpour,5km,Himachal Pradesh,Chandra,1,NASA GLC/COOLR
+3807,2011-07-19,33.6917,76.0412,landslide,rain,10km,Jammu and Kashmir,Haraz,3,NASA GLC/COOLR
+3819,2011-07-21,30.4043,79.3318,landslide,rain,25km,Uttarakhand,Langsu,1,NASA GLC/COOLR
+3820,2011-07-21,30.1665,78.1123,landslide,rain,25km,Uttarakhand,Dehradun,1,NASA GLC/COOLR
+3821,2011-07-21,29.7334,79.6367,landslide,rain,25km,Uttarakhand,Almora,1,NASA GLC/COOLR
+3839,2011-07-25,32.1896,77.187,landslide,downpour,10km,Himachal Pradesh,Shirir,0,NASA GLC/COOLR
+3859,2011-07-29,30.012,78.197,landslide,downpour,50km,Uttarakhand,Rishikesh,0,NASA GLC/COOLR
+3884,2011-08-07,31.69138,77.13222,landslide,continuous_rain,5km,Himachal Pradesh,Pandoh,,NASA GLC/COOLR
+3890,2011-08-07,31.71457,77.02239,landslide,downpour,5km,Himachal Pradesh,Pandoh,,NASA GLC/COOLR
+3891,2011-08-07,33.4406,75.1996,landslide,downpour,unknown,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+3892,2011-08-07,33.0271,75.0018,landslide,downpour,5km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+3894,2011-08-07,31.0766,77.3916,landslide,downpour,1km,Himachal Pradesh,Gannja,0,NASA GLC/COOLR
+3895,2011-08-07,31.0766,77.3913,landslide,rain,5km,Himachal Pradesh,Gannja,0,NASA GLC/COOLR
+3888,2011-08-07,31.2403,77.9258,landslide,downpour,5km,Himachal Pradesh,Saura,0,NASA GLC/COOLR
+3889,2011-08-07,31.7083,76.9316,landslide,downpour,50km,Himachal Pradesh,Mandi,0,NASA GLC/COOLR
+3899,2011-08-08,30.2258,78.3755,landslide,downpour,unknown,Uttarakhand,Dehradun,0,NASA GLC/COOLR
+3900,2011-08-08,30.6521,79.5566,landslide,downpour,5km,Uttarakhand,Joshimath,0,NASA GLC/COOLR
+3905,2011-08-10,30.2828,78.3041,landslide,rain,50km,Uttarakhand,Dehradun,0,NASA GLC/COOLR
+3907,2011-08-11,32.7327,74.8556,landslide,downpour,50km,Jammu and Kashmir,Jammu,0,NASA GLC/COOLR
+3908,2011-08-11,32.737,74.876,landslide,rain,1km,Jammu and Kashmir,Jammu,1,NASA GLC/COOLR
+3913,2011-08-12,29.9121,78.1723,landslide,rain,25km,Uttarakhand,Jwalapur,0,NASA GLC/COOLR
+3914,2011-08-12,28.8665,79.5682,landslide,rain,unknown,Uttarakhand,Baheri,11,NASA GLC/COOLR
+3917,2011-08-13,31.7077,76.9313,landslide,downpour,5km,Himachal Pradesh,Mandi,2,NASA GLC/COOLR
+6566,2011-08-27,32.6188,75.3504,landslide,downpour,1km,Jammu and Kashmir,Ramnagar,0,NASA GLC/COOLR
+6567,2011-08-27,32.5764,75.8466,landslide,downpour,50km,Jammu and Kashmir,Chamba,0,NASA GLC/COOLR
+4090,2011-12-10,29.913,79.3532,landslide,downpour,10km,Uttarakhand,Chaukhutia,0,NASA GLC/COOLR
+4139,2012-01-13,33.2407,75.2373,landslide,downpour,10km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+4140,2012-01-13,33.4209,75.2045,landslide,downpour,10km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+4183,2012-02-04,33.2424,75.2381,landslide,downpour,25km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+4198,2012-02-15,32.3682,75.5227,landslide,downpour,25km,Jammu and Kashmir,Kathua,0,NASA GLC/COOLR
+4202,2012-02-16,32.5655,76.1201,landslide,downpour,10km,Himachal Pradesh,Chamba,2,NASA GLC/COOLR
+4210,2012-02-19,33.2361,75.2441,complex,unknown,10km,Jammu and Kashmir,Chaunkri,6,NASA GLC/COOLR
+4218,2012-02-22,33.241,75.234,landslide,downpour,25km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+4240,2012-03-04,29.5798,80.2123,landslide,unknown,10km,Uttarakhand,Pithoragarh,2,NASA GLC/COOLR
+4277,2012-03-20,34.6507,74.7362,rock_fall,rain,10km,Jammu and Kashmir,Wampor,1,NASA GLC/COOLR
+4325,2012-04-16,33.1467,75.5488,landslide,unknown,10km,Jammu and Kashmir,Doda,1,NASA GLC/COOLR
+4335,2012-04-24,33.2413,75.2381,landslide,downpour,5km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+4396,2012-06-08,34.27951,77.59999,landslide,downpour,10km,Jammu and Kashmir,Leh,,NASA GLC/COOLR
+4445,2012-07-05,30.1281,78.3221,landslide,downpour,1km,Uttarakhand,Rishikesh,1,NASA GLC/COOLR
+4447,2012-07-05,31.1066,77.209,landslide,downpour,5km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+4452,2012-07-07,34.0123,77.9988,landslide,downpour,10km,Jammu and Kashmir,Tangtse,,NASA GLC/COOLR
+6310,2012-08-06,30.4876,78.0366,rock_fall,unknown,1km,Uttarakhand,Mussorie,0,NASA GLC/COOLR
+4472,2012-08-14,30.7362,78.44,landslide,downpour,10km,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+4481,2012-08-17,30.6594,79.5605,landslide,downpour,5km,Uttarakhand,Saraswati,4,NASA GLC/COOLR
+4487,2012-08-17,30.6179,78.3233,landslide,downpour,25km,Uttarakhand,Chham,,NASA GLC/COOLR
+4497,2012-08-18,32.2278,78.071,landslide,downpour,5km,Himachal Pradesh,Luling,,NASA GLC/COOLR
+4498,2012-08-18,32.1797,77.1947,landslide,downpour,25km,Himachal Pradesh,Shirir,,NASA GLC/COOLR
+4501,2012-08-20,33.0829,74.8333,landslide,downpour,1km,Jammu and Kashmir,Riasi,1,NASA GLC/COOLR
+4504,2012-08-21,34.6113,74.9499,landslide,downpour,5km,Jammu and Kashmir,Wampor,,NASA GLC/COOLR
+4507,2012-08-22,33.2412,75.2382,landslide,downpour,1km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+4513,2012-08-24,32.1002,76.2699,landslide,downpour,5km,Himachal Pradesh,Kangra,,NASA GLC/COOLR
+4514,2012-08-24,31.709,76.9312,landslide,downpour,5km,Himachal Pradesh,Mandi,,NASA GLC/COOLR
+4515,2012-08-24,30.7395,77.2847,landslide,downpour,5km,Himachal Pradesh,Nahan,,NASA GLC/COOLR
+4516,2012-08-24,30.9044,77.0969,landslide,downpour,5km,Himachal Pradesh,Gannja,,NASA GLC/COOLR
+4523,2012-08-29,33.775,74.0934,landslide,downpour,5km,Jammu and Kashmir,Punch,,NASA GLC/COOLR
+4551,2012-09-14,29.841,79.7758,landslide,downpour,5km,Uttarakhand,Bageshwar,9,NASA GLC/COOLR
+4550,2012-09-14,30.2853,78.9829,landslide,downpour,5km,Uttarakhand,Srinagar,19,NASA GLC/COOLR
+4555,2012-09-15,32.9295,75.1432,landslide,downpour,50km,Jammu and Kashmir,Udhampur,,NASA GLC/COOLR
+4557,2012-09-16,33.303,77.8876,landslide,downpour,50km,Jammu and Kashmir,Pongnagu,,NASA GLC/COOLR
+4559,2012-09-17,33.9639,74.9597,landslide,downpour,unknown,Jammu and Kashmir,Awantipura,,NASA GLC/COOLR
+4565,2012-09-18,31.0226,77.1029,landslide,downpour,1km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+4658,2012-12-11,32.9522,75.1533,mudslide,rain,25km,Jammu and Kashmir,Udhampur,,NASA GLC/COOLR
+4764,2013-02-22,33.4372,75.2027,landslide,snowfall_snowmelt,unknown,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+4823,2013-04-26,34.2946,75.4832,mudslide,rain,5km,Jammu and Kashmir,Matayan,1,NASA GLC/COOLR
+4912,2013-06-12,31.4898,76.7043,landslide,downpour,25km,Himachal Pradesh,Bilaspur,1,NASA GLC/COOLR
+4913,2013-06-12,31.4881,76.6702,landslide,rain,unknown,Himachal Pradesh,Bilaspur,0,NASA GLC/COOLR
+4916,2013-06-12,32.2108,76.2833,landslide,downpour,1km,Himachal Pradesh,Dharmsala,0,NASA GLC/COOLR
+4917,2013-06-12,32.5552,76.1249,landslide,downpour,10km,Himachal Pradesh,Chamba,0,NASA GLC/COOLR
+4914,2013-06-13,30.7394,78.5306,landslide,downpour,5km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+4920,2013-06-15,31.5168,78.0976,landslide,downpour,1km,Himachal Pradesh,Oling,0,NASA GLC/COOLR
+4925,2013-06-16,31.4551,78.1996,landslide,rain,25km,Himachal Pradesh,Oling,0,NASA GLC/COOLR
+4926,2013-06-16,30.6738,77.3544,landslide,rain,25km,Himachal Pradesh,Nahan,0,NASA GLC/COOLR
+4927,2013-06-16,30.5728,77.6521,landslide,rain,25km,Himachal Pradesh,Chuharpur,0,NASA GLC/COOLR
+4928,2013-06-16,30.4619,79.0765,landslide,rain,25km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+4929,2013-06-16,30.4954,78.3881,landslide,rain,50km,Uttarakhand,Chham,0,NASA GLC/COOLR
+4930,2013-06-16,30.885,78.6695,landslide,rain,50km,Uttarakhand,Purali,0,NASA GLC/COOLR
+4931,2013-06-16,29.7986,80.417,landslide,rain,50km,Uttarakhand,Tham,0,NASA GLC/COOLR
+4932,2013-06-16,31.348,77.4614,landslide,downpour,unknown,Himachal Pradesh,Rampur,0,NASA GLC/COOLR
+4933,2013-06-16,31.5986,78.4384,landslide,downpour,50km,Himachal Pradesh,Burati Thatang,4,NASA GLC/COOLR
+4924,2013-06-17,30.7351,79.0666,debris_flow,downpour,1km,Uttarakhand,Gaundar,5000,NASA GLC/COOLR
+4936,2013-06-17,30.6945,79.0544,landslide,downpour,1km,Uttarakhand,Gaundar,13,NASA GLC/COOLR
+4940,2013-06-17,30.3069,78.0169,landslide,rain,25km,Uttarakhand,Dehra Dun,3,NASA GLC/COOLR
+4943,2013-06-17,29.5987,79.6592,landslide,downpour,5km,Uttarakhand,Almora,4,NASA GLC/COOLR
+4946,2013-06-17,31.6223,78.0193,landslide,downpour,50km,Himachal Pradesh,Oling,5,NASA GLC/COOLR
+4949,2013-06-18,30.3797,78.5017,landslide,rain,5km,Uttarakhand,Chham,0,NASA GLC/COOLR
+4966,2013-06-19,29.5935,79.6805,landslide,rain,5km,Uttarakhand,Almora,0,NASA GLC/COOLR
+4978,2013-06-24,30.4542,78.3911,debris_flow,downpour,50km,Uttarakhand,Chham,0,NASA GLC/COOLR
+4974,2013-06-24,30.4091,79.0579,landslide,rain,25km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+4975,2013-06-25,30.2524,78.9228,landslide,downpour,10km,Uttarakhand,Srinagar,0,NASA GLC/COOLR
+5013,2013-07-03,31.0722,77.1402,landslide,downpour,5km,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+5022,2013-07-04,29.58,80.2214,landslide,downpour,25km,Uttarakhand,Pithoragarh,,NASA GLC/COOLR
+5023,2013-07-04,30.0712,80.2386,landslide,continuous_rain,unknown,Uttarakhand,Mathkot,,NASA GLC/COOLR
+5024,2013-07-04,30.1719,80.8576,landslide,continuous_rain,50km,Uttarakhand,Sobala,,NASA GLC/COOLR
+5036,2013-07-06,33.0852,74.8799,landslide,downpour,50km,Jammu and Kashmir,Riasi,1,NASA GLC/COOLR
+5043,2013-07-06,31.9906,76.7907,landslide,downpour,1km,Himachal Pradesh,Tarmahr,,NASA GLC/COOLR
+5044,2013-07-06,31.1628,77.7241,landslide,downpour,50km,Himachal Pradesh,Saura,,NASA GLC/COOLR
+5049,2013-07-07,31.5596,77.1679,landslide,downpour,5km,Himachal Pradesh,Pandoh,,NASA GLC/COOLR
+5050,2013-07-07,31.703,76.936,mudslide,rain,unknown,Himachal Pradesh,Mandi,,NASA GLC/COOLR
+5051,2013-07-07,31.7017,76.973,landslide,downpour,50km,Himachal Pradesh,Mandi,,NASA GLC/COOLR
+5052,2013-07-07,31.7093,76.9297,landslide,downpour,1km,Himachal Pradesh,Mandi,,NASA GLC/COOLR
+5053,2013-07-07,31.9671,76.8521,landslide,downpour,1km,Himachal Pradesh,Tarmahr,,NASA GLC/COOLR
+5054,2013-07-07,31.7018,76.9424,landslide,downpour,1km,Himachal Pradesh,Mandi,,NASA GLC/COOLR
+5047,2013-07-07,31.8795,76.9161,landslide,downpour,1km,Himachal Pradesh,Bhuntar,,NASA GLC/COOLR
+5062,2013-07-08,33.3118,75.7525,mudslide,downpour,10km,Jammu and Kashmir,Ariz,2,NASA GLC/COOLR
+5068,2013-07-10,30.3629,79.2143,landslide,rain,5km,Uttarakhand,Langsu,7,NASA GLC/COOLR
+5086,2013-07-12,29.3802,79.4633,landslide,rain,5km,Uttarakhand,Nainital,6,NASA GLC/COOLR
+5097,2013-07-14,31.4711,77.6746,landslide,downpour,10km,Himachal Pradesh,Rampur,1,NASA GLC/COOLR
+5098,2013-07-14,32.17,77.1788,landslide,downpour,unknown,Himachal Pradesh,Shirir,1,NASA GLC/COOLR
+5099,2013-07-14,30.6738,77.3544,landslide,rain,25km,Himachal Pradesh,Nahan,0,NASA GLC/COOLR
+5100,2013-07-14,31.673,76.5338,landslide,rain,5km,Himachal Pradesh,Panjgraon,0,NASA GLC/COOLR
+5129,2013-07-18,30.4043,79.3308,landslide,downpour,1km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+5130,2013-07-18,30.7314,78.4347,debris_flow,downpour,5km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+5139,2013-07-19,30.0718,80.2369,landslide,downpour,5km,Uttarakhand,Mathkot,0,NASA GLC/COOLR
+5176,2013-07-23,30.1944,79.1939,landslide,downpour,1km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+5177,2013-07-23,30.2902,79.151,landslide,downpour,5km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+5178,2013-07-24,30.4605,79.4774,landslide,continuous_rain,unknown,Uttarakhand,Joshimath,2,NASA GLC/COOLR
+5179,2013-07-24,30.262,79.2191,landslide,downpour,5km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+5181,2013-07-24,30.2733,79.233,landslide,downpour,unknown,Uttarakhand,Langsu,,NASA GLC/COOLR
+5182,2013-07-24,30.301,79.3628,landslide,downpour,5km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+5183,2013-07-24,30.3056,79.3286,landslide,downpour,1km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+5184,2013-07-24,30.9058,78.0906,landslide,downpour,1km,Uttarakhand,Deoban,0,NASA GLC/COOLR
+5195,2013-07-25,30.4041,79.3276,landslide,continuous_rain,unknown,Uttarakhand,Langsu,,NASA GLC/COOLR
+5196,2013-07-25,30.8928,78.48,landslide,continuous_rain,unknown,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+5197,2013-07-25,30.8203,78.6185,landslide,continuous_rain,5km,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+5199,2013-07-25,30.7866,78.6171,landslide,continuous_rain,1km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+5208,2013-07-26,30.2835,79.2498,landslide,rain,5km,Uttarakhand,Langsu,,NASA GLC/COOLR
+5209,2013-07-26,30.6539,78.3366,landslide,rain,25km,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+5214,2013-07-27,31.8931,78.63,landslide,mining,10km,Himachal Pradesh,Khab,,NASA GLC/COOLR
+5215,2013-07-27,30.4521,78.754,landslide,rain,5km,Uttarakhand,Bhatgaon,,NASA GLC/COOLR
+5224,2013-07-28,29.9964,80.201,mudslide,downpour,10km,Uttarakhand,Nachani,1,NASA GLC/COOLR
+5225,2013-07-28,30.819,78.6149,mudslide,downpour,5km,Uttarakhand,Uttarkashi,1,NASA GLC/COOLR
+5233,2013-07-29,32.9918,75.1945,landslide,rain,1km,Jammu and Kashmir,Udhampur,,NASA GLC/COOLR
+5240,2013-07-31,30.3822,78.0949,landslide,downpour,10km,Uttarakhand,Dehra Dun,4,NASA GLC/COOLR
+5241,2013-07-31,29.5952,79.6625,landslide,downpour,unknown,Uttarakhand,Almora,,NASA GLC/COOLR
+5244,2013-08-02,34.4332,76.2851,landslide,downpour,5km,Jammu and Kashmir,Goma,,NASA GLC/COOLR
+5252,2013-08-02,32.5282,75.1199,landslide,continuous_rain,10km,Jammu and Kashmir,Chhanni,0,NASA GLC/COOLR
+5285,2013-08-05,29.5659,80.3657,landslide,monsoon,10km,Uttarakhand,Baitadi,1,NASA GLC/COOLR
+5287,2013-08-06,32.8363,75.1489,landslide,downpour,50km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+5293,2013-08-07,32.9913,75.1915,landslide,unknown,10km,Jammu and Kashmir,Udhampur,,NASA GLC/COOLR
+5290,2013-08-07,32.2322,76.3037,landslide,downpour,5km,Himachal Pradesh,Dharmsala,0,NASA GLC/COOLR
+5323,2013-08-13,34.2601,75.4466,landslide,downpour,50km,Jammu and Kashmir,Sonamarg,,NASA GLC/COOLR
+5320,2013-08-13,30.6014,78.3449,landslide,downpour,5km,Uttarakhand,Chham,2,NASA GLC/COOLR
+5327,2013-08-14,33.4431,75.1915,landslide,downpour,25km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+5328,2013-08-14,33.3018,75.1793,landslide,downpour,50km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+5329,2013-08-14,32.9913,75.1915,landslide,downpour,10km,Jammu and Kashmir,Udhampur,,NASA GLC/COOLR
+5330,2013-08-14,33.3216,75.1984,landslide,downpour,10km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+5331,2013-08-14,33.0498,74.6264,landslide,downpour,25km,Jammu and Kashmir,Riasi,,NASA GLC/COOLR
+5332,2013-08-14,33.7705,74.0967,landslide,downpour,50km,Jammu and Kashmir,Punch,,NASA GLC/COOLR
+5333,2013-08-14,33.7706,74.0967,landslide,downpour,50km,Jammu and Kashmir,Punch,3,NASA GLC/COOLR
+5334,2013-08-16,32.36109,77.30378,landslide,downpour,10km,Himachal Pradesh,Chandra,,NASA GLC/COOLR
+5346,2013-08-17,31.0343,78.7248,landslide,rain,5km,Uttarakhand,Purali,,NASA GLC/COOLR
+5347,2013-08-17,30.7292,78.4396,landslide,rain,5km,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+5358,2013-08-18,30.6639,78.0574,landslide,rain,unknown,Uttarakhand,Aindi,,NASA GLC/COOLR
+5359,2013-08-18,30.742,78.4543,landslide,rain,unknown,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+5360,2013-08-18,30.3642,79.3158,landslide,rain,5km,Uttarakhand,Langsu,,NASA GLC/COOLR
+5361,2013-08-18,31.0826,78.066,landslide,unknown,25km,Uttarakhand,Phetari,,NASA GLC/COOLR
+5377,2013-08-19,34.0942,74.0226,landslide,tropical_cyclone,25km,Jammu and Kashmir,Uri,2,NASA GLC/COOLR
+5365,2013-08-20,30.6293,78.3303,debris_flow,downpour,unknown,Uttarakhand,Chham,,NASA GLC/COOLR
+5382,2013-08-21,31.5375,77.3737,landslide,downpour,25km,Himachal Pradesh,Manglaor,,NASA GLC/COOLR
+5410,2013-08-28,29.9531,78.1514,landslide,downpour,25km,Uttarakhand,Jwalapur,0,NASA GLC/COOLR
+5567,2013-09-30,30.6004,78.3154,landslide,unknown,25km,Uttarakhand,Chham,1,NASA GLC/COOLR
+5598,2013-10-11,32.3665,77.0857,landslide,downpour,5km,Himachal Pradesh,Chandra,3,NASA GLC/COOLR
+5608,2013-10-16,30.5345,79.0853,landslide,unknown,25km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+5611,2013-10-18,30.5345,79.0853,landslide,rain,25km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+5864,2014-02-12,31.8246,77.4702,landslide,snowfall_snowmelt,10km,Himachal Pradesh,Pulga,0,NASA GLC/COOLR
+5897,2014-02-23,33.2359,75.244,landslide,unknown,5km,Jammu and Kashmir,Chaunkri,2,NASA GLC/COOLR
+5940,2014-03-10,33.2359,75.2439,landslide,snowfall_snowmelt,5km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+5943,2014-03-11,34.0823,74.056,landslide,continuous_rain,25km,Jammu and Kashmir,Uri,0,NASA GLC/COOLR
+5964,2014-03-18,34.6651,73.961,landslide,downpour,25km,Jammu and Kashmir,Bakwali,0,NASA GLC/COOLR
+5970,2014-03-20,33.2355,75.2449,landslide,unknown,5km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+5994,2014-04-15,34.209,74.3524,landslide,unknown,5km,Jammu and Kashmir,Baramula,1,NASA GLC/COOLR
+6022,2014-05-12,34.0893,74.0241,landslide,rain,5km,Jammu and Kashmir,Uri,0,NASA GLC/COOLR
+6024,2014-05-14,33.2394,75.2405,landslide,rain,1km,Jammu and Kashmir,Chaunkri,2,NASA GLC/COOLR
+6162,2014-07-19,30.4305,78.0803,landslide,rain,10km,Uttarakhand,Mussorie,0,NASA GLC/COOLR
+6167,2014-07-20,30.6326,78.9953,landslide,continuous_rain,1km,Uttarakhand,Gaundar,3,NASA GLC/COOLR
+6174,2014-07-22,33.2395,75.2406,landslide,rain,1km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+6177,2014-07-24,29.1585,79.1464,rock_fall,downpour,25km,Uttarakhand,Shafakhana,2,NASA GLC/COOLR
+6184,2014-07-28,29.5829,80.2182,landslide,continuous_rain,1km,Uttarakhand,Pithoragarh,7,NASA GLC/COOLR
+7367,2014-08-08,32.2237,76.3369,landslide,unknown,1km,Himachal Pradesh,Dharmsala,0,NASA GLC/COOLR
+6510,2014-08-15,30.1176,78.7472,debris_flow,rain,unknown,Uttarakhand,Alaknanda,14,NASA GLC/COOLR
+6197,2014-08-17,33.0272,74.9465,landslide,downpour,5km,Jammu and Kashmir,Riasi,0,NASA GLC/COOLR
+6530,2014-08-17,34.5382,74.2493,landslide,downpour,50km,Jammu and Kashmir,Nutnus,0,NASA GLC/COOLR
+6525,2014-08-18,30.9936,78.4594,landslide,downpour,50km,Uttarakhand,Purali,0,NASA GLC/COOLR
+6538,2014-08-21,31.5216,78.1346,landslide,unknown,5km,Himachal Pradesh,Oling,2,NASA GLC/COOLR
+6552,2014-08-26,31.5593,77.9277,landslide,unknown,5km,Himachal Pradesh,Sarahan,2,NASA GLC/COOLR
+6371,2014-09-03,33.1253,74.8288,landslide,downpour,50km,Jammu and Kashmir,Riasi,5,NASA GLC/COOLR
+6369,2014-09-04,33.0086,74.9426,rock_fall,downpour,5km,Jammu and Kashmir,Riasi,0,NASA GLC/COOLR
+6370,2014-09-04,33.798,74.2562,landslide,rain,25km,Jammu and Kashmir,Rajpur,1,NASA GLC/COOLR
+6294,2014-09-06,33.3551,74.5128,landslide,continuous_rain,10km,Jammu and Kashmir,Kot Bainka,3,NASA GLC/COOLR
+6339,2014-09-06,33.5405,74.3723,landslide,downpour,5km,Jammu and Kashmir,Rajaori,13,NASA GLC/COOLR
+6358,2014-09-06,32.8468,75.137,landslide,rain,1km,Jammu and Kashmir,Udhampur,5,NASA GLC/COOLR
+6225,2014-09-07,33.0677,75.1466,mudslide,downpour,25km,Jammu and Kashmir,Chaunkri,41,NASA GLC/COOLR
+6337,2014-09-10,31.7766,76.9832,landslide,unknown,5km,Himachal Pradesh,Mandi,0,NASA GLC/COOLR
+6338,2014-09-11,33.2611,75.2138,landslide,unknown,50km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+6341,2014-09-11,30.688,79.0478,landslide,downpour,10km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+6263,2014-09-26,33.0365,74.4889,landslide,continuous_rain,unknown,Jammu and Kashmir,Dhangar,0,NASA GLC/COOLR
+6247,2014-10-15,31.0164,77.0991,landslide,mining,25km,Himachal Pradesh,Simla,2,NASA GLC/COOLR
+6299,2014-10-26,33.1206,75.3142,landslide,unknown,25km,Jammu and Kashmir,Doda,0,NASA GLC/COOLR
+6374,2014-11-06,33.1261,75.4481,landslide,unknown,5km,Jammu and Kashmir,Doda,0,NASA GLC/COOLR
+6356,2014-11-07,32.9411,75.0922,mudslide,downpour,25km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+6730,2014-12-31,33.287,77.2853,landslide,unknown,1km,Jammu and Kashmir,Yaytah,0,NASA GLC/COOLR
+6840,2015-02-05,33.7453,74.1794,landslide,unknown,25km,Jammu and Kashmir,Punch,0,NASA GLC/COOLR
+6804,2015-02-26,33.3376,75.1922,landslide,unknown,50km,Jammu and Kashmir,Gund,2,NASA GLC/COOLR
+6842,2015-03-02,33.3296,75.203,landslide,continuous_rain,1km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+6827,2015-03-05,34.2092,74.321,landslide,continuous_rain,25km,Jammu and Kashmir,Baramula,0,NASA GLC/COOLR
+6841,2015-03-05,33.1213,75.2449,landslide,unknown,10km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+6851,2015-03-10,32.5612,76.1238,mudslide,downpour,5km,Himachal Pradesh,Chamba,0,NASA GLC/COOLR
+6872,2015-03-15,33.7732,74.1011,mudslide,rain,25km,Jammu and Kashmir,Punch,1,NASA GLC/COOLR
+6889,2015-03-15,34.0786,74.3836,landslide,continuous_rain,5km,Jammu and Kashmir,Gulmarg,0,NASA GLC/COOLR
+6890,2015-03-15,34.0968,74.4117,landslide,continuous_rain,1km,Jammu and Kashmir,Gulmarg,0,NASA GLC/COOLR
+6891,2015-03-15,34.1327,74.5594,landslide,continuous_rain,1km,Jammu and Kashmir,Palhalan,0,NASA GLC/COOLR
+6908,2015-03-15,33.0977,75.5787,landslide,unknown,5km,Jammu and Kashmir,Thalol,0,NASA GLC/COOLR
+6867,2015-03-15,33.8911,74.9781,landslide,continuous_rain,1km,Jammu and Kashmir,Awantipur,1,NASA GLC/COOLR
+6871,2015-03-15,33.6846,74.2453,mudslide,snowfall_snowmelt,25km,Jammu and Kashmir,Rajpur,1,NASA GLC/COOLR
+6873,2015-03-16,33.0809,75.2966,landslide,snowfall_snowmelt,50km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+6907,2015-03-21,33.1754,75.8103,landslide,continuous_rain,50km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+6874,2015-03-23,33.3343,75.1969,landslide,snowfall_snowmelt,50km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+6931,2015-03-23,33.7099,74.7959,landslide,continuous_rain,25km,Jammu and Kashmir,Shupiyan,0,NASA GLC/COOLR
+6932,2015-03-23,34.0796,74.0357,landslide,continuous_rain,10km,Jammu and Kashmir,Uri,0,NASA GLC/COOLR
+6925,2015-03-28,33.0186,75.2405,landslide,downpour,unknown,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+6924,2015-03-28,33.95483,74.79428,landslide,downpour,50km,Jammu and Kashmir,Kasba,0,NASA GLC/COOLR
+6933,2015-03-30,33.9344,74.6566,landslide,continuous_rain,10km,Jammu and Kashmir,Srinagar,0,NASA GLC/COOLR
+6934,2015-03-30,34.0096,74.5915,landslide,continuous_rain,5km,Jammu and Kashmir,Srinagar,0,NASA GLC/COOLR
+7171,2015-03-30,33.9445,74.799,landslide,continuous_rain,5km,Jammu and Kashmir,Kasba,16,NASA GLC/COOLR
+10990,2015-03-30,33.85484,74.76317,landslide,continuous_rain,10km,Jammu and Kashmir,Kasba,0,NASA GLC/COOLR
+6928,2015-03-31,30.6145,79.8102,landslide,construction,25km,Uttarakhand,Joshimath,4,NASA GLC/COOLR
+7176,2015-04-02,34.1587,74.4725,landslide,continuous_rain,1km,Jammu and Kashmir,Palhalan,0,NASA GLC/COOLR
+7172,2015-04-03,33.1445,75.5469,landslide,continuous_rain,5km,Jammu and Kashmir,Doda,4,NASA GLC/COOLR
+7174,2015-04-03,34.0823,74.03099,landslide,continuous_rain,1km,Jammu and Kashmir,Uri,2,NASA GLC/COOLR
+7178,2015-04-03,34.0604,74.4203,landslide,continuous_rain,10km,Jammu and Kashmir,Gulmarg,0,NASA GLC/COOLR
+7185,2015-04-03,32.2934,77.1803,landslide,downpour,1km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+7177,2015-04-03,34.0978,74.4016,landslide,continuous_rain,1km,Jammu and Kashmir,Gulmarg,0,NASA GLC/COOLR
+7175,2015-04-05,33.9243,74.6163,landslide,continuous_rain,25km,Jammu and Kashmir,Kasba,0,NASA GLC/COOLR
+7168,2015-04-07,34.2088,74.3279,landslide,continuous_rain,1km,Jammu and Kashmir,Baramula,0,NASA GLC/COOLR
+7167,2015-04-08,34.6609,73.9593,landslide,continuous_rain,1km,Jammu and Kashmir,Bakwali,0,NASA GLC/COOLR
+14202,2015-04-16,31.49912,78.22419,landslide,construction,10km,Himachal Pradesh,Oling,,NASA GLC/COOLR
+7111,2015-04-28,30.5631,79.5765,landslide,continuous_rain,1km,Uttarakhand,Joshimath,0,NASA GLC/COOLR
+7110,2015-04-30,30.5568,79.5541,landslide,continuous_rain,5km,Uttarakhand,Joshimath,0,NASA GLC/COOLR
+7062,2015-05-14,33.6303,74.4838,landslide,downpour,1km,Jammu and Kashmir,Pir Panjal Range,0,NASA GLC/COOLR
+7026,2015-05-30,34.2607,75.4446,landslide,rain,1km,Jammu and Kashmir,Sonamarg,0,NASA GLC/COOLR
+6947,2015-06-21,30.0261,78.6278,landslide,rain,25km,Uttarakhand,Kandi,0,NASA GLC/COOLR
+7012,2015-06-25,30.6838,79.0479,landslide,downpour,5km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+7027,2015-06-25,34.6056,76.0539,landslide,downpour,250km,Jammu and Kashmir,Dalunang,0,NASA GLC/COOLR
+7011,2015-06-25,34.141,74.6568,mudslide,downpour,5km,Jammu and Kashmir,Palhalan,0,NASA GLC/COOLR
+7084,2015-07-06,29.393,79.4525,landslide,downpour,5km,Uttarakhand,Nainital,0,NASA GLC/COOLR
+7157,2015-07-10,34.0404,75.3156,landslide,continuous_rain,5km,Jammu and Kashmir,Brariyen,2,NASA GLC/COOLR
+7159,2015-07-10,29.3908,79.4552,landslide,continuous_rain,5km,Uttarakhand,Nainital,0,NASA GLC/COOLR
+7158,2015-07-11,32.9262,75.1447,landslide,continuous_rain,5km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+7160,2015-07-11,30.3799,78.4862,landslide,continuous_rain,5km,Uttarakhand,Chham,0,NASA GLC/COOLR
+7161,2015-07-11,30.241,78.9,landslide,continuous_rain,5km,Uttarakhand,Srinagar,0,NASA GLC/COOLR
+7195,2015-07-12,33.2504,75.2102,landslide,continuous_rain,1km,Jammu and Kashmir,Chaunkri,1,NASA GLC/COOLR
+7196,2015-07-12,33.2049,75.2845,landslide,continuous_rain,10km,Jammu and Kashmir,Panjan,0,NASA GLC/COOLR
+7249,2015-07-13,31.0851,77.1665,mudslide,continuous_rain,5km,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+7215,2015-07-14,32.2473,78.037,landslide,continuous_rain,1km,Himachal Pradesh,Luling,1,NASA GLC/COOLR
+7226,2015-07-18,32.2239,76.3226,landslide,monsoon,5km,Himachal Pradesh,Dharmsala,0,NASA GLC/COOLR
+7224,2015-07-19,30.73,78.4378,landslide,continuous_rain,5km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+7227,2015-07-19,30.0705,80.2364,rock_fall,monsoon,1km,Uttarakhand,Mathkot,1,NASA GLC/COOLR
+7251,2015-07-21,34.2689,75.1495,landslide,continuous_rain,5km,Jammu and Kashmir,Kulan,0,NASA GLC/COOLR
+7261,2015-07-21,33.616,77.7652,landslide,continuous_rain,1km,Jammu and Kashmir,Ikpadok,0,NASA GLC/COOLR
+7262,2015-07-21,33.7403,77.7559,landslide,continuous_rain,1km,Jammu and Kashmir,Changa,0,NASA GLC/COOLR
+7270,2015-07-24,29.5863,80.2186,landslide,continuous_rain,5km,Uttarakhand,Pithoragarh,0,NASA GLC/COOLR
+7275,2015-07-24,34.258,75.4189,landslide,continuous_rain,1km,Jammu and Kashmir,Sonamarg,0,NASA GLC/COOLR
+7294,2015-07-24,30.4528,78.1045,landslide,continuous_rain,25km,Uttarakhand,Mussorie,0,NASA GLC/COOLR
+7295,2015-07-24,30.4517,78.1443,landslide,continuous_rain,25km,Uttarakhand,Mussorie,0,NASA GLC/COOLR
+7296,2015-07-24,30.416,78.3415,landslide,continuous_rain,25km,Uttarakhand,Chham,0,NASA GLC/COOLR
+7273,2015-07-26,30.2411,78.9014,landslide,continuous_rain,5km,Uttarakhand,Srinagar,0,NASA GLC/COOLR
+7285,2015-07-26,31.1263,77.3525,landslide,continuous_rain,5km,Himachal Pradesh,Gannja,3,NASA GLC/COOLR
+7286,2015-07-26,31.1003,77.1751,landslide,continuous_rain,10km,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+7287,2015-07-26,32.5606,76.1206,landslide,continuous_rain,5km,Himachal Pradesh,Chamba,0,NASA GLC/COOLR
+7288,2015-07-26,31.9563,77.1135,landslide,continuous_rain,5km,Himachal Pradesh,Kulu,0,NASA GLC/COOLR
+7289,2015-07-26,31.7085,76.9297,landslide,continuous_rain,5km,Himachal Pradesh,Mandi,0,NASA GLC/COOLR
+7284,2015-07-27,33.2706,75.7702,landslide,downpour,10km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+7297,2015-07-28,30.7204,79.0758,landslide,continuous_rain,5km,Uttarakhand,Gaundar,0,NASA GLC/COOLR
+7366,2015-07-31,32.2241,76.3374,debris_flow,continuous_rain,1km,Himachal Pradesh,Dharmsala,0,NASA GLC/COOLR
+7391,2015-08-01,31.0358,78.8578,rock_fall,continuous_rain,50km,Uttarakhand,Dhumku,0,NASA GLC/COOLR
+7598,2015-08-06,33.1078,74.7756,landslide,unknown,50km,Jammu and Kashmir,Riasi,0,NASA GLC/COOLR
+7613,2015-08-08,32.9961,75.1994,landslide,downpour,10km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+7614,2015-08-08,31.8028,76.757,landslide,downpour,5km,Himachal Pradesh,Mandi,3,NASA GLC/COOLR
+7628,2015-08-09,31.6916,76.5102,rock_fall,rain,5km,Himachal Pradesh,Beas,0,NASA GLC/COOLR
+7636,2015-08-09,33.29475,74.56645,landslide,downpour,5km,Jammu and Kashmir,Kot Bainka,0,NASA GLC/COOLR
+7649,2015-08-11,31.3237,76.7622,landslide,downpour,5km,Himachal Pradesh,Bilaspur,0,NASA GLC/COOLR
+7678,2015-08-12,32.1967,76.3194,landslide,rain,1km,Himachal Pradesh,Dharmsala,0,NASA GLC/COOLR
+7676,2015-08-12,32.1764,76.3075,landslide,monsoon,10km,Himachal Pradesh,Dharmsala,0,NASA GLC/COOLR
+7685,2015-08-13,31.7756,76.9876,landslide,unknown,5km,Himachal Pradesh,Mandi,0,NASA GLC/COOLR
+7308,2015-08-15,30.9111,78.6814,landslide,continuous_rain,5km,Uttarakhand,Purali,0,NASA GLC/COOLR
+7309,2015-08-15,30.7864,78.616,landslide,continuous_rain,1km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+7310,2015-08-15,30.9085,78.3299,landslide,continuous_rain,25km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+7311,2015-08-15,30.6494,79.5269,landslide,continuous_rain,5km,Uttarakhand,Joshimath,0,NASA GLC/COOLR
+7329,2015-08-18,32.0275,77.3446,rock_fall,rain,1km,Himachal Pradesh,Himachal Pradesh,8,NASA GLC/COOLR
+7704,2015-08-20,32.6175,75.6157,landslide,unknown,5km,Jammu and Kashmir,Madhopur,0,NASA GLC/COOLR
+7746,2015-08-21,32.6173,75.264,landslide,unknown,5km,Jammu and Kashmir,Ramnagar,0,NASA GLC/COOLR
+7726,2015-08-22,31.0365,77.1213,landslide,downpour,5km,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+7940,2015-09-03,33.6794,74.2525,landslide,unknown,25km,Jammu and Kashmir,Rajpur,1,NASA GLC/COOLR
+8866,2015-10-25,33.33828,75.19549,landslide,downpour,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+9037,2015-12-07,31.6817,77.1209,rock_fall,unknown,1km,Himachal Pradesh,Pandoh,0,NASA GLC/COOLR
+9144,2015-12-29,31.46627,76.86927,complex,construction,50km,Himachal Pradesh,Sundarngar,0,NASA GLC/COOLR
+9677,2016-03-17,33.1381,75.51068,landslide,continuous_rain,1km,Jammu and Kashmir,Doda,,NASA GLC/COOLR
+9678,2016-03-17,33.13296,75.43929,landslide,continuous_rain,25km,Jammu and Kashmir,Doda,,NASA GLC/COOLR
+9426,2016-03-26,33.04965,75.29049,landslide,continuous_rain,unknown,Jammu and Kashmir,Udhampur,5,NASA GLC/COOLR
+9380,2016-04-04,34.4002,74.2798,landslide,continuous_rain,5km,Jammu and Kashmir,Nutnus,0,NASA GLC/COOLR
+9314,2016-05-22,30.306,78.0648,rock_fall,rain,25km,Uttarakhand,Dehra Dun,10,NASA GLC/COOLR
+9318,2016-05-23,30.7007,77.8644,rock_fall,rain,1km,Uttarakhand,Deoban,10,NASA GLC/COOLR
+9199,2016-06-09,34.2952,75.3226,landslide,downpour,5km,Jammu and Kashmir,Sonamarg,0,NASA GLC/COOLR
+8860,2016-06-17,31.5124,78.1181,rock_fall,monsoon,1km,Himachal Pradesh,Oling,0,NASA GLC/COOLR
+8744,2016-06-21,32.99,75.1892,landslide,downpour,1km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+8032,2016-06-29,30.3299,79.3206,landslide,downpour,1km,Uttarakhand,Langsu,0,NASA GLC/COOLR
+8367,2016-07-01,29.8002,80.2565,mudslide,monsoon,1km,Uttarakhand,Tham,0,NASA GLC/COOLR
+8472,2016-07-02,33.6296,74.5264,landslide,unknown,25km,Jammu and Kashmir,Pir Panjal Range,0,NASA GLC/COOLR
+8482,2016-07-02,30.89222,77.09003,rock_fall,downpour,10km,Himachal Pradesh,Gannja,1,NASA GLC/COOLR
+9008,2016-07-16,30.3351,78.5113,rock_fall,rain,1km,Uttarakhand,Alaknanda,0,NASA GLC/COOLR
+9002,2016-07-16,30.4554,78.0973,debris_flow,downpour,5km,Uttarakhand,Mussorie,0,NASA GLC/COOLR
+9017,2016-07-17,30.1642,78.2936,landslide,downpour,1km,Uttarakhand,Rishikesh,4,NASA GLC/COOLR
+9048,2016-07-17,31.5007,78.1758,landslide,unknown,1km,Himachal Pradesh,Oling,1,NASA GLC/COOLR
+9020,2016-07-17,29.9551,78.1677,mudslide,downpour,exact,Uttarakhand,Jwalapur,0,NASA GLC/COOLR
+9166,2016-07-18,30.7313,78.4358,rock_fall,rain,1km,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+9216,2016-07-27,30.6935,77.4266,rock_fall,downpour,1km,Himachal Pradesh,Nahan,2,NASA GLC/COOLR
+9258,2016-07-31,30.9753,78.4375,landslide,continuous_rain,1km,Uttarakhand,Purali,0,NASA GLC/COOLR
+9264,2016-08-01,31.6865,77.1043,landslide,rain,5km,Himachal Pradesh,Pandoh,0,NASA GLC/COOLR
+9449,2016-08-04,30.7386,79.4954,debris_flow,continuous_rain,5km,Uttarakhand,Saraswati,0,NASA GLC/COOLR
+9447,2016-08-05,33.0068,74.9455,landslide,downpour,5km,Jammu and Kashmir,Riasi,5,NASA GLC/COOLR
+9448,2016-08-06,29.5866,80.2154,rock_fall,downpour,10km,Uttarakhand,Pithoragarh,1,NASA GLC/COOLR
+9465,2016-08-07,32.9834,75.6953,landslide,continuous_rain,25km,Jammu and Kashmir,Bhadarwah,2,NASA GLC/COOLR
+9468,2016-08-07,33.2483,75.2131,landslide,downpour,5km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+9474,2016-08-07,32.6987,75.0582,landslide,continuous_rain,10km,Jammu and Kashmir,Karlup,1,NASA GLC/COOLR
+9476,2016-08-07,33.1457,75.7964,landslide,continuous_rain,25km,Jammu and Kashmir,Khandhot,0,NASA GLC/COOLR
+9477,2016-08-07,33.0716,74.839,landslide,continuous_rain,10km,Jammu and Kashmir,Riasi,0,NASA GLC/COOLR
+9478,2016-08-07,32.4298,75.5807,landslide,continuous_rain,5km,Jammu and Kashmir,Madhopur,0,NASA GLC/COOLR
+9475,2016-08-07,32.9041,75.0911,landslide,continuous_rain,25km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+9852,2016-08-09,31.70779,76.93277,landslide,downpour,5km,Himachal Pradesh,Mandi,0,NASA GLC/COOLR
+9849,2016-08-11,30.07051,80.23722,landslide,continuous_rain,1km,Uttarakhand,Mathkot,1,NASA GLC/COOLR
+9859,2016-08-16,31.58149,78.41278,landslide,rain,25km,Himachal Pradesh,Burati Thatang,0,NASA GLC/COOLR
+9864,2016-08-16,29.35085,79.45126,landslide,rain,5km,Uttarakhand,Nainital,0,NASA GLC/COOLR
+9892,2016-08-21,31.45206,78.4013,landslide,rain,exact,Himachal Pradesh,Chitkal,1,NASA GLC/COOLR
+9895,2016-08-24,33.02998,74.94808,landslide,unknown,1km,Jammu and Kashmir,Riasi,1,NASA GLC/COOLR
+9915,2016-08-28,30.92233,78.68138,landslide,rain,1km,Uttarakhand,Purali,1,NASA GLC/COOLR
+9912,2016-08-29,30.99569,78.93631,landslide,rain,exact,Uttarakhand,Dhumku,0,NASA GLC/COOLR
+9490,2016-08-30,31.5728,77.8561,rock_fall,continuous_rain,5km,Himachal Pradesh,Sarahan,0,NASA GLC/COOLR
+9953,2016-09-02,31.95655,77.10972,landslide,unknown,5km,Himachal Pradesh,Kulu,4,NASA GLC/COOLR
+9507,2016-10-03,30.8974,77.0588,landslide,construction,10km,Himachal Pradesh,Gannja,0,NASA GLC/COOLR
+10863,2016-11-10,32.83198,75.73016,rock_fall,construction,5km,Jammu and Kashmir,Bhadarwah,2,NASA GLC/COOLR
+10821,2016-12-26,33.43538,75.19067,landslide,unknown,1km,Jammu and Kashmir,Gund,1,NASA GLC/COOLR
+10832,2017-01-06,33.24199,75.22771,landslide,rain,5km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+10835,2017-01-06,33.3382,75.19229,landslide,rain,exact,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10860,2017-01-06,31.05633,77.13685,rock_fall,construction,5km,Himachal Pradesh,Simla,4,NASA GLC/COOLR
+10829,2017-01-26,33.24789,75.21402,landslide,rain,5km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+10831,2017-01-26,33.36012,75.17291,landslide,rain,1km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10859,2017-01-26,30.87544,77.00009,rock_fall,downpour,1km,Himachal Pradesh,Kalka,0,NASA GLC/COOLR
+10825,2017-02-02,33.22166,75.26927,landslide,unknown,1km,Jammu and Kashmir,Panjan,0,NASA GLC/COOLR
+10828,2017-02-04,33.30044,75.18163,landslide,unknown,1km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10836,2017-02-04,33.27071,75.17529,landslide,snowfall_snowmelt,10km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+10830,2017-02-05,33.24824,75.2135,landslide,rain,1km,Jammu and Kashmir,Chaunkri,0,NASA GLC/COOLR
+10823,2017-02-18,33.49573,75.18134,landslide,rain,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10826,2017-02-19,33.33689,75.19166,landslide,rain,10km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10857,2017-02-21,32.00653,78.56989,rock_fall,rain,5km,Himachal Pradesh,Southeastern Zaskar Mountains,0,NASA GLC/COOLR
+10846,2017-02-23,33.38247,75.72288,landslide,continuous_rain,5km,Jammu and Kashmir,Mugal Maidan,0,NASA GLC/COOLR
+10944,2017-02-23,34.07756,74.58082,landslide,continuous_rain,5km,Jammu and Kashmir,Palhalan,0,NASA GLC/COOLR
+10843,2017-02-25,33.17581,75.81056,rock_fall,rain,5km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+10840,2017-02-26,33.25647,75.77361,landslide,snowfall_snowmelt,10km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+10833,2017-02-27,33.37197,75.1944,landslide,snowfall_snowmelt,100km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10827,2017-02-28,33.2883,75.17803,landslide,snowfall_snowmelt,25km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10824,2017-03-06,33.33737,75.19213,landslide,unknown,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10834,2017-03-10,33.37055,75.19392,landslide,rain,10km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10842,2017-03-19,33.22014,75.79645,landslide,snowfall_snowmelt,10km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+10856,2017-03-22,31.77316,77.30471,landslide,construction,5km,Himachal Pradesh,Manglaor,1,NASA GLC/COOLR
+10845,2017-03-25,33.40308,75.68061,landslide,other,5km,Jammu and Kashmir,Mugal Maidan,2,NASA GLC/COOLR
+10841,2017-03-30,33.18025,75.80786,landslide,unknown,1km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+10844,2017-04-02,33.15322,75.67827,landslide,unknown,25km,Jammu and Kashmir,Khandhot,3,NASA GLC/COOLR
+10068,2017-04-06,30.8135,78.61792,landslide,downpour,1km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+10069,2017-04-06,30.61461,78.31575,landslide,downpour,1km,Uttarakhand,Chham,0,NASA GLC/COOLR
+10070,2017-04-06,31.01261,78.8845,landslide,downpour,1km,Uttarakhand,Dhumku,0,NASA GLC/COOLR
+10073,2017-04-06,30.50416,79.48751,rock_fall,continuous_rain,5km,Uttarakhand,Joshimath,0,NASA GLC/COOLR
+10858,2017-04-06,31.09794,77.15164,landslide,continuous_rain,exact,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+10938,2017-04-07,34.40394,74.26149,landslide,rain,5km,Jammu and Kashmir,Nutnus,0,NASA GLC/COOLR
+10942,2017-04-07,34.08325,74.84254,landslide,continuous_rain,1km,Jammu and Kashmir,Pampur,0,NASA GLC/COOLR
+10820,2017-04-08,33.40832,75.20596,landslide,continuous_rain,50km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10852,2017-04-08,32.95544,74.96483,landslide,continuous_rain,5km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+10848,2017-04-08,33.12173,75.40856,landslide,unknown,10km,Jammu and Kashmir,Doda,0,NASA GLC/COOLR
+10819,2017-04-12,32.99132,75.19428,rock_fall,rain,1km,Jammu and Kashmir,Udhampur,1,NASA GLC/COOLR
+10838,2017-04-15,33.17598,75.81089,landslide,rain,1km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+10847,2017-04-16,33.12922,75.44619,rock_fall,rain,10km,Jammu and Kashmir,Doda,0,NASA GLC/COOLR
+10822,2017-04-17,33.31916,75.1933,landslide,rain,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+10855,2017-04-18,31.76419,77.29184,landslide,construction,5km,Himachal Pradesh,Manglaor,0,NASA GLC/COOLR
+10937,2017-04-18,34.58916,74.24641,landslide,rain,5km,Jammu and Kashmir,Nutnus,0,NASA GLC/COOLR
+10837,2017-04-22,33.18368,75.80817,rock_fall,rain,5km,Jammu and Kashmir,Shandero,2,NASA GLC/COOLR
+10853,2017-04-23,32.36149,77.23399,landslide,snowfall_snowmelt,1km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+10839,2017-04-25,33.17191,75.81074,landslide,rain,1km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+10862,2017-04-30,32.30717,77.60234,landslide,snowfall_snowmelt,50km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+10854,2017-05-05,32.34194,77.22158,landslide,snowfall_snowmelt,5km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+10818,2017-05-05,33.32218,75.19282,landslide,rain,10km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+9802,2017-05-20,30.56505,79.56163,landslide,unknown,5km,Uttarakhand,Joshimath,0,NASA GLC/COOLR
+9809,2017-05-20,30.73316,79.49232,landslide,rain,25km,Uttarakhand,Saraswati,13,NASA GLC/COOLR
+9740,2017-06-06,34.27704,75.46743,landslide,rain,25km,Jammu and Kashmir,Matayan,0,NASA GLC/COOLR
+9706,2017-06-06,30.33597,79.31958,landslide,rain,5km,Uttarakhand,Langsu,1,NASA GLC/COOLR
+9707,2017-06-07,30.94222,76.80054,landslide,rain,5km,Himachal Pradesh,Nalagarh,8,NASA GLC/COOLR
+9726,2017-06-08,33.35149,74.23353,landslide,unknown,25km,Jammu and Kashmir,Rajauri,1,NASA GLC/COOLR
+14497,2017-06-16,34.16748,77.58032,landslide,unknown,5km,Jammu and Kashmir,Leh,,NASA GLC/COOLR
+9835,2017-06-21,32.62803,75.37123,landslide,rain,5km,Jammu and Kashmir,Ramnagar,0,NASA GLC/COOLR
+9836,2017-06-21,32.94818,75.12206,rock_fall,rain,5km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+9826,2017-06-22,33.0174,74.93828,landslide,rain,1km,Jammu and Kashmir,Riasi,0,NASA GLC/COOLR
+9830,2017-06-22,33.63252,75.23162,landslide,downpour,25km,Jammu and Kashmir,Anantnag,,NASA GLC/COOLR
+9840,2017-06-27,31.72415,76.93732,landslide,downpour,1km,Himachal Pradesh,Mandi,0,NASA GLC/COOLR
+9870,2017-06-29,30.86642,76.9979,landslide,monsoon,10km,Himachal Pradesh,Kalka,0,NASA GLC/COOLR
+9899,2017-06-29,33.18477,75.80814,landslide,rain,5km,Jammu and Kashmir,Shandero,0,NASA GLC/COOLR
+10025,2017-06-29,32.76391,77.28273,landslide,rain,25km,Himachal Pradesh,Gushai,0,NASA GLC/COOLR
+9897,2017-06-30,33.08147,75.2975,landslide,downpour,1km,Jammu and Kashmir,Udhampur,0,NASA GLC/COOLR
+9886,2017-06-30,33.01346,74.9353,landslide,rain,1km,Jammu and Kashmir,Riasi,1,NASA GLC/COOLR
+9924,2017-07-02,32.26186,78.0685,landslide,rain,5km,Himachal Pradesh,Luling,0,NASA GLC/COOLR
+9925,2017-07-02,32.24637,78.06616,landslide,rain,5km,Himachal Pradesh,Luling,0,NASA GLC/COOLR
+9927,2017-07-02,32.23843,78.06239,landslide,rain,10km,Himachal Pradesh,Luling,0,NASA GLC/COOLR
+9936,2017-07-03,32.30629,77.52161,landslide,unknown,100km,Himachal Pradesh,Chandra,0,NASA GLC/COOLR
+10006,2017-07-05,29.88885,80.56522,landslide,rain,10km,Uttarakhand,Sobala,5,NASA GLC/COOLR
+10067,2017-07-07,30.24148,78.89774,landslide,rain,5km,Uttarakhand,Srinagar,0,NASA GLC/COOLR
+10071,2017-07-11,30.41288,78.08379,landslide,continuous_rain,5km,Uttarakhand,Mussorie,3,NASA GLC/COOLR
+10866,2017-07-11,29.83417,80.26895,landslide,continuous_rain,50km,Uttarakhand,Tham,1,NASA GLC/COOLR
+10849,2017-07-12,33.14402,75.54564,landslide,unknown,5km,Jammu and Kashmir,Doda,1,NASA GLC/COOLR
+10072,2017-07-13,30.23936,77.95582,landslide,continuous_rain,5km,Uttarakhand,Clement Town,0,NASA GLC/COOLR
+10943,2017-07-13,34.06831,74.63364,landslide,rain,exact,Jammu and Kashmir,Palhalan,0,NASA GLC/COOLR
+14235,2017-08-14,31.91423,76.89299,debris_flow,downpour,exact,Himachal Pradesh,Bhuntar,,NASA GLC/COOLR
+12943,2017-08-22,31.49791,76.87454,landslide,unknown,1km,Himachal Pradesh,Sundarngar,0,NASA GLC/COOLR
+13253,2017-08-22,31.10245,77.20459,landslide,unknown,10km,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+10861,2017-09-02,31.10313,77.20356,landslide,rain,exact,Himachal Pradesh,Simla,0,NASA GLC/COOLR
+12881,2017-09-03,30.73923,78.37396,landslide,unknown,5km,Uttarakhand,Uttarkashi,,NASA GLC/COOLR
+13224,2017-12-10,31.41067,77.60255,landslide,unknown,5km,Himachal Pradesh,Rampur,6,NASA GLC/COOLR
+13214,2017-12-14,29.42015,80.24413,landslide,mining,exact,Uttarakhand,Pithoragarh,,NASA GLC/COOLR
+11225,2017-12-25,34.24897,74.68431,landslide,unknown,1km,Jammu and Kashmir,Palhalan,0,NASA GLC/COOLR
+12880,2018-04-27,30.74149,78.52656,landslide,unknown,5km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+11317,2018-05-08,30.65161,79.52009,rock_fall,rain,1km,Uttarakhand,Saraswati,0,NASA GLC/COOLR
+11327,2018-05-09,33.37067,74.31966,landslide,rain,10km,Jammu and Kashmir,Rajaori,1,NASA GLC/COOLR
+11375,2018-05-13,33.63589,74.51371,landslide,unknown,5km,Jammu and Kashmir,Pir Panjal Range,0,NASA GLC/COOLR
+11356,2018-05-15,34.30437,76.93329,landslide,unknown,50km,Jammu and Kashmir,Khalsi,2,NASA GLC/COOLR
+11482,2018-05-29,34.31775,75.5465,landslide,snowfall_snowmelt,25km,Jammu and Kashmir,Matayan,0,NASA GLC/COOLR
+11484,2018-05-29,34.43134,75.74123,landslide,rain,1km,Jammu and Kashmir,Dras,0,NASA GLC/COOLR
+11483,2018-05-30,34.30926,75.53529,rock_fall,rain,25km,Jammu and Kashmir,Matayan,0,NASA GLC/COOLR
+11485,2018-06-01,34.08328,74.03228,landslide,unknown,1km,Jammu and Kashmir,Uri,1,NASA GLC/COOLR
+11513,2018-06-01,30.72203,78.44517,landslide,downpour,1km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+13849,2018-08-01,33.25401,75.01406,landslide,unknown,25km,Jammu and Kashmir,Chaunkri,2,NASA GLC/COOLR
+14164,2018-08-07,31.12029,77.35888,landslide,rain,25km,Himachal Pradesh,Gannja,0,NASA GLC/COOLR
+14113,2018-08-09,32.55696,76.12911,landslide,rain,10km,Himachal Pradesh,Chamba,1,NASA GLC/COOLR
+14102,2018-08-09,30.8213,78.23266,landslide,rain,10km,Uttarakhand,Uttarkashi,0,NASA GLC/COOLR
+14179,2018-08-09,32.17103,76.41866,landslide,rain,1km,Himachal Pradesh,Pathiar,0,NASA GLC/COOLR
+14057,2018-08-10,34.16098,77.55449,mudslide,rain,5km,Jammu and Kashmir,Leh,0,NASA GLC/COOLR
+14194,2018-08-10,30.04015,80.31355,landslide,rain,25km,Uttarakhand,Mathkot,1,NASA GLC/COOLR
+14055,2018-08-11,31.34335,76.76201,landslide,rain,5km,Himachal Pradesh,Bilaspur,0,NASA GLC/COOLR
+14081,2018-08-11,30.91714,78.68362,landslide,rain,10km,Uttarakhand,Purali,0,NASA GLC/COOLR
+14146,2018-08-13,31.425,78.26035,landslide,rain,25km,Himachal Pradesh,Oling,0,NASA GLC/COOLR
+14117,2018-08-13,32.02548,76.16693,mudslide,rain,25km,Himachal Pradesh,Katnor,4,NASA GLC/COOLR
+14071,2018-08-14,31.05513,77.024,landslide,rain,1km,Himachal Pradesh,Simla,1,NASA GLC/COOLR
+14577,2018-08-18,29.38417,79.46311,landslide,unknown,1km,Uttarakhand,Nainital,,NASA GLC/COOLR
+14505,2018-08-18,32.06073,77.13301,landslide,construction,10km,Himachal Pradesh,Shirir,0,NASA GLC/COOLR
+14429,2018-08-20,33.31581,75.76341,rock_fall,unknown,10km,Jammu and Kashmir,Ariz,4,NASA GLC/COOLR
+14483,2018-08-20,31.49579,76.23393,landslide,rain,50km,Himachal Pradesh,Gobindpur,0,NASA GLC/COOLR
+14459,2018-08-21,33.14545,75.78026,landslide,rain,10km,Jammu and Kashmir,Khandhot,7,NASA GLC/COOLR
+14530,2018-08-25,29.3872,79.46145,landslide,unknown,1km,Uttarakhand,Nainital,,NASA GLC/COOLR
+12882,2018-08-29,30.35949,78.37743,debris_flow,downpour,1km,Uttarakhand,Chham,7,NASA GLC/COOLR
+14350,2018-08-29,32.7935,74.82127,landslide,rain,5km,Jammu and Kashmir,Kurwanda,,NASA GLC/COOLR
+13796,2018-08-30,30.27159,79.44951,landslide,unknown,unknown,Uttarakhand,Langsu,2,NASA GLC/COOLR
+14359,2018-09-01,32.71989,76.09863,landslide,unknown,25km,Himachal Pradesh,Shaini,,NASA GLC/COOLR
+14326,2018-09-02,31.11295,77.61443,landslide,rain,25km,Himachal Pradesh,Saura,,NASA GLC/COOLR
+14325,2018-09-03,31.10756,77.21538,landslide,rain,1km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+14392,2018-09-03,32.44155,76.53467,landslide,downpour,10km,Himachal Pradesh,Bara Bangahol,1,NASA GLC/COOLR
+14464,2018-09-03,30.29068,78.48726,landslide,unknown,25km,Uttarakhand,Alaknanda,14,NASA GLC/COOLR
+14386,2018-09-11,31.10269,77.15933,landslide,unknown,5km,Himachal Pradesh,Simla,,NASA GLC/COOLR
+14572,2018-09-13,31.01885,78.04493,rock_fall,rain,10km,Uttarakhand,Phetari,1,NASA GLC/COOLR
+14360,2018-09-18,33.25718,75.19682,landslide,unknown,5km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+14542,2018-09-23,32.99133,75.19804,landslide,continuous_rain,5km,Jammu and Kashmir,Udhampur,,NASA GLC/COOLR
+14553,2018-09-23,32.79449,74.82074,landslide,continuous_rain,10km,Jammu and Kashmir,Kurwanda,,NASA GLC/COOLR
+14606,2018-09-23,33.33481,75.19626,landslide,continuous_rain,5km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+14549,2018-09-23,32.55707,76.12318,landslide,monsoon,25km,Himachal Pradesh,Chamba,,NASA GLC/COOLR
+14558,2018-09-25,33.07376,75.60806,landslide,rain,25km,Jammu and Kashmir,Thalol,,NASA GLC/COOLR
+14623,2018-09-25,33.03222,75.90944,landslide,rain,10km,Jammu and Kashmir,Gondo,5,NASA GLC/COOLR
+14605,2018-09-25,31.40954,76.43306,landslide,unknown,1km,Himachal Pradesh,Govind Sagar,,NASA GLC/COOLR
+14332,2018-09-25,33.04987,75.94929,landslide,rain,5km,Jammu and Kashmir,Gondo,5,NASA GLC/COOLR
+14282,2018-09-26,31.70553,76.93439,landslide,continuous_rain,50km,Himachal Pradesh,Mandi,0,NASA GLC/COOLR
+14596,2018-09-26,33.13499,75.54505,landslide,unknown,5km,Jammu and Kashmir,Doda,,NASA GLC/COOLR
+14584,2018-09-26,32.74104,74.87509,landslide,downpour,1km,Jammu and Kashmir,Jammu,,NASA GLC/COOLR
+14516,2018-09-26,31.4672,76.26298,landslide,downpour,5km,Himachal Pradesh,Nangal,,NASA GLC/COOLR
+14446,2018-09-26,33.1442,75.76778,landslide,unknown,1km,Jammu and Kashmir,Khandhot,,NASA GLC/COOLR
+14598,2018-09-26,32.34525,76.52057,landslide,unknown,10km,Himachal Pradesh,Dharmsala,,NASA GLC/COOLR
+14538,2018-09-27,33.38282,75.20065,landslide,unknown,10km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+14569,2018-09-27,31.11743,77.57455,landslide,continuous_rain,25km,Himachal Pradesh,Saura,0,NASA GLC/COOLR
+14236,2018-09-28,33.2644,75.18642,landslide,unknown,1km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+14489,2018-09-28,31.11123,77.60625,landslide,monsoon,5km,Himachal Pradesh,Saura,,NASA GLC/COOLR
+14125,2018-10-09,31.68912,77.27868,landslide,rain,5km,Himachal Pradesh,Manglaor,,NASA GLC/COOLR
+14116,2018-10-10,31.51688,78.26894,landslide,construction,5km,Himachal Pradesh,Oling,,NASA GLC/COOLR
+14191,2018-10-10,33.2995,75.18116,landslide,rain,5km,Jammu and Kashmir,Gund,,NASA GLC/COOLR
+14079,2018-10-14,30.89561,77.00451,landslide,construction,10km,Himachal Pradesh,Kalka,,NASA GLC/COOLR
+14212,2018-10-19,33.21265,75.36251,landslide,construction,25km,Jammu and Kashmir,Panjan,0,NASA GLC/COOLR
+13835,2018-10-30,33.30596,75.17357,landslide,unknown,5km,Jammu and Kashmir,Gund,1,NASA GLC/COOLR
+14397,2018-10-30,33.30078,75.18148,landslide,continuous_rain,1km,Jammu and Kashmir,Gund,1,NASA GLC/COOLR
+14465,2018-11-03,33.25427,75.20537,landslide,continuous_rain,50km,Jammu and Kashmir,Chaunkri,1,NASA GLC/COOLR
+14468,2018-11-06,33.23065,75.25138,landslide,continuous_rain,5km,Jammu and Kashmir,Chaunkri,3,NASA GLC/COOLR
+14338,2018-11-21,31.70825,77.18597,landslide,mining,25km,Himachal Pradesh,Pandoh,0,NASA GLC/COOLR
+14295,2018-11-22,32.23427,77.18888,landslide,unknown,50km,Himachal Pradesh,Shirir,0,NASA GLC/COOLR
+14038,2018-12-15,33.33198,75.20071,landslide,snowfall_snowmelt,5km,Jammu and Kashmir,Gund,0,NASA GLC/COOLR
+14063,2018-12-18,33.24019,75.23889,rock_fall,snowfall_snowmelt,1km,Jammu and Kashmir,Chaunkri,,NASA GLC/COOLR
+13834,2018-12-21,30.51702,79.09243,translational_slide,construction,10km,Uttarakhand,Gaundar,8,NASA GLC/COOLR
+13305,2019-03-17,33.40117,75.18645,debris_flow,unknown,10km,Jammu and Kashmir,Gund,1,NASA GLC/COOLR
+13804,2020-04-18,33.09846,75.32836,rock_fall,rain,5km,Jammu and Kashmir,Doda,0,NASA GLC/COOLR
