@@ -1,12 +1,14 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from flask import Flask, jsonify
 from flask_cors import CORS
-from dotenv import load_dotenv
 from routes.api_routes import api_bp
 from routes.forecast_routes import forecast_bp
 from routes.chatbot import chatbot_bp
 from routes.admin_routes import admin_bp
-
-load_dotenv()
+from routes.subscriber_routes import subscriber_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -16,6 +18,7 @@ app.register_blueprint(api_bp, url_prefix='/api')
 app.register_blueprint(forecast_bp, url_prefix='/api/forecast')
 app.register_blueprint(chatbot_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
+app.register_blueprint(subscriber_bp, url_prefix='/api/subscribers')
 
 @app.route('/')
 def home():

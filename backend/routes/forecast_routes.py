@@ -19,6 +19,7 @@ DEFAULT_DAYS = 7
 MAX_DAYS = 30
 WEATHER_FORECAST_DAYS = 16  # longest day-by-day weather forecast Open-Meteo offers
 ALERT_DAYS = 7              # only the near days are firm enough to log alerts / send SMS
+SMS_MIN_SCORE = float(os.getenv('SMS_MIN_SCORE', '60'))  # SMS only for HIGH (60+) and CRITICAL (80+)
 
 
 def _seasonal_rain(lat, lon, days):
@@ -164,6 +165,7 @@ def predict_7day():
 
         # Step 3: Predict for each day
         results = []
+        sms_days = []  # risky days to put in ONE summary SMS
 
         for i, (date, rain_mm, rain_source, windows) in enumerate(daily_forecast):
             runs = (ensemble or {}).get(date)
@@ -216,14 +218,14 @@ def predict_7day():
                     trigger=f"Forecast for {date}"
                 )
 
-            if notify and prediction['score'] >= 3:
-                alert_service.send_landslide_alert(
-                    lat=lat,
-                    lon=lon,
-                    risk_score=float(prediction['score']),
-                    risk_level=prediction['level'],
-                    date=date
-    )
+
+            if notify and float(prediction['score']) >= SMS_MIN_SCORE:
+                sms_days.append((date, float(prediction['score']), str(prediction['level']).upper()))
+
+        # One summary SMS per request (skipped if this place was texted recently)
+        if sms_days:
+            alert_service.send_forecast_alert(lat, lon, sms_days)
+
 
         return jsonify({
             'location': {'lat': lat, 'lon': lon},
