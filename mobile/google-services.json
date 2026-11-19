@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "190595507246",
+    "project_id": "terraalert-a3dcc",
+    "storage_bucket": "terraalert-a3dcc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190595507246:android:d9faa6435a81909876abbf",
+        "android_client_info": {
+          "package_name": "Terra_Alert.v01"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpwiyEls89O2n5qfO1BDPAMgTub-WDdzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190595507246:android:9a4c439cd4e54e8176abbf",
+        "android_client_info": {
+          "package_name": "com.terraalert.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpwiyEls89O2n5qfO1BDPAMgTub-WDdzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

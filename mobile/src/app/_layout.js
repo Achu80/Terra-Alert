@@ -3,6 +3,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import LaunchScreen from '@/components/startup/LaunchScreen';
+import SubscribeScreen from '@/components/startup/SubscribeScreen';
+import { setupNotifications } from '@/services/notifications';
 import WelcomeScreen from '@/components/startup/WelcomeScreen';
 import { AdminProvider } from '@/context/AdminContext';
 import { AlertProvider } from '@/context/AlertContext';
@@ -20,6 +22,10 @@ const LAUNCH_MS = 1200;
  * then the one on top fades away, so there is never a blank frame between them.
  */
 export default function RootLayout() {
+    // Show landslide alerts as banners while the app is open
+    useEffect(() => {
+        setupNotifications();
+    }, []);
     const [showLaunch, setShowLaunch] = useState(true);
     const [showWelcome, setShowWelcome] = useState(false);
     const [showApp, setShowApp] = useState(false);
@@ -54,6 +60,8 @@ export default function RootLayout() {
                         <StatusBar style="light" />
                         <View style={styles.root}>
                             {showApp ? <Stack screenOptions={{ headerShown: false, contentStyle: styles.root }} /> : null}
+                            {/* First-launch prompt for SMS alerts: shows once, after the welcome screen */}
+                            {showApp ? <SubscribeScreen onDone={() => {}} /> : null}
 
                             {showWelcome ? (
                                 <Animated.View

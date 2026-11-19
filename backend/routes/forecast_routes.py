@@ -7,8 +7,10 @@ import requests
 from datetime import datetime, timedelta
 import os
 from services.alert_service import AlertService
+from services.push_service import PushService
 from database.repositories import AlertRepository
 alert_service = AlertService()
+push_service = PushService()
 alert_repo = AlertRepository()
 forecast_bp = Blueprint('forecast', __name__)
 
@@ -225,6 +227,8 @@ def predict_7day():
         # One summary SMS per request (skipped if this place was texted recently)
         if sms_days:
             alert_service.send_forecast_alert(lat, lon, sms_days)
+            # Phone notifications for devices near this place (same risk rule as SMS)
+            push_service.send_risk_alert(lat, lon, sms_days)
 
 
         return jsonify({

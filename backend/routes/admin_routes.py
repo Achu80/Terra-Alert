@@ -20,7 +20,9 @@ _failures = {}  # ip -> (count, first_failure_time)
 
 
 def _client_ip():
-    return request.headers.get('X-Forwarded-For', request.remote_addr or 'unknown').split(',')[0].strip()
+    # Use the real connection address only. X-Forwarded-For is set by the client, so trusting it
+    # let anyone reset the lockout by sending a new fake address each time.
+    return request.remote_addr or 'unknown'
 
 
 def _is_locked(ip):

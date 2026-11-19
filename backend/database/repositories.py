@@ -696,3 +696,65 @@ class SubscriberRepository:
             if km(lat, lon, r['lat'], r['lon']) <= radius_km and r['phone'] not in phones:
                 phones.append(r['phone'])
         return phones
+
+class PushRepository:
+    """Phone notification devices: an Expo push token plus the place the person wants warnings for."""
+
+    def __init__(self):
+        try:
+            self.supabase = get_supabase() if is_supabase_available() else None
+        except Exception as e:
+            print(f"Warning: Could not initialize Supabase in PushRepository: {e}")
+            self.supabase = None
+
+    def register(self, token: str, lat: float, lon: float, name: Optional[str] = None, min_score: int = 60) -> None:
+        """Save or update a device. Registering again moves the device to the new place and re-activates it."""
+        if not self.supabase:
+            raise ConnectionError("Supabase not available")
+        row = {
+            'token': token,
+            'lat': float(lat),
+            'lon': float(lon),
+            'location_name': name,
+            'min_score': int(min_score),
+            'active': True,
+            'updated_at': datetime.utcnow().isoformat(),
+        }
+        self.supabase.table('push_devices').upsert(row, on_conflict='token').execute()
+
+    def unregister(self, token: str) -> None:
+        if not self.supabase:
+            raise ConnectionError("Supabase not available")
+        self.supabase.table('push_devices').update({'active': False}).eq('token', token).execute()
+
+    def find_near(self, lat: float, lon: float, radius_km: float = 10.0) -> Optional[List[Dict]]:
+        """Active devices within radius_km of (lat, lon): [{'token', 'min_score'}]. None if the database is unavailable."""
+        if not self.supabase:
+            return None
+        import math
+        lat, lon = float(lat), float(lon)
+        dlat = radius_km / 111.0
+        dlon = radius_km / (111.0 * max(math.cos(math.radians(lat)), 0.01))
+        try:
+            rows = self.supabase.table('push_devices')\
+                .select('token,lat,lon,min_score')\
+                .eq('active', True)\
+                .gte('lat', lat - dlat).lte('lat', lat + dlat)\
+                .gte('lon', lon - dlon).lte('lon', lon + dlon)\
+                .execute().data or []
+        except Exception as e:
+            print(f"Error in push find_near: {e}")
+            return None
+
+        def km(a_lat, a_lon, b_lat, b_lon):
+            p = math.pi / 180
+            h = (math.sin((b_lat - a_lat) * p / 2) ** 2
+                 + math.cos(a_lat * p) * math.cos(b_lat * p) * math.sin((b_lon - a_lon) * p / 2) ** 2)
+            return 12742 * math.asin(math.sqrt(h))
+
+        devices, seen = [], set()
+        for r in rows:
+            if km(lat, lon, r['lat'], r['lon']) <= radius_km and r['token'] not in seen:
+                seen.add(r['token'])
+                devices.append({'token': r['token'], 'min_score': int(r.get('min_score') or 60)})
+        return devices

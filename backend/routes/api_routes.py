@@ -14,6 +14,22 @@ from datetime import datetime, timedelta
 import os
 import numpy as np
 
+
+def _send_assessment_alerts(lat, lon, prediction):
+    """Send the SMS and phone alert for a Home-screen assessment at High (60) or above.
+    Uses the same services, thresholds and cooldowns as the forecast alerts. Never breaks the prediction."""
+    try:
+        score = float(prediction['score'])
+        if score < float(os.getenv('SMS_MIN_SCORE', '60')):
+            return
+        # Reuse the forecast route's service objects (they hold the SMS and push setup)
+        from routes.forecast_routes import alert_service, push_service
+        days = [(datetime.utcnow().date().isoformat(), score, str(prediction['level']).upper())]
+        alert_service.send_forecast_alert(float(lat), float(lon), days)
+        push_service.send_risk_alert(float(lat), float(lon), days)
+    except Exception as e:
+        print(f"WARNING: assessment alert failed: {e}")
+
 api_bp = Blueprint('api', __name__)
 
 # Initialize services
@@ -509,9 +525,13 @@ def predict():
                 cache.save_prediction(lat, lon, result)
             except:
                 pass  # Cache save failed, but prediction succeeded
-        
+
+        # High or above on the Home screen also sends the SMS and phone alert for this place.
+        # The SMS and push cooldowns stop repeat messages when the screen is opened again.
+        _send_assessment_alerts(lat, lon, prediction)
+
         return jsonify(result)
-    
+
     except Exception as e:
         import traceback
         error_details = {
