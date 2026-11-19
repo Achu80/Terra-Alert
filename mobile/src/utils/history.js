@@ -56,6 +56,12 @@ export function assignDistrict(name, lat, lon) {
     return null;
 }
 
+function addDays(date, days) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+}
+
 function bucketStart(date, bucket) {
     const d = new Date(date);
     d.setHours(0, 0, 0, 0);
@@ -75,6 +81,13 @@ export function buildTrend(rows, range, now = new Date()) {
     const span = Math.max(1, now.getTime() - start);
     const buckets = new Map();
 
+    // Every day (or week) in the range gets a slot, so days with no predictions show as gaps on the chart
+    const step = range.bucket === 'week' ? 7 : 1;
+    const last = bucketStart(now, range.bucket);
+    for (let d = bucketStart(new Date(start), range.bucket); d <= last; d = addDays(d, step)) {
+        buckets.set(d.toISOString(), { date: d, sum: 0, count: 0 });
+    }
+
     for (const row of rows) {
         const b = bucketStart(row.createdAt, range.bucket);
         const key = b.toISOString();
@@ -89,7 +102,7 @@ export function buildTrend(rows, range, now = new Date()) {
         .map(([key, e]) => ({
             key,
             label: shortDate(e.date),
-            score: e.sum / e.count,
+            score: e.count > 0 ? e.sum / e.count : null, // null = no predictions that day or week
             count: e.count,
             t: Math.min(1, Math.max(0, (e.date.getTime() - start) / span)),
         }));

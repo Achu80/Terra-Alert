@@ -104,7 +104,7 @@ export default function HistoryScreen() {
                         <ActivityIndicator color={colors.primary} style={styles.loader} />
                     ) : result.error ? (
                         <Text style={styles.error}>{result.error}</Text>
-                    ) : trend.length === 0 ? (
+                    ) : !trend.some((p) => p.count > 0) ? (
                         <Text style={styles.empty}>
                             No predictions for {regionName} in the last {range.label.toLowerCase()}. Run a risk assessment on Home to
                             add one.

@@ -1,16 +1,38 @@
-import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, G, Line, LinearGradient, Path, Rect, Stop, Text as SvgText } from 'react-native-svg';
 import { colors, RISK_COLORS } from '@/theme/colors';
 
 const GRID_VALUES = [0, 25, 50, 75, 100];
-const MAX_X_LABELS = 5;
+// Date labels are written vertically, so they only need the height of one line of text between them
+const LABEL_GAP = 12;
+// Room under the axis for a vertical date label (about 6 characters at 11px)
+const DATE_LABEL_SPACE = 44;
+// Horizontal space per day (or week) slot. When the slots need more room than the screen, the chart scrolls sideways.
+const SLOT_PX = 14;
 
-// Evenly spread label positions: always the first and last point, never crowded
-function labelIndexes(count) {
-    if (count <= MAX_X_LABELS) return new Set([...Array(count).keys()]);
-    const step = (count - 1) / (MAX_X_LABELS - 1);
-    return new Set(Array.from({ length: MAX_X_LABELS }, (_, i) => Math.round(i * step)));
+// Pick which points get a date label, using their actual x positions (points are placed by time, so
+// evenly spaced indexes can sit on top of each other). Greedy left to right, skipping any label that
+// would be closer than LABEL_GAP to the last one shown. The last point is always labelled if it fits.
+function pickLabels(placed) {
+    const shown = new Set();
+    let lastX = -Infinity;
+    placed.forEach((p, i) => {
+        if (p.x - lastX >= LABEL_GAP) {
+            shown.add(i);
+            lastX = p.x;
+        }
+    });
+    const last = placed.length - 1;
+    if (last >= 0 && !shown.has(last)) {
+        // Make room for the final label by dropping shown labels it would collide with
+        for (const i of [...shown]) {
+            if (Math.abs(placed[last].x - placed[i].x) < LABEL_GAP && i !== 0) shown.delete(i);
+        }
+        // If the first label is still too close, the first label wins and the last one is left off
+        if (!shown.has(0) || Math.abs(placed[last].x - placed[0].x) >= LABEL_GAP) shown.add(last);
+    }
+    return shown;
 }
 
 /**
@@ -26,14 +48,17 @@ export default function TrendChart({ title, points, baseline, baselineLabel, ban
     // Svg needs pixel sizes, so measure the available width first
     const [width, setWidth] = useState(0);
     const [selectedKey, setSelectedKey] = useState(null);
+    const scrollRef = useRef(null);
 
     const pad = {
         top: 14,
         right: bands ? 58 : 14,
-        bottom: xAxisLabel ? 46 : 28,
+        bottom: DATE_LABEL_SPACE + (xAxisLabel ? 46 : 28),
         left: yAxisLabel ? 48 : 34,
     };
-    const graphW = Math.max(0, width - pad.left - pad.right);
+    // Chart width: the screen width, or wider when there are many slots (then the chart scrolls sideways)
+    const chartW = Math.max(width, pad.left + pad.right + points.length * SLOT_PX);
+    const graphW = Math.max(0, chartW - pad.left - pad.right);
     const graphH = height - pad.top - pad.bottom;
     const yOf = (score) => pad.top + graphH - (Math.max(0, Math.min(100, score)) / 100) * graphH;
     const xOf = (p, i) => {
@@ -41,14 +66,28 @@ export default function TrendChart({ title, points, baseline, baselineLabel, ban
         return pad.left + t * graphW;
     };
 
-    const placed = points.map((p, i) => ({ ...p, x: xOf(p, i), y: yOf(p.score) }));
-    const linePath = placed.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+    // Slots with no score (no predictions that day or week) keep their x position and date label,
+    // but get no dot, and the line is broken across them
+    const placed = points.map((p, i) => ({ ...p, x: xOf(p, i), y: p.score == null ? null : yOf(p.score) }));
+    const known = placed.filter((p) => p.y != null);
+    let linePath = '';
+    let penDown = false;
+    placed.forEach((p) => {
+        if (p.y == null) {
+            penDown = false;
+            return;
+        }
+        linePath += `${penDown ? 'L' : 'M'} ${p.x} ${p.y} `;
+        penDown = true;
+    });
     const baseY = pad.top + graphH;
     const areaPath =
-        placed.length > 1 ? `${linePath} L ${placed[placed.length - 1].x} ${baseY} L ${placed[0].x} ${baseY} Z` : '';
-    const showLabel = labelIndexes(placed.length);
+        known.length > 1
+            ? `M ${known[0].x} ${known[0].y} ${known.slice(1).map((p) => `L ${p.x} ${p.y}`).join(' ')} L ${known[known.length - 1].x} ${baseY} L ${known[0].x} ${baseY} Z`
+            : '';
+    const showLabel = pickLabels(placed);
     const dotRadius = placed.length > 30 ? 3 : 4.5;
-    const selected = placed.find((p) => p.key === selectedKey);
+    const selected = known.find((p) => p.key === selectedKey);
 
     const zones = bands
         ? [
@@ -61,17 +100,18 @@ export default function TrendChart({ title, points, baseline, baselineLabel, ban
 
     // Tap anywhere on the chart -> select the nearest point by x position
     const handlePress = (e) => {
-        if (placed.length === 0) return;
+        if (known.length === 0) return;
         const x = e.nativeEvent.locationX;
-        const nearest = placed.reduce((best, p) => (Math.abs(p.x - x) < Math.abs(best.x - x) ? p : best));
+        const nearest = known.reduce((best, p) => (Math.abs(p.x - x) < Math.abs(best.x - x) ? p : best));
         setSelectedKey((current) => (current === nearest.key ? null : nearest.key));
     };
 
     // Keep the tooltip inside the chart
     const tipW = 150;
-    const tipX = selected ? Math.min(Math.max(selected.x - tipW / 2, pad.left), width - pad.right - tipW) : 0;
+    const tipX = selected ? Math.min(Math.max(selected.x - tipW / 2, pad.left), chartW - pad.right - tipW) : 0;
     const tipY = selected ? (selected.y - pad.top > 52 ? selected.y - 50 : selected.y + 12) : 0;
 
+    // The scroll view starts at the most recent day, which is on the right
     return (
         <View>
             {title ? <Text style={styles.title}>{title}</Text> : null}
@@ -82,7 +122,13 @@ export default function TrendChart({ title, points, baseline, baselineLabel, ban
                 accessibilityHint="Tap the chart to read a value"
             >
                 {width > 0 ? (
-                    <Svg width={width} height={height}>
+                    <ScrollView
+                        ref={scrollRef}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+                    >
+                    <Svg width={chartW} height={height}>
                         <Defs>
                             <LinearGradient id="trendArea" x1="0" y1="0" x2="0" y2="1">
                                 <Stop offset="0" stopColor={colors.primary} stopOpacity="0.28" />
@@ -163,7 +209,7 @@ export default function TrendChart({ title, points, baseline, baselineLabel, ban
                             <Line x1={selected.x} x2={selected.x} y1={pad.top} y2={baseY} stroke="rgba(255,255,255,0.35)" strokeWidth={1} />
                         ) : null}
 
-                        {placed.map((p) => (
+                        {known.map((p) => (
                             <Circle
                                 key={`pt-${p.key}`}
                                 cx={p.x}
@@ -181,10 +227,12 @@ export default function TrendChart({ title, points, baseline, baselineLabel, ban
                                 <SvgText
                                     key={`x-${p.key}`}
                                     x={p.x}
-                                    y={baseY + 17}
+                                    y={baseY + 8}
+                                    // Rotated -90 degrees and anchored at its end, so the text hangs straight down
+                                    transform={`rotate(-90 ${p.x} ${baseY + 8})`}
                                     fill={colors.textMuted}
-                                    fontSize="11"
-                                    textAnchor={i === 0 && placed.length > 1 ? 'start' : i === placed.length - 1 && placed.length > 1 ? 'end' : 'middle'}
+                                    fontSize="9"
+                                    textAnchor="end"
                                 >
                                     {p.label}
                                 </SvgText>
@@ -217,6 +265,7 @@ export default function TrendChart({ title, points, baseline, baselineLabel, ban
                             </G>
                         ) : null}
                     </Svg>
+                    </ScrollView>
                 ) : null}
             </Pressable>
 
